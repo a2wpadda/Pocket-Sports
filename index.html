@@ -35,6 +35,14 @@
       user-select: none;
       -webkit-user-select: none;
       font-family: var(--font-family);
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    *::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
     }
 
     html, body {
@@ -67,7 +75,7 @@
       background: var(--sky-blue);
     }
 
-    /* Background Cartoon Stadium SVG (Always Crisp & Unblurred) */
+    /* Background Cartoon Stadium SVG with Cinematic Glide Transform */
     #stadium-bg {
       position: absolute;
       top: 0;
@@ -76,6 +84,88 @@
       height: 100%;
       pointer-events: none;
       z-index: 1;
+      transform-origin: 50% 68%;
+      transition: transform 2.0s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    #stadium-bg.gliding {
+      transform: scale(2.4) translateY(-8%);
+    }
+
+    /* Cloud Drifting Animation */
+    @keyframes floatClouds {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(1800px); }
+    }
+
+    .cloud-animated-group {
+      animation: floatClouds 55s linear infinite;
+    }
+
+    /* Flag Waving Animation */
+    @keyframes flagFlutter {
+      0%, 100% { transform: skewY(0deg) scaleY(1); }
+      50% { transform: skewY(5deg) scaleY(0.94); }
+    }
+
+    .stadium-flag {
+      transform-origin: left center;
+      animation: flagFlutter 1.6s ease-in-out infinite;
+    }
+
+    /* Cinematic White Light Wash Overlay */
+    #white-flash-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #ffffff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 95;
+      transition: opacity 0.5s ease-out;
+    }
+
+    #white-flash-overlay.fade-in {
+      opacity: 1;
+      transition: opacity 3.0s cubic-bezier(0.35, 0, 0.2, 1);
+    }
+
+    /* Kickoff 3... 2... 1... GO! Countdown Overlay */
+    #kickoff-countdown-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 90;
+    }
+
+    .countdown-pop-number {
+      font-size: 150px;
+      font-weight: 900;
+      color: #fde047;
+      -webkit-text-stroke: 6px #1e293b;
+      text-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
+      animation: countPop 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    .countdown-pop-number.go {
+      color: #22c55e;
+      font-size: 180px;
+    }
+
+    @keyframes countPop {
+      0% { transform: scale(0.3); opacity: 0; }
+      50% { transform: scale(1.25); opacity: 1; }
+      80% { transform: scale(1.0); opacity: 1; }
+      100% { transform: scale(1.0); opacity: 0.95; }
     }
 
     /* Canvas for In-Match Gameplay */
@@ -115,15 +205,50 @@
       to { transform: scale(1); opacity: 1; }
     }
 
-    /* Top Corner User Bar (Hidden on Main Menu & Login) */
+    /* Top Corner User Bar & Controls */
     #user-corner-bar {
       position: absolute;
       top: 16px;
       right: 20px;
-      display: none;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      z-index: 50;
+      pointer-events: auto;
+    }
+
+    .user-top-row {
+      display: flex;
       align-items: center;
       gap: 10px;
-      z-index: 50;
+    }
+
+    .corner-quick-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .corner-action-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #1e293b;
+      border: 3px solid var(--border-dark);
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 0 var(--border-dark);
+      transition: all 0.2s;
+    }
+
+    .corner-action-btn:hover {
+      background: #334155;
+      color: var(--btn-yellow);
+      transform: scale(1.08);
     }
 
     .user-tag {
@@ -501,12 +626,306 @@
       background: #1e293b;
       border: 5px solid var(--btn-yellow);
       border-radius: 28px;
-      padding: 30px 36px;
+      padding: 24px 32px;
       width: 92%;
       max-width: 540px;
       max-height: 88vh;
       overflow-y: auto;
+      overflow-x: hidden;
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    .cmd-modal-card::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
+    /* =========================================================
+       UNOBSTRUCTED STADIUM SELECTION SCREEN (NO CENTER BOX)
+       ========================================================= */
+    #screen-stadium-select {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      background: transparent;
+    }
+
+    .stadium-unobstructed-hud {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Floating Top Glassmorphic Stadium Info Pill */
+    .stadium-top-badge {
+      position: absolute;
+      top: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 3.5px solid var(--btn-yellow);
+      border-radius: 24px;
+      padding: 14px 32px;
+      text-align: center;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 320px;
+    }
+
+    .stadium-preview-name {
+      font-size: 24px;
+      font-weight: 900;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 3px;
+    }
+
+    .stadium-preview-tag {
+      font-size: 13px;
+      font-weight: 800;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+
+    .stadium-index-pill {
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--btn-yellow);
+      background: #1e293b;
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      padding: 3px 14px;
+      border-radius: 12px;
+    }
+
+    /* Floating Left & Right Stadium Navigation Arrows */
+    .stadium-side-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--btn-yellow);
+      border: 4px solid var(--border-dark);
+      color: var(--text-dark);
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      font-size: 30px;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 0 var(--border-dark), 0 10px 25px rgba(0,0,0,0.5);
+      transition: all 0.15s ease;
+      pointer-events: auto;
+      z-index: 20;
+    }
+
+    .stadium-side-arrow.prev { left: 32px; }
+    .stadium-side-arrow.next { right: 32px; }
+
+    .stadium-side-arrow:hover {
+      background: var(--btn-yellow-hover);
+      transform: translateY(calc(-50% - 3px));
+      box-shadow: 0 9px 0 var(--border-dark), 0 14px 30px rgba(0,0,0,0.6);
+    }
+
+    .stadium-side-arrow:active {
+      transform: translateY(calc(-50% + 3px));
+      box-shadow: 0 3px 0 var(--border-dark);
+    }
+
+    /* Floating Bottom Action Bar */
+    .stadium-bottom-bar {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      pointer-events: auto;
+      z-index: 20;
+    }
+
+    .btn-stadium-enter {
+      background: var(--btn-yellow);
+      border: 4px solid var(--border-dark);
+      color: var(--text-dark);
+      padding: 16px 36px;
+      font-size: 18px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: 20px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 var(--border-dark), 0 10px 25px rgba(0,0,0,0.5);
+      transition: all 0.15s ease;
+    }
+
+    .btn-stadium-enter:hover {
+      background: var(--btn-yellow-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 9px 0 var(--border-dark), 0 14px 30px rgba(0,0,0,0.6);
+    }
+
+    .btn-stadium-enter:active {
+      transform: translateY(3px);
+      box-shadow: 0 3px 0 var(--border-dark);
+    }
+
+    .btn-stadium-cancel {
+      background: rgba(30, 41, 59, 0.9);
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      color: #cbd5e1;
+      padding: 14px 24px;
+      border-radius: 20px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+
+    .btn-stadium-cancel:hover {
+      border-color: #ef4444;
+      color: #ef4444;
+      background: #1e293b;
+    }
+
+    /* =========================================================
+       3D FIRST-PERSON WALKING ENTRANCE STAGE (GROUNDED WORLD)
+       ========================================================= */
+    #walkway-3d-stage {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: none;
+      z-index: 85;
+      pointer-events: none;
+      background: #0f172a;
+    }
+
+    #walkway-3d-stage.active {
+      display: block;
+    }
+
+    /* Full-Bleed World SVG Camera Glide */
+    .walkway-world-camera {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      transform-origin: 50% 51.4%;
+      transform: scale(1) translateY(0);
+    }
+
+    #walkway-3d-stage.active .walkway-world-camera {
+      animation: stadiumWalkGlide 3.0s cubic-bezier(0.25, 0.8, 0.35, 1) forwards;
+    }
+
+    @keyframes stadiumWalkGlide {
+      0% {
+        transform: scale(1) translateY(0);
+      }
+      100% {
+        transform: scale(3.5) translateY(18px);
+      }
+    }
+
+    /* Step Head-Bobbing (rhythmic walking footsteps up/down and subtle sway) */
+    .human-head-bob {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      animation: stepBob 0.38s ease-in-out infinite alternate;
+    }
+
+    @keyframes stepBob {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-8px) rotate(0.3deg); }
+    }
+
+    /* 3D Realistic Fluttering Flags (Back-and-forth 3D Perspective Flutter) */
+    .stadium-flag {
+      transform-box: fill-box;
+      transform-origin: 0% 50%;
+      animation: flagFlutter3D 1.8s ease-in-out infinite alternate;
+    }
+
+    #svg-flag-1, #svg-walkway-flag-1 { animation-delay: 0.0s; }
+    #svg-flag-2, #svg-walkway-flag-2 { animation-delay: -0.45s; }
+    #svg-flag-3, #svg-walkway-flag-3 { animation-delay: -0.9s; }
+    #svg-flag-4, #svg-walkway-flag-4 { animation-delay: -1.35s; }
+
+    @keyframes flagFlutter3D {
+      0% {
+        transform: perspective(300px) rotateY(0deg) skewY(0deg) scaleX(1);
+      }
+      25% {
+        transform: perspective(300px) rotateY(32deg) skewY(-5deg) scaleX(0.82);
+      }
+      50% {
+        transform: perspective(300px) rotateY(-24deg) skewY(4deg) scaleX(0.92);
+      }
+      75% {
+        transform: perspective(300px) rotateY(26deg) skewY(-3deg) scaleX(0.86);
+      }
+      100% {
+        transform: perspective(300px) rotateY(-18deg) skewY(2deg) scaleX(0.95);
+      }
+    }
+
+    /* Main Menu Title (Bigger, Freestanding Arcade Font, No Box/Black Background) */
+    .main-title-badge {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+      z-index: 25;
+    }
+
+    .main-title-logo {
+      font-size: 76px;
+      font-weight: 900;
+      color: #facc15;
+      text-transform: uppercase;
+      letter-spacing: 6px;
+      margin: 0;
+      padding: 0;
+      background: none;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      /* Bold arcade 3D text stroke & deep shadow directly on sky */
+      -webkit-text-stroke: 5px #1e293b;
+      text-shadow: 
+        0 7px 0 #1e293b,
+        0 12px 0 #0f172a,
+        0 18px 36px rgba(0, 0, 0, 0.7);
+      white-space: nowrap;
+      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5));
     }
 
     .cmd-header {
@@ -707,6 +1126,126 @@
       margin-top: 4px;
     }
 
+    /* Audio Settings Modal Styles */
+    .sound-master-card {
+      background: rgba(30, 41, 59, 0.95);
+      border: 3.5px solid var(--btn-yellow);
+      border-radius: 18px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      box-shadow: 0 6px 0 var(--border-dark);
+    }
+
+    .sound-sub-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .sound-sub-row {
+      background: rgba(30, 41, 59, 0.7);
+      border: 2.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s;
+    }
+
+    .sound-sub-row:hover {
+      background: rgba(30, 41, 59, 0.9);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .sound-row-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      text-align: left;
+    }
+
+    .sound-row-title {
+      font-size: 15px;
+      font-weight: 900;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .sound-row-sub {
+      font-size: 12px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+
+    /* Cartoon Chunky Toggle Switch */
+    .cartoon-switch {
+      position: relative;
+      display: inline-block;
+      width: 58px;
+      height: 32px;
+      flex-shrink: 0;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .cartoon-switch input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      margin: 0;
+      padding: 0;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .cartoon-slider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #475569;
+      border: 3.5px solid #1e293b;
+      border-radius: 20px;
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.45);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .cartoon-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #cbd5e1;
+      border: 2px solid #1e293b;
+      border-radius: 50%;
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .cartoon-switch input:checked + .cartoon-slider {
+      background-color: #22c55e;
+      border-color: #15803d;
+    }
+
+    .cartoon-switch input:checked + .cartoon-slider:before {
+      transform: translateX(26px);
+      background-color: #facc15;
+    }
+
     .cmd-start-btn {
       width: 100%;
       background: var(--btn-yellow);
@@ -812,22 +1351,73 @@
       opacity: 1;
     }
 
-    /* In-Match HUD */
+    /* Top Corner User Bar & Quick Actions Underneath Logout */
+    #user-corner-bar {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      z-index: 100;
+    }
+
+    .user-top-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .corner-quick-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .corner-action-btn {
+      background: #1e293b;
+      border: 3px solid #64748b;
+      color: #fff;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .corner-action-btn:hover {
+      background: #334155;
+      border-color: var(--btn-yellow);
+      transform: scale(1.1);
+    }
+
+    .corner-action-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Symmetrically Centered In-Match HUD */
     #match-hud {
       position: absolute;
       top: 14px;
       left: 50%;
       transform: translateX(-50%);
-      width: 92%;
-      max-width: 940px;
+      width: auto;
+      min-width: 480px;
+      max-width: 90vw;
       height: 56px;
       display: none;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
+      gap: 28px;
       background: #1e293b;
       border: 4px solid var(--btn-yellow);
       border-radius: 28px;
-      padding: 0 20px;
+      padding: 0 28px;
       z-index: 30;
       box-shadow: 0 8px 22px rgba(0,0,0,0.65);
     }
@@ -879,25 +1469,6 @@
       border-radius: 12px;
     }
 
-    .hud-btn {
-      background: #334155;
-      border: 2.5px solid #64748b;
-      color: #fff;
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-
-    .hud-btn:hover {
-      background: #475569;
-      transform: scale(1.08);
-    }
-
     .hud-btn-svg {
       width: 18px;
       height: 18px;
@@ -917,60 +1488,68 @@
 <div id="app-container">
   <div id="viewport">
     
-    <!-- Top Corner User Pill (Only visible after login / in hub) -->
+    <!-- Top Corner User Bar & Quick Actions Underneath Logout -->
     <div id="user-corner-bar">
-      <div class="user-tag">
-        <svg class="user-avatar-svg" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-        </svg>
-        <span id="label-username">Player</span>
-        <span style="color: #854d0e; font-size: 11px;" id="label-mini-id">#OFFLINE</span>
+      <div class="user-top-row" id="user-top-row">
+        <div class="user-tag">
+          <svg class="user-avatar-svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+          </svg>
+          <span id="label-username">Player</span>
+          <span style="color: #854d0e; font-size: 11px;" id="label-mini-id">#OFFLINE</span>
+        </div>
+        <button class="btn-logout" id="btn-user-action">Log Out</button>
       </div>
-      <button class="btn-logout" id="btn-user-action">Log Out</button>
+
+      <div class="corner-quick-actions" id="corner-quick-actions">
+        <button class="corner-action-btn" id="btn-match-settings" title="Match Pause & Settings" style="display:none;">
+          <svg class="hud-btn-svg" viewBox="0 0 24 24">
+            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+          </svg>
+        </button>
+        <button class="corner-action-btn" id="btn-sound-toggle" title="Audio & Music Settings">
+          <svg class="hud-btn-svg" id="sound-icon-svg" viewBox="0 0 24 24">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+          </svg>
+        </button>
+      </div>
     </div>
 
-    <!-- Background Cartoon Stadium SVG (Always Crisp, Fully Visible Clouds, Lush Foliage) -->
+    <!-- Background Cartoon Stadium SVG (Clean Coliseum for Menus & Hub) -->
     <svg id="stadium-bg" viewBox="0 0 1120 700" preserveAspectRatio="none">
-      <!-- Sky -->
-      <rect width="1120" height="700" fill="#38bdf8" />
+      <!-- Sky (Dynamic Theme Fill) -->
+      <rect id="svg-sky" width="1120" height="700" fill="#38bdf8" />
 
-      <!-- Fluffy White Cartoon Clouds (Fully Contained & Lowered for Perfect Visibility) -->
-      <g fill="#ffffff">
-        <!-- Left Cloud -->
-        <path d="M 80,160 Q 100,110 150,115 Q 190,95 240,115 Q 290,105 320,135 Q 340,165 310,185 Q 270,195 210,190 Q 140,195 90,180 Z" />
-        <!-- Center Cloud -->
-        <path d="M 450,150 Q 480,100 540,105 Q 590,85 640,105 Q 690,95 720,130 Q 740,160 700,180 Q 640,190 570,185 Q 500,190 460,175 Z" />
-        <!-- Right Cloud -->
-        <path d="M 820,160 Q 850,110 900,115 Q 940,95 990,115 Q 1030,105 1060,135 Q 1080,165 1040,185 Q 990,195 930,190 Q 860,195 830,175 Z" />
-      </g>
+      <!-- Procedural Animated Cartoon Clouds Container -->
+      <g id="svg-clouds-dynamic"></g>
 
-      <!-- 4 Flagpoles Firmly Attached to the Stadium Coliseum Rim -->
-      <!-- Flagpole 1 (Yellow Pennant) -->
+      <!-- 4 Flagpoles with Waving Fluttering Flags -->
+      <!-- Flagpole 1 -->
       <line x1="220" y1="360" x2="220" y2="120" stroke="#475569" stroke-width="8" stroke-linecap="round" />
-      <polygon points="220,125 320,150 220,175" fill="#facc15" stroke="#1e293b" stroke-width="3.5" />
+      <polygon class="stadium-flag" id="svg-flag-1" points="220,125 320,150 220,175" fill="#facc15" stroke="#1e293b" stroke-width="3.5" />
 
-      <!-- Flagpole 2 (Red Pennant) -->
+      <!-- Flagpole 2 -->
       <line x1="440" y1="300" x2="440" y2="80" stroke="#475569" stroke-width="8" stroke-linecap="round" />
-      <polygon points="440,85 540,110 440,135" fill="#ef4444" stroke="#1e293b" stroke-width="3.5" />
+      <polygon class="stadium-flag" id="svg-flag-2" points="440,85 540,110 440,135" fill="#ef4444" stroke="#1e293b" stroke-width="3.5" />
 
-      <!-- Flagpole 3 (Blue Pennant) -->
+      <!-- Flagpole 3 -->
       <line x1="680" y1="300" x2="680" y2="80" stroke="#475569" stroke-width="8" stroke-linecap="round" />
-      <polygon points="680,85 780,110 680,135" fill="#2563eb" stroke="#1e293b" stroke-width="3.5" />
+      <polygon class="stadium-flag" id="svg-flag-3" points="680,85 780,110 680,135" fill="#2563eb" stroke="#1e293b" stroke-width="3.5" />
 
-      <!-- Flagpole 4 (Green Pennant) -->
+      <!-- Flagpole 4 -->
       <line x1="900" y1="360" x2="900" y2="120" stroke="#475569" stroke-width="8" stroke-linecap="round" />
-      <polygon points="900,125 1000,150 900,175" fill="#16a34a" stroke="#1e293b" stroke-width="3.5" />
+      <polygon class="stadium-flag" id="svg-flag-4" points="900,125 1000,150 900,175" fill="#16a34a" stroke="#1e293b" stroke-width="3.5" />
 
-      <!-- Stadium Exterior Concrete Coliseum -->
-      <ellipse cx="560" cy="500" rx="420" ry="240" fill="#cbd5e1" stroke="#1e293b" stroke-width="7" />
+      <!-- Stadium Exterior Coliseum Structure -->
+      <ellipse id="svg-coliseum" cx="560" cy="500" rx="420" ry="240" fill="#cbd5e1" stroke="#1e293b" stroke-width="7" />
       
       <!-- Arched Entrance Openings -->
       <path d="M 230,520 Q 255,470 280,520 L 280,680 L 230,680 Z" fill="#64748b" stroke="#1e293b" stroke-width="4" />
-      <path d="M 440,510 Q 560,400 680,510 L 680,690 L 440,690 Z" fill="#475569" stroke="#1e293b" stroke-width="5" />
+      <path id="svg-main-arch" d="M 440,510 Q 560,400 680,510 L 680,690 L 440,690 Z" fill="#475569" stroke="#1e293b" stroke-width="5" />
       <path d="M 840,520 Q 865,470 890,520 L 890,680 L 840,680 Z" fill="#64748b" stroke="#1e293b" stroke-width="4" />
 
-      <!-- Purple Stadium Grandstands / Tiered Seating Bowl -->
-      <ellipse cx="560" cy="460" rx="380" ry="190" fill="#7c3aed" stroke="#1e293b" stroke-width="6" />
+      <!-- Stadium Grandstands / Tiered Seating Bowl -->
+      <ellipse id="svg-stands" cx="560" cy="460" rx="380" ry="190" fill="#7c3aed" stroke="#1e293b" stroke-width="6" />
       
       <!-- Seating Dividers / Aisles -->
       <line x1="280" y1="360" x2="410" y2="440" stroke="#ffffff" stroke-width="6" opacity="0.9" />
@@ -982,7 +1561,7 @@
       <ellipse cx="560" cy="480" rx="260" ry="105" fill="#16a34a" stroke="#ffffff" stroke-width="5" />
       <ellipse cx="560" cy="480" rx="70" ry="32" fill="none" stroke="#ffffff" stroke-width="4" />
 
-      <!-- Lush Cartoon Green Bush Clusters (Only covering the specific circled gap areas) -->
+      <!-- Lush Cartoon Green Bush Clusters (Clean Stadium Rim Framing) -->
       <g stroke="#1e293b" stroke-width="4.5">
         <!-- 1. Left Corner Cluster -->
         <circle cx="60" cy="550" r="70" fill="#15803d" />
@@ -990,11 +1569,11 @@
         <circle cx="40" cy="640" r="75" fill="#16a34a" />
         <circle cx="170" cy="660" r="75" fill="#15803d" />
 
-        <!-- 2. Bottom-Left Gap Coverage (Circled 1) -->
+        <!-- 2. Bottom-Left Gap Coverage -->
         <circle cx="100" cy="690" r="75" fill="#22c55e" />
         <circle cx="210" cy="685" r="70" fill="#16a34a" />
 
-        <!-- 3. Bottom-Center Gap Coverage (Circled 2) -->
+        <!-- 3. Bottom-Center Gap Coverage -->
         <circle cx="340" cy="670" r="70" fill="#22c55e" />
         <circle cx="430" cy="680" r="75" fill="#16a34a" />
         <circle cx="520" cy="690" r="75" fill="#15803d" />
@@ -1002,22 +1581,32 @@
         <circle cx="690" cy="680" r="75" fill="#16a34a" />
         <circle cx="780" cy="670" r="70" fill="#22c55e" />
 
-        <!-- 4. Bottom-Right Gap Coverage (Circled 3) -->
+        <!-- 4. Bottom-Right Gap Coverage -->
         <circle cx="870" cy="685" r="70" fill="#16a34a" />
         <circle cx="940" cy="690" r="75" fill="#22c55e" />
 
-        <!-- 5. Right Corner Cluster -->
+        <!-- 5. Right Corner Cluster (Full Edge Coverage) -->
         <circle cx="1060" cy="550" r="70" fill="#15803d" />
         <circle cx="990" cy="590" r="65" fill="#22c55e" />
         <circle cx="1080" cy="640" r="75" fill="#16a34a" />
         <circle cx="950" cy="660" r="75" fill="#15803d" />
+        <circle cx="1040" cy="690" r="85" fill="#16a34a" />
+        <circle cx="1120" cy="695" r="80" fill="#15803d" />
       </g>
     </svg>
 
     <!-- Canvas for Active Match Play -->
     <canvas id="gameCanvas"></canvas>
 
-    <!-- In-Match Top HUD -->
+    <!-- White Light Wash Transition Overlay -->
+    <div id="white-flash-overlay"></div>
+
+    <!-- Kickoff Countdown Overlay (3... 2... 1... GO!) -->
+    <div id="kickoff-countdown-overlay">
+      <div id="countdown-pop-text" class="countdown-pop-number">3</div>
+    </div>
+
+    <!-- In-Match Centered Scoreboard Top HUD -->
     <div id="match-hud">
       <div class="hud-team">
         <div class="hud-puck-icon" id="hud-p1-puck" style="background:#3b82f6;">★</div>
@@ -1037,28 +1626,18 @@
         <div class="hud-puck-icon" id="hud-p2-puck" style="background:#ef4444;">★</div>
         <div class="hud-team-name" id="hud-p2-name">Red Stars</div>
       </div>
-
-      <div style="display:flex; gap:8px;">
-        <button class="hud-btn" id="btn-sound-toggle" title="Toggle Sound">
-          <svg class="hud-btn-svg" id="sound-icon-svg" viewBox="0 0 24 24">
-            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-          </svg>
-        </button>
-        <button class="hud-btn" id="btn-match-pause" title="Pause & Settings">
-          <svg class="hud-btn-svg" viewBox="0 0 24 24">
-            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
-          </svg>
-        </button>
-      </div>
     </div>
 
     <!-- Goal Celebration Text Splash -->
     <div id="goal-banner">GOAL!</div>
 
     <!-- =========================================================
-         SCREEN 1: MAIN MENU (GIANT PLAY BUTTON - IMAGE 1)
+         SCREEN 1: MAIN MENU (TITLE LOGO + GIANT PLAY BUTTON)
          ========================================================= -->
     <div class="ui-layer active" id="screen-main-menu">
+      <div class="main-title-badge">
+        <h1 class="main-title-logo">Pocket Sports</h1>
+      </div>
       <button id="btn-giant-play" title="Play Pocket Sports">
         <div class="play-triangle"></div>
       </button>
@@ -1383,7 +1962,223 @@
           </div>
         </div>
 
-        <button class="cmd-start-btn" id="btn-start-quickplay">Kick Off Match!</button>
+        <button class="cmd-start-btn" id="btn-start-quickplay">Choose Stadium ➔</button>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         SCREEN: DEDICATED STADIUM SELECTION (UNOBSTRUCTED VIEW)
+         ========================================================= -->
+    <div class="ui-layer" id="screen-stadium-select">
+      <div class="stadium-unobstructed-hud">
+        <!-- Floating Top Info Badge -->
+        <div class="stadium-top-badge">
+          <div class="stadium-preview-name" id="stadium-preview-name">Classic Coliseum</div>
+          <div class="stadium-preview-tag" id="stadium-preview-tag">Day Match • Roman Concrete & Hedges</div>
+          <div class="stadium-index-pill" id="stadium-preview-index">1 / 5</div>
+        </div>
+
+        <!-- Floating Side Navigation Arrows -->
+        <button class="stadium-side-arrow prev" id="btn-stadium-prev" title="Previous Stadium">◀</button>
+        <button class="stadium-side-arrow next" id="btn-stadium-next" title="Next Stadium">▶</button>
+
+        <!-- Floating Bottom Action Bar -->
+        <div class="stadium-bottom-bar">
+          <button class="btn-stadium-cancel" id="btn-stadium-back">✕ Back</button>
+          <button class="btn-stadium-enter" id="btn-stadium-kickoff">Walk into Stadium ➔</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         3D FIRST-PERSON WALKING STAGE (GROUNDED WORLD LANDSCAPE)
+         ========================================================= -->
+    <div id="walkway-3d-stage">
+      <div class="human-head-bob">
+        <div class="walkway-world-camera">
+          <svg id="svg-walkway-scene" viewBox="0 0 1120 700" preserveAspectRatio="none" style="width:100%; height:100%;">
+            <!-- 1. Sky Background -->
+            <rect id="svg-walkway-sky" width="1120" height="700" fill="#38bdf8" />
+
+            <!-- 2. Dynamic Clouds Group in Walkway Sky -->
+            <g id="svg-walkway-clouds"></g>
+
+            <!-- 3. Full Horizon Green Grass Ground Plane (Solid Ground!) -->
+            <rect x="0" y="360" width="1120" height="340" fill="#16a34a" />
+            <line x1="0" y1="360" x2="1120" y2="360" stroke="#1e293b" stroke-width="5" />
+
+            <!-- 4. Stadium Building (Planted firmly on Ground at y=360) -->
+            <!-- Stadium Base Ground Shadow -->
+            <rect x="250" y="352" width="620" height="12" fill="#1e293b" opacity="0.55" />
+
+            <!-- Grand Outer Coliseum Structure -->
+            <path id="svg-walkway-coliseum" d="M 280,360 L 280,180 Q 560,60 840,180 L 840,360 Z" fill="#cbd5e1" stroke="#1e293b" stroke-width="7" />
+
+            <!-- Upper Grandstands Seating Bowl (Behind Wall) -->
+            <path id="svg-walkway-stands" d="M 310,180 Q 560,80 810,180 L 810,250 Q 560,170 310,250 Z" fill="#7c3aed" stroke="#1e293b" stroke-width="6" />
+
+            <!-- Seating Tier Stripes -->
+            <path d="M 330,190 Q 560,95 790,190" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="4" />
+            <path d="M 350,220 Q 560,130 770,220" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="4" />
+
+            <!-- Colonnade Roman Arch Windows -->
+            <path d="M 340,360 L 340,290 Q 365,240 390,290 L 390,360 Z" fill="#1e293b" stroke="#1e293b" stroke-width="3" />
+            <path d="M 410,360 L 410,285 Q 435,235 460,285 L 460,360 Z" fill="#1e293b" stroke="#1e293b" stroke-width="3" />
+            <path d="M 660,360 L 660,285 Q 685,235 710,285 L 710,360 Z" fill="#1e293b" stroke="#1e293b" stroke-width="3" />
+            <path d="M 730,360 L 730,290 Q 755,240 780,290 L 780,360 Z" fill="#1e293b" stroke="#1e293b" stroke-width="3" />
+
+            <!-- Roof Cornice -->
+            <path d="M 270,185 Q 560,55 850,185" fill="none" stroke="#1e293b" stroke-width="9" />
+
+            <!-- Flagpoles & Fluttering 3D Flags on Stadium Roof -->
+            <line x1="360" y1="140" x2="360" y2="25" stroke="#475569" stroke-width="6.5" stroke-linecap="round" />
+            <polygon class="stadium-flag" id="svg-walkway-flag-1" points="360,30 440,50 360,70" fill="#facc15" stroke="#1e293b" stroke-width="3" />
+
+            <line x1="480" y1="100" x2="480" y2="5" stroke="#475569" stroke-width="6.5" stroke-linecap="round" />
+            <polygon class="stadium-flag" id="svg-walkway-flag-2" points="480,10 560,30 480,50" fill="#ef4444" stroke="#1e293b" stroke-width="3" />
+
+            <line x1="640" y1="100" x2="640" y2="5" stroke="#475569" stroke-width="6.5" stroke-linecap="round" />
+            <polygon class="stadium-flag" id="svg-walkway-flag-3" points="640,10 720,30 640,50" fill="#2563eb" stroke="#1e293b" stroke-width="3" />
+
+            <line x1="760" y1="140" x2="760" y2="25" stroke="#475569" stroke-width="6.5" stroke-linecap="round" />
+            <polygon class="stadium-flag" id="svg-walkway-flag-4" points="760,30 840,50 760,70" fill="#16a34a" stroke="#1e293b" stroke-width="3" />
+
+            <!-- 5. Static Paved Cobblestone Road / Walkway (No moving texture!) -->
+            <polygon points="500,360 620,360 840,700 280,700" fill="#64748b" stroke="#1e293b" stroke-width="6" />
+            <!-- Static Paved Stone Slab Lines across the Road -->
+            <line x1="480" y1="410" x2="640" y2="410" stroke="#475569" stroke-width="4" />
+            <line x1="440" y1="470" x2="680" y2="470" stroke="#475569" stroke-width="4.5" />
+            <line x1="390" y1="540" x2="730" y2="540" stroke="#475569" stroke-width="5" />
+            <line x1="330" y1="620" x2="790" y2="620" stroke="#475569" stroke-width="5.5" />
+            <line x1="560" y1="360" x2="560" y2="700" stroke="#cbd5e1" stroke-width="4.5" stroke-dasharray="24,18" />
+
+            <!-- Grand Centered Roman Entrance Arch Portal -->
+            <path id="svg-walkway-wall" d="M 480,360 L 480,240 Q 560,150 640,240 L 640,360 Z" fill="#cbd5e1" stroke="#1e293b" stroke-width="7" />
+            <path id="svg-walkway-arch" d="M 500,360 L 500,255 Q 560,175 620,255 L 620,360 Z" fill="#1e293b" stroke="#1e293b" stroke-width="6" />
+            <!-- Warm Glowing Portal Interior Light -->
+            <path id="svg-walkway-glow" d="M 510,360 L 510,265 Q 560,195 610,265 L 610,360 Z" fill="#fef08a" opacity="0.95" />
+
+            <!-- 6. Flanking Lush Green Bushes on the Grass & Pathway Edges -->
+            <g stroke="#1e293b" stroke-width="4.5">
+              <!-- Left Bush Cluster -->
+              <circle cx="240" cy="375" r="45" fill="#15803d" />
+              <circle cx="290" cy="390" r="40" fill="#22c55e" />
+              <circle cx="180" cy="460" r="65" fill="#15803d" />
+              <circle cx="230" cy="530" r="75" fill="#22c55e" />
+              <circle cx="120" cy="620" r="85" fill="#15803d" />
+              <circle cx="190" cy="670" r="90" fill="#22c55e" />
+
+              <!-- Right Bush Cluster -->
+              <circle cx="880" cy="375" r="45" fill="#15803d" />
+              <circle cx="830" cy="390" r="40" fill="#22c55e" />
+              <circle cx="940" cy="460" r="65" fill="#15803d" />
+              <circle cx="890" cy="530" r="75" fill="#22c55e" />
+              <circle cx="1000" cy="620" r="85" fill="#15803d" />
+              <circle cx="930" cy="670" r="90" fill="#22c55e" />
+            </g>
+
+            <!-- 7. Flanking Foreground Trees -->
+            <!-- Left Trees -->
+            <rect x="90" y="300" width="18" height="60" fill="#78350f" stroke="#1e293b" stroke-width="3.5" />
+            <circle cx="99" cy="260" r="50" fill="#15803d" stroke="#1e293b" stroke-width="4.5" />
+            <circle cx="99" cy="245" r="34" fill="#22c55e" />
+
+            <rect x="30" y="420" width="26" height="90" fill="#78350f" stroke="#1e293b" stroke-width="4" />
+            <circle cx="43" cy="370" r="70" fill="#15803d" stroke="#1e293b" stroke-width="5" />
+            <circle cx="43" cy="350" r="48" fill="#22c55e" />
+
+            <!-- Right Trees -->
+            <rect x="1010" y="300" width="18" height="60" fill="#78350f" stroke="#1e293b" stroke-width="3.5" />
+            <circle cx="1019" cy="260" r="50" fill="#15803d" stroke="#1e293b" stroke-width="4.5" />
+            <circle cx="1019" cy="245" r="34" fill="#22c55e" />
+
+            <rect x="1060" y="420" width="26" height="90" fill="#78350f" stroke="#1e293b" stroke-width="4" />
+            <circle cx="1073" cy="370" r="70" fill="#15803d" stroke="#1e293b" stroke-width="5" />
+            <circle cx="1073" cy="350" r="48" fill="#22c55e" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         SOUND & AUDIO SETTINGS MODAL
+         ========================================================= -->
+    <div class="ui-layer" id="modal-sound-settings">
+      <div class="cmd-modal-card" style="max-width: 460px;">
+        <div class="cmd-header">
+          <div class="cmd-title">Audio Settings</div>
+          <button class="cmd-close-btn" id="btn-close-sound-modal">✕</button>
+        </div>
+
+        <!-- Master Audio Switch at Top -->
+        <div class="sound-master-card" id="sound-master-card">
+          <div class="sound-row-info">
+            <span class="sound-row-title">Master Audio</span>
+            <span class="sound-row-sub">Toggle all game sound & music</span>
+          </div>
+          <label class="cartoon-switch">
+            <input type="checkbox" id="chk-audio-master" checked />
+            <span class="cartoon-slider"></span>
+          </label>
+        </div>
+
+        <!-- Individual Audio Sub-Switches -->
+        <div class="sound-sub-list" id="sound-sub-list">
+          <div class="sound-sub-row" id="row-audio-music">
+            <div class="sound-row-info">
+              <span class="sound-row-title">Menu Music</span>
+              <span class="sound-row-sub">Calm ambient melody in menus</span>
+            </div>
+            <label class="cartoon-switch">
+              <input type="checkbox" id="chk-audio-music" checked />
+              <span class="cartoon-slider"></span>
+            </label>
+          </div>
+
+          <div class="sound-sub-row" id="row-audio-atmosphere">
+            <div class="sound-row-info">
+              <span class="sound-row-title">Match Atmosphere</span>
+              <span class="sound-row-sub">Soft background crowd murmur & drums</span>
+            </div>
+            <label class="cartoon-switch">
+              <input type="checkbox" id="chk-audio-atmosphere" checked />
+              <span class="cartoon-slider"></span>
+            </label>
+          </div>
+
+          <div class="sound-sub-row" id="row-audio-cheers">
+            <div class="sound-row-info">
+              <span class="sound-row-title">Goal Cheers & Roar</span>
+              <span class="sound-row-sub">Loud crowd celebration on goals</span>
+            </div>
+            <label class="cartoon-switch">
+              <input type="checkbox" id="chk-audio-cheers" checked />
+              <span class="cartoon-slider"></span>
+            </label>
+          </div>
+
+          <div class="sound-sub-row" id="row-audio-hits">
+            <div class="sound-row-info">
+              <span class="sound-row-title">Puck & Ball Hit SFX</span>
+              <span class="sound-row-sub">Collisions, bounces, and net impacts</span>
+            </div>
+            <label class="cartoon-switch">
+              <input type="checkbox" id="chk-audio-hits" checked />
+              <span class="cartoon-slider"></span>
+            </label>
+          </div>
+
+          <div class="sound-sub-row" id="row-audio-ui">
+            <div class="sound-row-info">
+              <span class="sound-row-title">UI & Button Clicks</span>
+              <span class="sound-row-sub">Menu navigation and selection beeps</span>
+            </div>
+            <label class="cartoon-switch">
+              <input type="checkbox" id="chk-audio-ui" checked />
+              <span class="cartoon-slider"></span>
+            </label>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1606,12 +2401,32 @@
     return { valid: true };
   }
 
-  // --- PROCEDURAL SOUND SYNTHESIZER ---
+  // --- PROCEDURAL SOUND SYNTHESIZER & AUDIO MANAGER ---
   class SoundEngine {
     constructor() {
       this.ctx = null;
-      this.enabled = true;
+      this.prefs = {
+        master: true,
+        music: true,
+        atmosphere: true,
+        cheers: true,
+        hits: true,
+        ui: true
+      };
+
+      // Load saved preferences if available
+      try {
+        const saved = localStorage.getItem('ps_sound_prefs');
+        if (saved) {
+          this.prefs = Object.assign(this.prefs, JSON.parse(saved));
+        }
+      } catch (e) {}
+
       this.bgMusic = null;
+      this.crowdAtmosphere = null;
+      this.drumInterval = null;
+      this.crowdGain = null;
+      this.crowdFilter = null;
     }
 
     init() {
@@ -1622,19 +2437,98 @@
       if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
     }
 
+    savePrefs() {
+      try {
+        localStorage.setItem('ps_sound_prefs', JSON.stringify(this.prefs));
+      } catch (e) {}
+      this.syncUI();
+      this.updateIcons();
+    }
+
+    setMaster(enabled) {
+      this.prefs.master = !!enabled;
+      this.savePrefs();
+      if (!this.prefs.master) {
+        this.stopCozyMusic();
+        this.stopMatchAtmosphere();
+      } else {
+        if (gameState === 'MATCH' || gameState === 'COUNTDOWN') {
+          this.startMatchAtmosphere();
+        } else {
+          this.startCozyMusic();
+        }
+      }
+    }
+
+    setPref(key, val) {
+      this.prefs[key] = !!val;
+      this.savePrefs();
+      if (key === 'music') {
+        if (!this.prefs.music) this.stopCozyMusic();
+        else if (this.prefs.master && gameState !== 'MATCH') this.startCozyMusic();
+      }
+      if (key === 'atmosphere') {
+        if (!this.prefs.atmosphere) this.stopMatchAtmosphere();
+        else if (this.prefs.master && (gameState === 'MATCH' || gameState === 'COUNTDOWN')) this.startMatchAtmosphere();
+      }
+    }
+
+    toggleMaster() {
+      this.init();
+      this.setMaster(!this.prefs.master);
+    }
+
+    updateIcons() {
+      const soundSvg = document.getElementById('sound-icon-svg');
+      if (soundSvg) {
+        if (this.prefs.master) {
+          soundSvg.innerHTML = `<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>`;
+        } else {
+          soundSvg.innerHTML = `<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27l4.73 4.73H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>`;
+        }
+      }
+      const pauseBtn = document.getElementById('btn-pause-sound-toggle');
+      if (pauseBtn) {
+        pauseBtn.textContent = this.prefs.master ? 'Sound: ON' : 'Sound: OFF';
+        pauseBtn.className = `chip-btn ${this.prefs.master ? 'selected' : ''}`;
+      }
+    }
+
+    syncUI() {
+      const chkMaster = document.getElementById('chk-audio-master');
+      const chkMusic = document.getElementById('chk-audio-music');
+      const chkAtmosphere = document.getElementById('chk-audio-atmosphere');
+      const chkCheers = document.getElementById('chk-audio-cheers');
+      const chkHits = document.getElementById('chk-audio-hits');
+      const chkUI = document.getElementById('chk-audio-ui');
+      const subList = document.getElementById('sound-sub-list');
+
+      if (chkMaster) chkMaster.checked = !!this.prefs.master;
+      if (chkMusic) chkMusic.checked = !!this.prefs.music;
+      if (chkAtmosphere) chkAtmosphere.checked = !!this.prefs.atmosphere;
+      if (chkCheers) chkCheers.checked = !!this.prefs.cheers;
+      if (chkHits) chkHits.checked = !!this.prefs.hits;
+      if (chkUI) chkUI.checked = !!this.prefs.ui;
+
+      if (subList) {
+        subList.style.opacity = this.prefs.master ? '1' : '0.45';
+        subList.style.pointerEvents = this.prefs.master ? 'auto' : 'none';
+      }
+    }
+
     startCozyMusic() {
-      if (!this.enabled || !this.ctx || this.bgMusic) return;
+      if (!this.prefs.master || !this.prefs.music || !this.ctx || this.bgMusic) return;
       const notes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
       let i = 0;
       this.bgMusic = setInterval(() => {
-        if (!this.enabled || !this.ctx) return;
+        if (!this.prefs.master || !this.prefs.music || !this.ctx) return;
         try {
           const now = this.ctx.currentTime;
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
           osc.type = 'triangle';
           osc.frequency.setValueAtTime(notes[i % notes.length], now);
-          gain.gain.setValueAtTime(0.035, now);
+          gain.gain.setValueAtTime(0.032, now);
           gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
           osc.connect(gain);
           gain.connect(this.ctx.destination);
@@ -1650,7 +2544,7 @@
     }
 
     playKick(vol = 0.6) {
-      if (!this.enabled || !this.ctx) return;
+      if (!this.prefs.master || !this.prefs.hits || !this.ctx) return;
       try {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
@@ -1667,7 +2561,7 @@
     }
 
     playDiscHit(vol = 0.5) {
-      if (!this.enabled || !this.ctx) return;
+      if (!this.prefs.master || !this.prefs.hits || !this.ctx) return;
       try {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
@@ -1684,7 +2578,7 @@
     }
 
     playWhistle() {
-      if (!this.enabled || !this.ctx) return;
+      if (!this.prefs.master || !this.prefs.ui || !this.ctx) return;
       try {
         const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
@@ -1702,27 +2596,240 @@
       } catch (e) {}
     }
 
+    // Loud scoring goal explosion & crowd celebration
     playGoalExplosion() {
-      if (!this.enabled || !this.ctx) return;
+      if (!this.prefs.master || !this.ctx) return;
       try {
-        const freqs = [523.25, 659.25, 783.99, 1046.50];
-        freqs.forEach((f, idx) => {
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(f, this.ctx.currentTime + idx * 0.05);
-          gain.gain.setValueAtTime(0.18, this.ctx.currentTime + idx * 0.05);
-          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 1.5);
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start(this.ctx.currentTime + idx * 0.05);
-          osc.stop(this.ctx.currentTime + 1.6);
-        });
+        // Goal Horn / Brass Fanfare
+        if (this.prefs.ui) {
+          const freqs = [523.25, 659.25, 783.99, 1046.50];
+          freqs.forEach((f, idx) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(f, this.ctx.currentTime + idx * 0.05);
+            gain.gain.setValueAtTime(0.22, this.ctx.currentTime + idx * 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 1.8);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(this.ctx.currentTime + idx * 0.05);
+            osc.stop(this.ctx.currentTime + 1.9);
+          });
+        }
+        // Erupt into LOUD stadium cheer roar!
+        this.playCrowdCheerSurge();
+      } catch (e) {}
+    }
+
+    playCountdownBeep(isFinal = false) {
+      if (!this.prefs.master || !this.prefs.ui || !this.ctx) return;
+      try {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(isFinal ? 880 : 440, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + (isFinal ? 0.35 : 0.18));
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + (isFinal ? 0.4 : 0.2));
+      } catch (e) {}
+    }
+
+    playWhoosh() {
+      if (!this.prefs.master || !this.prefs.ui || !this.ctx) return;
+      try {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(480, this.ctx.currentTime + 1.2);
+        gain.gain.setValueAtTime(0.01, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.25, this.ctx.currentTime + 0.8);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 2.0);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 2.1);
+      } catch (e) {}
+    }
+
+    // --- SOFT MATCH ATMOSPHERE & SUPPORTER DRUMS ---
+    startMatchAtmosphere() {
+      if (!this.prefs.master || !this.prefs.atmosphere || !this.ctx || this.crowdAtmosphere) return;
+      try {
+        // 1. Continuous SOFT Background Crowd Murmur (gentle murmuring stadium noise)
+        const bufferSize = this.ctx.sampleRate * 2;
+        const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        let lastOut = 0.0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          output[i] = (lastOut + (0.04 * white)) / 1.04;
+          lastOut = output[i];
+        }
+
+        const whiteNoise = this.ctx.createBufferSource();
+        whiteNoise.buffer = noiseBuffer;
+        whiteNoise.loop = true;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(420, this.ctx.currentTime);
+        filter.Q.setValueAtTime(1.8, this.ctx.currentTime);
+        this.crowdFilter = filter;
+
+        this.crowdGain = this.ctx.createGain();
+        // SOFT crowd murmur (0.038 volume during normal match play)
+        this.crowdGain.gain.setValueAtTime(0.038, this.ctx.currentTime);
+
+        whiteNoise.connect(filter);
+        filter.connect(this.crowdGain);
+        this.crowdGain.connect(this.ctx.destination);
+        whiteNoise.start(0);
+        this.crowdAtmosphere = whiteNoise;
+
+        // 2. Supporter Drums (Soft stadium cadence)
+        let drumStep = 0;
+        this.drumInterval = setInterval(() => {
+          if (!this.prefs.master || !this.prefs.atmosphere || !this.ctx || isPaused) return;
+          const now = this.ctx.currentTime;
+
+          const isHit = (drumStep === 0 || drumStep === 2 || drumStep === 4 || drumStep === 5 || drumStep === 6 || drumStep === 7);
+          if (isHit) {
+            const isHeavy = (drumStep >= 4);
+            const drumOsc = this.ctx.createOscillator();
+            const drumGain = this.ctx.createGain();
+            drumOsc.type = 'sine';
+            drumOsc.frequency.setValueAtTime(isHeavy ? 105 : 85, now);
+            drumOsc.frequency.exponentialRampToValueAtTime(36, now + (isHeavy ? 0.15 : 0.11));
+            drumGain.gain.setValueAtTime(isHeavy ? 0.20 : 0.14, now);
+            drumGain.gain.exponentialRampToValueAtTime(0.001, now + (isHeavy ? 0.18 : 0.13));
+            drumOsc.connect(drumGain);
+            drumGain.connect(this.ctx.destination);
+            drumOsc.start(now);
+            drumOsc.stop(now + 0.20);
+          }
+          drumStep = (drumStep + 1) % 12;
+        }, 280);
+      } catch (e) {}
+    }
+
+    stopMatchAtmosphere() {
+      if (this.crowdAtmosphere) {
+        try { this.crowdAtmosphere.stop(); } catch (e) {}
+        this.crowdAtmosphere = null;
+      }
+      if (this.drumInterval) {
+        clearInterval(this.drumInterval);
+        this.drumInterval = null;
+      }
+    }
+
+    // LOUD Crowd Roar & Cheering Celebration on Goal Scoring!
+    playCrowdCheerSurge() {
+      if (!this.prefs.master || !this.prefs.cheers || !this.ctx) return;
+      try {
+        const now = this.ctx.currentTime;
+        if (this.crowdGain) {
+          this.crowdGain.gain.cancelScheduledValues(now);
+          // Erupt to LOUD 0.48 volume immediately upon scoring!
+          this.crowdGain.gain.setValueAtTime(0.48, now);
+          // Sustain loud roar for 1.8s, then smoothly decay back to soft 0.038
+          this.crowdGain.gain.setValueAtTime(0.45, now + 1.8);
+          this.crowdGain.gain.exponentialRampToValueAtTime(0.038, now + 3.6);
+        }
+
+        // Additional layered cheer harmonics for huge stadium celebration
+        const cheerOsc = this.ctx.createOscillator();
+        const cheerGain = this.ctx.createGain();
+        cheerOsc.type = 'sawtooth';
+        cheerOsc.frequency.setValueAtTime(320, now);
+        cheerOsc.frequency.linearRampToValueAtTime(540, now + 0.4);
+        cheerGain.gain.setValueAtTime(0.12, now);
+        cheerGain.gain.exponentialRampToValueAtTime(0.001, now + 2.2);
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(900, now);
+
+        cheerOsc.connect(filter);
+        filter.connect(cheerGain);
+        cheerGain.connect(this.ctx.destination);
+        cheerOsc.start(now);
+        cheerOsc.stop(now + 2.3);
       } catch (e) {}
     }
   }
 
   const sound = new SoundEngine();
+
+  // --- STADIUM THEMES DATA ---
+  const STADIUM_THEMES = [
+    {
+      name: 'Classic Coliseum',
+      tag: 'Day Match • Roman Concrete & Hedges',
+      sky: '#38bdf8',
+      stands: '#7c3aed',
+      coliseum: '#cbd5e1',
+      arch: '#475569',
+      flags: ['#facc15', '#ef4444', '#2563eb', '#16a34a'],
+      pitchBg: '#48bb78',
+      pitchStripe: '#38a169',
+      surroundings: '#22c55e'
+    },
+    {
+      name: 'Cyberpunk Neon Dome',
+      tag: 'Night Match • Cyan & Magenta Trusses',
+      sky: '#090d16',
+      stands: '#1e1b4b',
+      coliseum: '#312e81',
+      arch: '#0284c7',
+      flags: ['#06b6d4', '#ec4899', '#a855f7', '#06b6d4'],
+      pitchBg: '#10b981',
+      pitchStripe: '#059669',
+      surroundings: '#0f172a'
+    },
+    {
+      name: 'Golden Sunset Arena',
+      tag: 'Sunset Hour • Sandstone Amphitheater',
+      sky: '#ea580c',
+      stands: '#b45309',
+      coliseum: '#d97706',
+      arch: '#78350f',
+      flags: ['#f59e0b', '#dc2626', '#f59e0b', '#d97706'],
+      pitchBg: '#65a30d',
+      pitchStripe: '#4d7c0f',
+      surroundings: '#b45309'
+    },
+    {
+      name: 'Alpine Mountain Park',
+      tag: 'Crisp Morning • Timber Cabins & Snow',
+      sky: '#bae6fd',
+      stands: '#78350f',
+      coliseum: '#f1f5f9',
+      arch: '#334155',
+      flags: ['#3b82f6', '#ffffff', '#10b981', '#3b82f6'],
+      pitchBg: '#22c55e',
+      pitchStripe: '#16a34a',
+      surroundings: '#f8fafc'
+    },
+    {
+      name: 'Underground Street Cage',
+      tag: 'Dusk Twilight • Brick Walls & Fences',
+      sky: '#334155',
+      stands: '#475569',
+      coliseum: '#991b1b',
+      arch: '#1e293b',
+      flags: ['#ef4444', '#eab308', '#ef4444', '#eab308'],
+      pitchBg: '#15803d',
+      pitchStripe: '#166534',
+      surroundings: '#1e293b'
+    }
+  ];
+  let currentStadiumIndex = 0;
+  let isNewAccount = false;
 
   // --- GEOMETRY & PHYSICS CONSTANTS ---
   let CANVAS_WIDTH = window.innerWidth || 1120;
@@ -2064,6 +3171,211 @@
     if (remembered && myUsername) {
       document.getElementById('input-username').value = myUsername;
     }
+
+    // Generate Randomized Sky Clouds & Initial Theme
+    generateRandomClouds();
+    applyStadiumTheme(0);
+    showScreen('screen-main-menu');
+  }
+
+  function generateRandomClouds() {
+    const mainContainer = document.getElementById('svg-clouds-dynamic');
+    const walkContainer = document.getElementById('svg-walkway-clouds');
+
+    [mainContainer, walkContainer].forEach(container => {
+      if (!container) return;
+      container.innerHTML = '';
+
+      // Nicely spread out cloud positions across the vast sky
+      const cloudSlots = [
+        { x: -520, y: 30, scale: 0.85, dur: 68, op: 0.85 },
+        { x: -300, y: 145, scale: 0.65, dur: 82, op: 0.75 },
+        { x: -80, y: 45, scale: 1.05, dur: 60, op: 0.90 },
+        { x: 160, y: 175, scale: 0.70, dur: 76, op: 0.80 },
+        { x: 380, y: 32, scale: 0.95, dur: 64, op: 0.88 },
+        { x: 620, y: 130, scale: 0.80, dur: 72, op: 0.82 },
+        { x: 840, y: 40, scale: 1.10, dur: 56, op: 0.92 },
+        { x: 1060, y: 165, scale: 0.75, dur: 79, op: 0.78 }
+      ];
+
+      cloudSlots.forEach((c, idx) => {
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('class', 'cloud-animated-group');
+
+        const dur = c.dur + (Math.random() * 6 - 3);
+        const delay = -((idx * 9.5 + Math.random() * 3) % dur);
+        g.style.animationDuration = `${dur}s`;
+        g.style.animationDelay = `${delay}s`;
+        g.setAttribute('opacity', c.op);
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const w = 180 * c.scale;
+        const h = 65 * c.scale;
+        const startX = c.x + (Math.random() * 30 - 15);
+        const y = c.y + (Math.random() * 15 - 7.5);
+
+        path.setAttribute(
+          'd',
+          `M ${startX},${y + h * 0.6} Q ${startX + w * 0.2},${y} ${startX + w * 0.45},${y + h * 0.1} Q ${startX + w * 0.7},${y - h * 0.2} ${startX + w * 0.9},${y + h * 0.25} Q ${startX + w * 1.05},${y + h * 0.7} ${startX + w * 0.85},${y + h * 0.95} Q ${startX + w * 0.4},${y + h * 1.05} ${startX},${y + h * 0.6} Z`
+        );
+        path.setAttribute('fill', '#ffffff');
+
+        g.appendChild(path);
+        container.appendChild(g);
+      });
+    });
+  }
+
+  let stadiumFans = [];
+
+  function generateStadiumFans() {
+    stadiumFans = [];
+    const p = getPitch();
+    const g = getGoalBounds();
+    const theme = STADIUM_THEMES[currentStadiumIndex] || STADIUM_THEMES[0];
+
+    const skinTones = ['#fcd34d', '#fbcfe8', '#fed7aa', '#fde047', '#fbcfe8', '#fdba74'];
+    const shirtColors = [
+      p1Color, p2Color, '#ffffff', '#38bdf8', '#facc15', '#ef4444', '#10b981', '#8b5cf6', '#f97316'
+    ];
+    const scarfColors = [p1Color, p2Color, '#facc15', '#ffffff'];
+
+    // 1. Top Grandstand (Above touchline with safe padding)
+    for (let row = 0; row < 3; row++) {
+      const rowY = p.y - 20 - row * 18;
+      if (rowY < 18) continue;
+      for (let x = p.x - 20; x <= p.x + p.w + 20; x += 22) {
+        stadiumFans.push({
+          x: x + (row % 2) * 11 + (Math.random() * 4 - 2),
+          y: rowY,
+          radius: 7.5,
+          skin: skinTones[Math.floor(Math.random() * skinTones.length)],
+          shirt: shirtColors[Math.floor(Math.random() * shirtColors.length)],
+          scarf: Math.random() > 0.4 ? scarfColors[Math.floor(Math.random() * scarfColors.length)] : null,
+          hat: Math.random() > 0.6 ? (Math.random() > 0.5 ? 'cap' : 'beanie') : 'none',
+          phase: Math.random() * Math.PI * 2,
+          isJumping: Math.random() > 0.35,
+          jumpSpeed: 0.006 + Math.random() * 0.004
+        });
+      }
+    }
+
+    // 2. Bottom Grandstand (Below touchline with safe bottom padding)
+    for (let row = 0; row < 3; row++) {
+      const rowY = p.y + p.h + 22 + row * 18;
+      if (rowY > CANVAS_HEIGHT - 18) continue;
+      for (let x = p.x - 20; x <= p.x + p.w + 20; x += 22) {
+        stadiumFans.push({
+          x: x + (row % 2) * 11 + (Math.random() * 4 - 2),
+          y: rowY,
+          radius: 7.5,
+          skin: skinTones[Math.floor(Math.random() * skinTones.length)],
+          shirt: shirtColors[Math.floor(Math.random() * shirtColors.length)],
+          scarf: Math.random() > 0.4 ? scarfColors[Math.floor(Math.random() * scarfColors.length)] : null,
+          hat: Math.random() > 0.6 ? (Math.random() > 0.5 ? 'cap' : 'beanie') : 'none',
+          phase: Math.random() * Math.PI * 2,
+          isJumping: Math.random() > 0.35,
+          jumpSpeed: 0.006 + Math.random() * 0.004
+        });
+      }
+    }
+
+    // 3. Left Grandstand (Behind Left Goal)
+    const leftLimit = p.x - GOAL_DEPTH - 14;
+    for (let col = 0; col < 2; col++) {
+      const colX = leftLimit - 16 - col * 18;
+      if (colX < 14) continue;
+      for (let y = p.y + 14; y <= p.y + p.h - 14; y += 22) {
+        stadiumFans.push({
+          x: colX,
+          y: y + (col % 2) * 11 + (Math.random() * 4 - 2),
+          radius: 7.5,
+          skin: skinTones[Math.floor(Math.random() * skinTones.length)],
+          shirt: shirtColors[Math.floor(Math.random() * shirtColors.length)],
+          scarf: Math.random() > 0.4 ? scarfColors[Math.floor(Math.random() * scarfColors.length)] : null,
+          hat: Math.random() > 0.6 ? 'cap' : 'none',
+          phase: Math.random() * Math.PI * 2,
+          isJumping: Math.random() > 0.35,
+          jumpSpeed: 0.006 + Math.random() * 0.004
+        });
+      }
+    }
+
+    // 4. Right Grandstand (Behind Right Goal)
+    const rightLimit = p.x + p.w + GOAL_DEPTH + 14;
+    for (let col = 0; col < 2; col++) {
+      const colX = rightLimit + 16 + col * 18;
+      if (colX > CANVAS_WIDTH - 14) continue;
+      for (let y = p.y + 14; y <= p.y + p.h - 14; y += 22) {
+        stadiumFans.push({
+          x: colX,
+          y: y + (col % 2) * 11 + (Math.random() * 4 - 2),
+          radius: 7.5,
+          skin: skinTones[Math.floor(Math.random() * skinTones.length)],
+          shirt: shirtColors[Math.floor(Math.random() * shirtColors.length)],
+          scarf: Math.random() > 0.4 ? scarfColors[Math.floor(Math.random() * scarfColors.length)] : null,
+          hat: Math.random() > 0.6 ? 'cap' : 'none',
+          phase: Math.random() * Math.PI * 2,
+          isJumping: Math.random() > 0.35,
+          jumpSpeed: 0.006 + Math.random() * 0.004
+        });
+      }
+    }
+  }
+
+  function applyStadiumTheme(idx) {
+    if (idx < 0) idx = STADIUM_THEMES.length - 1;
+    if (idx >= STADIUM_THEMES.length) idx = 0;
+    currentStadiumIndex = idx;
+
+    const theme = STADIUM_THEMES[idx];
+
+    // 1. Update SVG background elements
+    const sky = document.getElementById('svg-sky');
+    if (sky) sky.setAttribute('fill', theme.sky);
+
+    const stands = document.getElementById('svg-stands');
+    if (stands) stands.setAttribute('fill', theme.stands);
+
+    const coliseum = document.getElementById('svg-coliseum');
+    if (coliseum) coliseum.setAttribute('fill', theme.coliseum);
+
+    const mainArch = document.getElementById('svg-main-arch');
+    if (mainArch) mainArch.setAttribute('fill', theme.arch);
+
+    theme.flags.forEach((flagColor, fIdx) => {
+      const flagEl = document.getElementById(`svg-flag-${fIdx + 1}`);
+      if (flagEl) flagEl.setAttribute('fill', flagColor);
+    });
+
+    // 2. Update 3D Walkway Elements
+    const walkSky = document.getElementById('svg-walkway-sky');
+    if (walkSky) walkSky.setAttribute('fill', theme.sky);
+
+    const walkColiseum = document.getElementById('svg-walkway-coliseum');
+    if (walkColiseum) walkColiseum.setAttribute('fill', theme.coliseum);
+
+    const walkStands = document.getElementById('svg-walkway-stands');
+    if (walkStands) walkStands.setAttribute('fill', theme.stands);
+
+    theme.flags.forEach((flagColor, fIdx) => {
+      const flagEl = document.getElementById(`svg-walkway-flag-${fIdx + 1}`);
+      if (flagEl) flagEl.setAttribute('fill', flagColor);
+    });
+
+    const walkWall = document.getElementById('svg-walkway-wall');
+    if (walkWall) walkWall.setAttribute('fill', theme.coliseum);
+
+    const walkArch = document.getElementById('svg-walkway-arch');
+    if (walkArch) walkArch.setAttribute('fill', theme.arch);
+
+    // 3. Update Stadium Selection Floating Badge
+    const nameEl = document.getElementById('stadium-preview-name');
+    const tagEl = document.getElementById('stadium-preview-tag');
+    const indexEl = document.getElementById('stadium-preview-index');
+    if (nameEl) nameEl.textContent = theme.name;
+    if (tagEl) tagEl.textContent = theme.tag;
+    if (indexEl) indexEl.textContent = `${idx + 1} / ${STADIUM_THEMES.length}`;
   }
 
   function updateUserBarUI() {
@@ -2071,7 +3383,11 @@
     document.getElementById('label-username').textContent = userLabel;
     document.getElementById('label-mini-id').textContent = myMiniId;
     document.getElementById('my-mini-id').textContent = myMiniId;
-    document.getElementById('hub-username-display').textContent = userLabel;
+    const banner = document.getElementById('hub-welcome-banner');
+    if (banner) {
+      const prefix = isNewAccount ? 'Welcome, ' : 'Welcome back, ';
+      banner.innerHTML = `${prefix}<span id="hub-username-display">${userLabel}</span>!`;
+    }
   }
 
   window.showScreen = function (screenId) {
@@ -2080,15 +3396,30 @@
     canvas.style.display = 'none';
     isPaused = false;
 
-    // Show top-right user pill only inside Hub, Modes, Modals, and Match
+    // 1. User Account Tag: shown on authenticated hub, modes, match
     const isPublicMenu = (screenId === 'screen-main-menu' || screenId === 'screen-login');
-    document.getElementById('user-corner-bar').style.display = isPublicMenu ? 'none' : 'flex';
+    const userTopRow = document.getElementById('user-top-row');
+    if (userTopRow) userTopRow.style.display = isPublicMenu ? 'none' : 'flex';
+    document.getElementById('user-corner-bar').style.display = 'flex';
+
+    // 2. Settings Gear Button: ONLY visible during a match
+    const settingsBtn = document.getElementById('btn-match-settings');
+    if (settingsBtn) {
+      settingsBtn.style.display = (screenId === 'match') ? 'flex' : 'none';
+    }
+
+    // 3. Sound / Music Button: stays on every single screen
+    const soundBtn = document.getElementById('btn-sound-toggle');
+    if (soundBtn) {
+      soundBtn.style.display = 'flex';
+    }
 
     if (screenId === 'match') {
       document.getElementById('match-hud').style.display = 'flex';
       canvas.style.display = 'block';
       sound.stopCozyMusic();
     } else {
+      sound.stopMatchAtmosphere();
       sound.startCozyMusic();
       const el = document.getElementById(screenId);
       if (el) el.classList.add('active');
@@ -2166,6 +3497,7 @@
 
         fbAuth.signInWithEmailAndPassword(authEmail, authPass)
           .then(res => {
+            isNewAccount = false;
             currentUser = res.user;
             if (!currentUser.displayName) {
               currentUser.updateProfile({ displayName: u });
@@ -2184,6 +3516,7 @@
             // If user doesn't exist, create it instantly
             fbAuth.createUserWithEmailAndPassword(authEmail, authPass)
               .then(res => {
+                isNewAccount = true;
                 currentUser = res.user;
                 currentUser.updateProfile({ displayName: u });
                 if (fbDb) {
@@ -2332,7 +3665,29 @@
       p1Name = myUsername || 'Blue Stars';
       p2Name = is2Player ? 'Red Player' : 'Red Stars';
       p2Color = (p1Color === '#ef4444') ? '#3b82f6' : '#ef4444';
-      startMatch();
+      applyStadiumTheme(currentStadiumIndex);
+      showScreen('screen-stadium-select');
+    });
+
+    // Dedicated Stadium Carousel Controls
+    document.getElementById('btn-stadium-prev').addEventListener('click', () => {
+      sound.init();
+      sound.playKick(0.3);
+      applyStadiumTheme(currentStadiumIndex - 1);
+    });
+
+    document.getElementById('btn-stadium-next').addEventListener('click', () => {
+      sound.init();
+      sound.playKick(0.3);
+      applyStadiumTheme(currentStadiumIndex + 1);
+    });
+
+    document.getElementById('btn-stadium-back').addEventListener('click', () => {
+      showScreen('modal-quickplay');
+    });
+
+    document.getElementById('btn-stadium-kickoff').addEventListener('click', () => {
+      triggerCinematicMatchKickoff();
     });
 
     // Tournament Controls
@@ -2365,7 +3720,7 @@
       p2Color = '#ef4444';
       is2Player = false;
       matchFormat = 'goals';
-      startMatch();
+      triggerCinematicMatchKickoff();
     });
 
     // Season Controls
@@ -2376,7 +3731,7 @@
       p2Color = '#ef4444';
       is2Player = false;
       matchFormat = 'goals';
-      startMatch();
+      triggerCinematicMatchKickoff();
     });
 
     // Online Send Invite
@@ -2395,36 +3750,86 @@
         is2Player = false;
         activeDifficulty = 'master';
         matchFormat = 'goals';
-        startMatch();
+        triggerCinematicMatchKickoff();
       }, 1500);
     });
 
-    // Sound toggle
-    function toggleSoundState() {
-      sound.init();
-      sound.enabled = !sound.enabled;
-      const icon = document.getElementById('sound-icon-svg');
-      const pauseBtn = document.getElementById('btn-pause-sound-toggle');
-      if (sound.enabled) {
-        icon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
-        pauseBtn.textContent = 'Sound: ON';
-        pauseBtn.classList.add('selected');
-      } else {
-        icon.innerHTML = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
-        pauseBtn.textContent = 'Sound: OFF';
-        pauseBtn.classList.remove('selected');
-      }
+    // 1. Music / Sound Button (Top-Right on EVERY screen) -> Opens Audio Settings Menu
+    const soundToggleBtn = document.getElementById('btn-sound-toggle');
+    if (soundToggleBtn) {
+      soundToggleBtn.addEventListener('click', () => {
+        sound.init();
+        sound.syncUI();
+        document.getElementById('modal-sound-settings').classList.add('active');
+      });
     }
 
-    document.getElementById('btn-sound-toggle').addEventListener('click', toggleSoundState);
-    document.getElementById('btn-pause-sound-toggle').addEventListener('click', toggleSoundState);
+    // 2. Settings Gear Button (ONLY appears during Match) -> Opens Match Pause Menu ("old stuff")
+    const settingsBtn = document.getElementById('btn-match-settings');
+    if (settingsBtn) {
+      settingsBtn.addEventListener('click', () => {
+        sound.init();
+        isPaused = true;
+        document.getElementById('pause-matchup-text').textContent = `${p1Name} (${scores.p1}) vs (${scores.p2}) ${p2Name}`;
+        document.getElementById('modal-match-settings').classList.add('active');
+      });
+    }
 
-    // In-Match Pause & Settings Menu Button
-    document.getElementById('btn-match-pause').addEventListener('click', () => {
-      sound.init();
-      isPaused = true;
-      document.getElementById('pause-matchup-text').textContent = `${p1Name} (${scores.p1}) vs (${scores.p2}) ${p2Name}`;
-      document.getElementById('modal-match-settings').classList.add('active');
+    // 3. Audio Settings Modal Close Button
+    const closeSoundModalBtn = document.getElementById('btn-close-sound-modal');
+    if (closeSoundModalBtn) {
+      closeSoundModalBtn.addEventListener('click', () => {
+        document.getElementById('modal-sound-settings').classList.remove('active');
+      });
+    }
+
+    // 4. Quick Sound Toggle inside Match Pause Menu
+    const pauseSoundToggleBtn = document.getElementById('btn-pause-sound-toggle');
+    if (pauseSoundToggleBtn) {
+      pauseSoundToggleBtn.addEventListener('click', () => {
+        sound.toggleMaster();
+      });
+    }
+
+    // 5. Audio Sub-Category Switches & Row Click Handlers
+    const switchBindings = [
+      { rowId: 'sound-master-card', inputId: 'chk-audio-master', isMaster: true },
+      { rowId: 'row-audio-music', inputId: 'chk-audio-music', pref: 'music' },
+      { rowId: 'row-audio-atmosphere', inputId: 'chk-audio-atmosphere', pref: 'atmosphere' },
+      { rowId: 'row-audio-cheers', inputId: 'chk-audio-cheers', pref: 'cheers' },
+      { rowId: 'row-audio-hits', inputId: 'chk-audio-hits', pref: 'hits' },
+      { rowId: 'row-audio-ui', inputId: 'chk-audio-ui', pref: 'ui' }
+    ];
+
+    switchBindings.forEach(b => {
+      const row = document.getElementById(b.rowId);
+      const chk = document.getElementById(b.inputId);
+
+      if (chk) {
+        chk.addEventListener('change', (e) => {
+          sound.init();
+          if (b.isMaster) {
+            sound.setMaster(e.target.checked);
+          } else {
+            sound.setPref(b.pref, e.target.checked);
+          }
+        });
+      }
+
+      if (row) {
+        row.addEventListener('click', (e) => {
+          if (e.target === chk || e.target.closest('.cartoon-switch')) return;
+          if (chk && !chk.disabled) {
+            sound.init();
+            chk.checked = !chk.checked;
+            if (b.isMaster) {
+              sound.setMaster(chk.checked);
+            } else {
+              sound.setPref(b.pref, chk.checked);
+            }
+          }
+        });
+      }
     });
 
     // Pause Modal Controls (Resume, Restart, Exit)
@@ -2544,46 +3949,136 @@
     document.getElementById('season-fixture-text').textContent = `${myUsername || 'Your Club'} vs ${seasonTeams[seasonMatchday % seasonTeams.length].name}`;
   }
 
-  // --- MATCH LIFECYCLE ---
-  function startMatch() {
-    scores = { p1: 0, p2: 0 };
-    currentTurn = 'p1';
-    isPaused = false;
+  // --- 3D FIRST-PERSON WALKING ENTRANCE & MATCH LIFECYCLE ---
+  function triggerCinematicMatchKickoff() {
+    sound.init();
+    sound.playWhoosh();
 
-    document.getElementById('hud-p1-name').textContent = p1Name;
-    document.getElementById('hud-p1-puck').style.background = p1Color;
-    document.getElementById('hud-p2-name').textContent = p2Name;
-    document.getElementById('hud-p2-puck').style.background = p2Color;
-
-    updateHUD();
-    resetPitchEntities();
-
-    // Match Countdown Timer if timed format
-    clearInterval(matchClockInterval);
-    if (matchFormat === 'timed') {
-      matchClockSeconds = (matchDurationMinutes || 3) * 60;
-      const initialMins = Math.floor(matchClockSeconds / 60);
-      const initialSecs = matchClockSeconds % 60;
-      document.getElementById('hud-clock-label').textContent = `${initialMins}:${initialSecs < 10 ? '0' : ''}${initialSecs}`;
-      matchClockInterval = setInterval(() => {
-        if (isPaused) return; // Freeze timer during pause!
-        matchClockSeconds--;
-        const mins = Math.floor(matchClockSeconds / 60);
-        const secs = matchClockSeconds % 60;
-        document.getElementById('hud-clock-label').textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-        if (matchClockSeconds <= 0) {
-          clearInterval(matchClockInterval);
-          handleMatchEnd(scores.p1 >= scores.p2 ? 'p1' : 'p2');
-        }
-      }, 1000);
-    } else {
-      document.getElementById('hud-clock-label').textContent = `First to ${targetGoals || 3}`;
+    // 1. Activate 3D Human Walkway Camera Rig (receding cobblestones + parallax trees + head bobbing)
+    const stage3d = document.getElementById('walkway-3d-stage');
+    if (stage3d) {
+      stage3d.classList.remove('active');
+      stage3d.offsetHeight; // trigger reflow
+      stage3d.classList.add('active');
     }
 
-    showScreen('match');
-    sound.playWhistle();
+    // 2. White Light Wash starts fading in immediately as soon as walk begins (t=0), reaches solid white at t=3.0s
+    const whiteOverlay = document.getElementById('white-flash-overlay');
+    if (whiteOverlay) {
+      whiteOverlay.classList.remove('fade-in');
+      void whiteOverlay.offsetWidth; // trigger reflow
+      whiteOverlay.classList.add('fade-in');
+    }
 
-    startTurn();
+    // 3. Switch Viewport to Inside Match Pitch at 3.0s
+    setTimeout(() => {
+      showScreen('match');
+      if (stage3d) stage3d.classList.remove('active');
+
+      // Smoothly fade out white light overlay into match pitch (takes 0.5s)
+      if (whiteOverlay) {
+        whiteOverlay.classList.remove('fade-in');
+      }
+
+      // Start Premier League Crowd Roar & Supporter Drums Atmosphere!
+      sound.startMatchAtmosphere();
+
+      // Generate Animated Spectator Crowd in the Grandstands
+      generateStadiumFans();
+
+      // Setup match state and rack the discs in formation
+      scores = { p1: 0, p2: 0 };
+      currentTurn = 'p1';
+      isPaused = false;
+      gameState = 'COUNTDOWN'; // Prevent dragging during countdown
+
+      document.getElementById('hud-p1-name').textContent = p1Name;
+      document.getElementById('hud-p1-puck').style.background = p1Color;
+      document.getElementById('hud-p2-name').textContent = p2Name;
+      document.getElementById('hud-p2-puck').style.background = p2Color;
+
+      updateHUD();
+      resetPitchEntities();
+
+      // 4. White Light Wash Fades Out, smoothly revealing the inside stadium & cheering fans!
+      setTimeout(() => {
+        if (whiteOverlay) whiteOverlay.classList.remove('active');
+      }, 100);
+
+      // 5. Trigger 3... 2... 1... GO! Countdown sequence
+      setTimeout(() => {
+        startKickoffCountdown();
+      }, 450);
+    }, 3200);
+  }
+
+  function startKickoffCountdown() {
+    const overlay = document.getElementById('kickoff-countdown-overlay');
+    const numEl = document.getElementById('countdown-pop-text');
+    if (!overlay || !numEl) return;
+
+    overlay.style.display = 'flex';
+    numEl.className = 'countdown-pop-number';
+    numEl.textContent = '3';
+    sound.playCountdownBeep(false);
+
+    setTimeout(() => {
+      numEl.style.animation = 'none';
+      numEl.offsetHeight; // trigger reflow
+      numEl.style.animation = '';
+      numEl.textContent = '2';
+      sound.playCountdownBeep(false);
+    }, 600);
+
+    setTimeout(() => {
+      numEl.style.animation = 'none';
+      numEl.offsetHeight;
+      numEl.style.animation = '';
+      numEl.textContent = '1';
+      sound.playCountdownBeep(false);
+    }, 1200);
+
+    setTimeout(() => {
+      numEl.style.animation = 'none';
+      numEl.offsetHeight;
+      numEl.style.animation = '';
+      numEl.className = 'countdown-pop-number go';
+      numEl.textContent = 'GO!';
+      sound.playWhistle();
+    }, 1800);
+
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      gameState = 'AIMING';
+
+      // Start match timer if timed format
+      clearInterval(matchClockInterval);
+      if (matchFormat === 'timed') {
+        matchClockSeconds = (matchDurationMinutes || 3) * 60;
+        const initialMins = Math.floor(matchClockSeconds / 60);
+        const initialSecs = matchClockSeconds % 60;
+        document.getElementById('hud-clock-label').textContent = `${initialMins}:${initialSecs < 10 ? '0' : ''}${initialSecs}`;
+        matchClockInterval = setInterval(() => {
+          if (isPaused) return;
+          matchClockSeconds--;
+          const mins = Math.floor(matchClockSeconds / 60);
+          const secs = matchClockSeconds % 60;
+          document.getElementById('hud-clock-label').textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+          if (matchClockSeconds <= 0) {
+            clearInterval(matchClockInterval);
+            handleMatchEnd(scores.p1 >= scores.p2 ? 'p1' : 'p2');
+          }
+        }, 1000);
+      } else {
+        document.getElementById('hud-clock-label').textContent = `First to ${targetGoals || 3}`;
+      }
+
+      startTurn();
+    }, 2400);
+  }
+
+  function startMatch() {
+    triggerCinematicMatchKickoff();
   }
 
   function resetPitchEntities() {
@@ -2644,11 +4139,206 @@
     document.getElementById('hud-p1-score').textContent = scores.p1;
     document.getElementById('hud-p2-score').textContent = scores.p2;
 
-    const badge = document.getElementById('hud-turn-badge');
+    const turnBadge = document.getElementById('hud-turn-badge');
     const isP1 = (currentTurn === 'p1');
-    badge.textContent = isP1 ? `${p1Name}'s Turn` : `${p2Name}'s Turn`;
-    badge.style.background = isP1 ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)';
-    badge.style.color = isP1 ? p1Color : p2Color;
+    turnBadge.textContent = isP1 ? `${p1Name}'s Turn` : `${p2Name}'s Turn`;
+    turnBadge.style.background = isP1 ? p1Color : p2Color;
+    turnBadge.style.color = '#ffffff';
+  }
+
+  // --- GOAL CELEBRATION & SOUND SURGES ---
+  function onGoalScored(scoringTeam) {
+    gameState = 'GOAL_CELEB';
+    scores[scoringTeam]++;
+    updateHUD();
+
+    sound.playGoalExplosion();
+    sound.playCrowdCheerSurge();
+
+    // Goal Mouth Radial Shockwave Explosion Bursting Outwards
+    const p = getPitch();
+    const g = getGoalBounds();
+    const goalX = (scoringTeam === 'p1') ? p.x + p.w : p.x;
+    const goalY = (g.top + g.bottom) / 2;
+    const explosionColor = (scoringTeam === 'p1') ? p1Color : p2Color;
+
+    goalShockwaves.push(new GoalShockwave(goalX, goalY, explosionColor));
+    for (let i = 0; i < 70; i++) {
+      particles.push(new Particle(goalX, goalY, explosionColor, 1.3));
+    }
+
+    const banner = document.getElementById('goal-banner');
+    banner.classList.add('show');
+
+    setTimeout(() => {
+      banner.classList.remove('show');
+      if (matchFormat === 'goals' && (scores.p1 >= targetGoals || scores.p2 >= targetGoals)) {
+        handleMatchEnd(scoringTeam);
+      } else {
+        sound.playWhistle();
+        resetPitchEntities();
+        currentTurn = (scoringTeam === 'p1') ? 'p2' : 'p1';
+        startTurn();
+      }
+    }, 2200);
+  }
+
+  function handleMatchEnd(winner) {
+    gameState = 'POSTMATCH';
+    clearInterval(matchClockInterval);
+    sound.stopMatchAtmosphere();
+
+    const isP1 = (winner === 'p1');
+    const winnerName = isP1 ? p1Name : p2Name;
+
+    document.getElementById('postmatch-title').textContent = `${winnerName} WINS!`;
+    document.getElementById('postmatch-sub').textContent = `Final Score: ${scores.p1} - ${scores.p2}`;
+
+    showScreen('screen-postmatch');
+  }
+
+  // --- CARTOON STADIUM BOWL, JUMPING FANS & PITCH RENDERING ---
+  function renderMatchPitch(c) {
+    const p = getPitch();
+    const g = getGoalBounds();
+    const theme = STADIUM_THEMES[currentStadiumIndex] || STADIUM_THEMES[0];
+    const now = Date.now();
+
+    c.save();
+
+    // =========================================================
+    // 1. STADIUM GRANDSTANDS BOWL (SURROUNDING THE PITCH)
+    // =========================================================
+    // Stadium Stands Base
+    c.fillStyle = theme.stands || '#7c3aed';
+    c.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    // Grandstand Seating Tier Stripes
+    c.fillStyle = 'rgba(0, 0, 0, 0.18)';
+    for (let y = 0; y < CANVAS_HEIGHT; y += 22) {
+      if (y < p.y - 10 || y > p.y + p.h + 10) {
+        c.fillRect(0, y, CANVAS_WIDTH, 11);
+      }
+    }
+
+    // Concrete Aisles / Tier Dividers
+    c.fillStyle = 'rgba(255, 255, 255, 0.10)';
+    for (let x = 60; x < CANVAS_WIDTH; x += 180) {
+      c.fillRect(x, 0, 16, CANVAS_HEIGHT);
+    }
+
+    // =========================================================
+    // 2. ANIMATED JUMPING & CHEERING CARTOON FANS
+    // =========================================================
+    stadiumFans.forEach(fan => {
+      const hop = Math.abs(Math.sin(now * fan.jumpSpeed + fan.phase)) * (fan.isJumping ? 8 : 2.5);
+      const fy = fan.y - hop;
+
+      // Body / Torso
+      c.fillStyle = fan.shirt;
+      c.beginPath();
+      c.arc(fan.x, fy + 7, fan.radius, 0, Math.PI * 2);
+      c.fill();
+      c.lineWidth = 1.8;
+      c.strokeStyle = '#1e293b';
+      c.stroke();
+
+      // Head
+      c.fillStyle = fan.skin;
+      c.beginPath();
+      c.arc(fan.x, fy, fan.radius * 0.82, 0, Math.PI * 2);
+      c.fill();
+      c.stroke();
+
+      // Hat / Cap
+      if (fan.hat === 'cap') {
+        c.fillStyle = fan.shirt;
+        c.beginPath();
+        c.arc(fan.x, fy - 2, fan.radius * 0.85, Math.PI, 0);
+        c.fill();
+        c.fillRect(fan.x - 2, fy - 3, fan.radius + 3, 2.5);
+      } else if (fan.hat === 'beanie') {
+        c.fillStyle = '#facc15';
+        c.beginPath();
+        c.arc(fan.x, fy - 2, fan.radius * 0.9, Math.PI, 0);
+        c.fill();
+      }
+
+      // Waving Scarf or Arms
+      if (fan.scarf && fan.isJumping) {
+        const wave = Math.sin(now * 0.01 + fan.phase) * 5;
+        c.strokeStyle = fan.scarf;
+        c.lineWidth = 3.2;
+        c.beginPath();
+        c.moveTo(fan.x - 7, fy + 4);
+        c.quadraticCurveTo(fan.x, fy + 6 + wave, fan.x + 7, fy + 4);
+        c.stroke();
+      }
+    });
+
+    // =========================================================
+    // 3. VIBRANT STRIPED GREEN PITCH
+    // =========================================================
+    const stripes = 10;
+    const sW = p.w / stripes;
+    for (let i = 0; i < stripes; i++) {
+      c.fillStyle = (i % 2 === 0) ? (theme.pitchBg || '#48bb78') : (theme.pitchStripe || '#38a169');
+      c.fillRect(p.x + i * sW, p.y, sW, p.h);
+    }
+
+    // Bold White Pitch Markings
+    c.strokeStyle = '#ffffff';
+    c.lineWidth = 4.5;
+    c.strokeRect(p.x, p.y, p.w, p.h);
+
+    // Center Line & Circle
+    c.beginPath();
+    c.moveTo(p.x + p.w / 2, p.y); c.lineTo(p.x + p.w / 2, p.y + p.h);
+    c.stroke();
+
+    c.beginPath();
+    c.arc(p.x + p.w / 2, p.y + p.h / 2, 85, 0, Math.PI * 2);
+    c.stroke();
+
+    c.beginPath();
+    c.arc(p.x + p.w / 2, p.y + p.h / 2, 7, 0, Math.PI * 2);
+    c.fillStyle = '#ffffff';
+    c.fill();
+
+    // Penalty Boxes
+    const penW = 135;
+    const penH = 260;
+    const penY = p.y + (p.h - penH) / 2;
+    c.strokeRect(p.x, penY, penW, penH);
+    c.strokeRect(p.x + p.w - penW, penY, penW, penH);
+
+    // Deep Goal Nets (with Cross Patterns)
+    c.fillStyle = 'rgba(255, 255, 255, 0.18)';
+    c.fillRect(g.leftGoal.x, g.leftGoal.y, g.leftGoal.w, g.leftGoal.h);
+    c.strokeRect(g.leftGoal.x, g.leftGoal.y, g.leftGoal.w, g.leftGoal.h);
+
+    c.fillRect(g.rightGoal.x, g.rightGoal.y, g.rightGoal.w, g.rightGoal.h);
+    c.strokeRect(g.rightGoal.x, g.rightGoal.y, g.rightGoal.w, g.rightGoal.h);
+
+    // Cross Pattern Net Grids
+    c.lineWidth = 1.5;
+    c.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+
+    for (let py = g.top + 12; py < g.bottom; py += 14) {
+      c.beginPath();
+      c.moveTo(g.leftGoal.x, py); c.lineTo(g.leftGoal.x + g.leftGoal.w, py);
+      c.moveTo(g.rightGoal.x, py); c.lineTo(g.rightGoal.x + g.rightGoal.w, py);
+      c.stroke();
+    }
+
+    for (let px = 10; px < g.leftGoal.w; px += 12) {
+      c.beginPath();
+      c.moveTo(g.leftGoal.x + px, g.top); c.lineTo(g.leftGoal.x + px, g.bottom);
+      c.moveTo(g.rightGoal.x + px, g.top); c.lineTo(g.rightGoal.x + px, g.bottom);
+      c.stroke();
+    }
+
+    c.restore();
   }
 
   // --- GOD-TIER & MULTI-TIER AI ENGINE ---
@@ -2824,11 +4514,11 @@
       }
     }
 
-    // Goal Detection (Deep Goal Nets)
+    // Goal Detection (Triggers cleanly when ball enters goal depth)
     if (ball && gameState === 'MOVING') {
-      if (ball.x + ball.radius < p.x && ball.y >= g.top && ball.y <= g.bottom) {
+      if (ball.x < p.x - ball.radius * 0.3 && ball.y >= g.top && ball.y <= g.bottom) {
         onGoalScored('p2');
-      } else if (ball.x - ball.radius > p.x + p.w && ball.y >= g.top && ball.y <= g.bottom) {
+      } else if (ball.x > p.x + p.w + ball.radius * 0.3 && ball.y >= g.top && ball.y <= g.bottom) {
         onGoalScored('p1');
       }
     }
@@ -2862,6 +4552,7 @@
     const g = getGoalBounds();
     const r = obj.radius;
 
+    // Top / Bottom Touchline Boundaries
     if (obj.y - r < p.y) {
       obj.y = p.y + r;
       obj.vy = -obj.vy * RESTITUTION_WALL;
@@ -2871,57 +4562,67 @@
       obj.vy = -obj.vy * RESTITUTION_WALL;
     }
 
-    // Left Wall & Goal Net Boundaries
+    // Left Goal & Left Endline Wall
     if (obj.x - r < p.x) {
-      const inGoal = (obj.y >= g.top && obj.y <= g.bottom);
-      if (!inGoal || !isBall) {
+      const inGoalMouth = (obj.y - r * 0.4 >= g.top && obj.y + r * 0.4 <= g.bottom);
+      if (!inGoalMouth && obj.x >= p.x - r * 0.5) {
+        // Hitting left endline outside the goal
         obj.x = p.x + r;
         obj.vx = -obj.vx * RESTITUTION_WALL;
       } else {
-        // Ball is inside left goal net
+        // Ball or Puck is inside/entering the Left Goal
+        // 1. Hit Back Net -> Fast Elastic Spring Rebound Outward!
         if (obj.x - r < g.leftGoal.x) {
           obj.x = g.leftGoal.x + r;
-          obj.vx = -obj.vx * 0.15; // Net absorbs impact
-          obj.vy *= 0.3;
+          obj.vx = Math.max(Math.abs(obj.vx) * 1.35, 7.5);
+          sound.playDiscHit(0.7);
         }
+        // 2. Hit Top Crossbar / Goal Post -> Fast Elastic Rebound Outward
         if (obj.y - r < g.top) {
           obj.y = g.top + r;
-          obj.vy = -obj.vy * 0.2;
+          obj.vy = Math.max(Math.abs(obj.vy) * 1.35, 5.0);
+          obj.vx += 3.5;
+          sound.playDiscHit(0.6);
         }
+        // 3. Hit Bottom Crossbar / Goal Post -> Fast Elastic Rebound Outward
         if (obj.y + r > g.bottom) {
           obj.y = g.bottom - r;
-          obj.vy = -obj.vy * 0.2;
+          obj.vy = -Math.max(Math.abs(obj.vy) * 1.35, 5.0);
+          obj.vx += 3.5;
+          sound.playDiscHit(0.6);
         }
-        // Heavy net damping so ball stays settled in the back of the net
-        obj.vx *= 0.90;
-        obj.vy *= 0.90;
       }
     }
 
-    // Right Wall & Goal Net Boundaries
+    // Right Goal & Right Endline Wall
     if (obj.x + r > p.x + p.w) {
-      const inGoal = (obj.y >= g.top && obj.y <= g.bottom);
-      if (!inGoal || !isBall) {
+      const inGoalMouth = (obj.y - r * 0.4 >= g.top && obj.y + r * 0.4 <= g.bottom);
+      if (!inGoalMouth && obj.x <= p.x + p.w + r * 0.5) {
+        // Hitting right endline outside the goal
         obj.x = p.x + p.w - r;
         obj.vx = -obj.vx * RESTITUTION_WALL;
       } else {
-        // Ball is inside right goal net
+        // Ball or Puck is inside/entering the Right Goal
+        // 1. Hit Back Net -> Fast Elastic Spring Rebound Outward!
         if (obj.x + r > g.rightGoal.x + g.rightGoal.w) {
           obj.x = g.rightGoal.x + g.rightGoal.w - r;
-          obj.vx = -obj.vx * 0.15; // Net absorbs impact
-          obj.vy *= 0.3;
+          obj.vx = -Math.max(Math.abs(obj.vx) * 1.35, 7.5);
+          sound.playDiscHit(0.7);
         }
+        // 2. Hit Top Crossbar / Goal Post -> Fast Elastic Rebound Outward
         if (obj.y - r < g.top) {
           obj.y = g.top + r;
-          obj.vy = -obj.vy * 0.2;
+          obj.vy = Math.max(Math.abs(obj.vy) * 1.35, 5.0);
+          obj.vx -= 3.5;
+          sound.playDiscHit(0.6);
         }
+        // 3. Hit Bottom Crossbar / Goal Post -> Fast Elastic Rebound Outward
         if (obj.y + r > g.bottom) {
           obj.y = g.bottom - r;
-          obj.vy = -obj.vy * 0.2;
+          obj.vy = -Math.max(Math.abs(obj.vy) * 1.35, 5.0);
+          obj.vx -= 3.5;
+          sound.playDiscHit(0.6);
         }
-        // Heavy net damping so ball stays settled in the back of the net
-        obj.vx *= 0.90;
-        obj.vy *= 0.90;
       }
     }
   }
@@ -2957,126 +4658,6 @@
         else sound.playDiscHit(impact / 12);
       }
     }
-  }
-
-  // --- GOAL CELEBRATION WITH OUT-OF-GOAL EXPLOSION ---
-  function onGoalScored(scoringTeam) {
-    gameState = 'GOAL_CELEB';
-    scores[scoringTeam]++;
-    updateHUD();
-
-    sound.playGoalExplosion();
-
-    // Goal Mouth Radial Shockwave Explosion Bursting Outwards
-    const p = getPitch();
-    const g = getGoalBounds();
-    const goalX = (scoringTeam === 'p1') ? p.x + p.w : p.x;
-    const goalY = (g.top + g.bottom) / 2;
-    const explosionColor = (scoringTeam === 'p1') ? p1Color : p2Color;
-
-    goalShockwaves.push(new GoalShockwave(goalX, goalY, explosionColor));
-    for (let i = 0; i < 70; i++) {
-      particles.push(new Particle(goalX, goalY, explosionColor, 1.3));
-    }
-
-    const banner = document.getElementById('goal-banner');
-    banner.classList.add('show');
-
-    setTimeout(() => {
-      banner.classList.remove('show');
-      if (matchFormat === 'goals' && (scores.p1 >= targetGoals || scores.p2 >= targetGoals)) {
-        handleMatchEnd(scoringTeam);
-      } else {
-        sound.playWhistle();
-        resetPitchEntities();
-        currentTurn = (scoringTeam === 'p1') ? 'p2' : 'p1';
-        startTurn();
-      }
-    }, 2200);
-  }
-
-  function handleMatchEnd(winner) {
-    gameState = 'POSTMATCH';
-    clearInterval(matchClockInterval);
-
-    const isP1 = (winner === 'p1');
-    const winnerName = isP1 ? p1Name : p2Name;
-
-    document.getElementById('postmatch-title').textContent = `${winnerName} WINS!`;
-    document.getElementById('postmatch-sub').textContent = `Final Score: ${scores.p1} - ${scores.p2}`;
-
-    showScreen('screen-postmatch');
-  }
-
-  // --- CARTOON PITCH RENDERING (CROSS PATTERN NETS) ---
-  function renderMatchPitch(c) {
-    const p = getPitch();
-    const g = getGoalBounds();
-
-    // Vibrant Striped Green Pitch (NO SHADOWS)
-    const stripes = 10;
-    const sW = p.w / stripes;
-    for (let i = 0; i < stripes; i++) {
-      c.fillStyle = (i % 2 === 0) ? '#48bb78' : '#38a169';
-      c.fillRect(p.x + i * sW, p.y, sW, p.h);
-    }
-
-    // Bold White Pitch Markings
-    c.save();
-    c.strokeStyle = '#ffffff';
-    c.lineWidth = 4.5;
-    c.strokeRect(p.x, p.y, p.w, p.h);
-
-    // Center Line & Circle
-    c.beginPath();
-    c.moveTo(p.x + p.w / 2, p.y); c.lineTo(p.x + p.w / 2, p.y + p.h);
-    c.stroke();
-
-    c.beginPath();
-    c.arc(p.x + p.w / 2, p.y + p.h / 2, 85, 0, Math.PI * 2);
-    c.stroke();
-
-    c.beginPath();
-    c.arc(p.x + p.w / 2, p.y + p.h / 2, 7, 0, Math.PI * 2);
-    c.fillStyle = '#ffffff';
-    c.fill();
-
-    // Penalty Boxes
-    const penW = 135;
-    const penH = 260;
-    const penY = p.y + (p.h - penH) / 2;
-    c.strokeRect(p.x, penY, penW, penH);
-    c.strokeRect(p.x + p.w - penW, penY, penW, penH);
-
-    // Deep Goal Nets (with Cross Patterns)
-    c.fillStyle = 'rgba(255, 255, 255, 0.15)';
-    c.fillRect(g.leftGoal.x, g.leftGoal.y, g.leftGoal.w, g.leftGoal.h);
-    c.strokeRect(g.leftGoal.x, g.leftGoal.y, g.leftGoal.w, g.leftGoal.h);
-
-    c.fillRect(g.rightGoal.x, g.rightGoal.y, g.rightGoal.w, g.rightGoal.h);
-    c.strokeRect(g.rightGoal.x, g.rightGoal.y, g.rightGoal.w, g.rightGoal.h);
-
-    // Cross Pattern Net Grids (Horizontal & Vertical Lines)
-    c.lineWidth = 1.5;
-    c.strokeStyle = 'rgba(255, 255, 255, 0.30)';
-
-    // 1. Horizontal Net Lines
-    for (let py = g.top + 12; py < g.bottom; py += 14) {
-      c.beginPath();
-      c.moveTo(g.leftGoal.x, py); c.lineTo(g.leftGoal.x + g.leftGoal.w, py);
-      c.moveTo(g.rightGoal.x, py); c.lineTo(g.rightGoal.x + g.rightGoal.w, py);
-      c.stroke();
-    }
-
-    // 2. Vertical Net Lines (Cross Grid)
-    for (let px = 10; px < g.leftGoal.w; px += 12) {
-      c.beginPath();
-      c.moveTo(g.leftGoal.x + px, g.top); c.lineTo(g.leftGoal.x + px, g.bottom);
-      c.moveTo(g.rightGoal.x + px, g.top); c.lineTo(g.rightGoal.x + px, g.bottom);
-      c.stroke();
-    }
-
-    c.restore();
   }
 
   function drawAimGuide(c) {
