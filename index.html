@@ -54,7 +54,7 @@
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      background: var(--sky-blue);
+      background: #000000;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -64,26 +64,29 @@
 
     #app-container {
       position: fixed;
-      top: 0;
-      left: 0;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       width: 100vw;
       height: 100vh;
+      max-width: calc(100vh * (16 / 10));
+      max-height: calc(100vw * (10 / 16));
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      background: var(--sky-blue, #38bdf8);
+      background: #000000;
       transition: background 0.5s ease;
     }
 
-    /* Background Cartoon Stadium SVG (Full-Bleed 100vw x 100vh on all devices) */
+    /* Background Cartoon Stadium SVG (Fills the aspect-ratio-constrained app container) */
     #stadium-bg {
       position: absolute;
       top: 0;
       left: 0;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       pointer-events: none;
       z-index: 1;
       transform-origin: 50% 68%;
@@ -198,8 +201,8 @@
       position: absolute;
       top: 0;
       left: 0;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       display: none;
       flex-direction: column;
       align-items: center;
@@ -1181,47 +1184,48 @@
       -webkit-appearance: none;
       appearance: none;
       width: 100%;
-      height: 8px;
+      height: 12px;
       background: #1e293b;
-      border: 2px solid #334155;
-      border-radius: 6px;
+      border: 2.5px solid #475569;
+      border-radius: 8px;
       outline: none;
       cursor: pointer;
-      margin: 0;
+      margin: 4px 0;
     }
 
     .kickoff-panning-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 60px;
-      height: 14px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
       background: var(--btn-yellow);
-      border: 2px solid var(--border-dark);
-      border-radius: 7px;
+      border: 3.5px solid #1e293b;
       cursor: grab;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-      transition: background 0.15s ease, transform 0.1s ease;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      transition: transform 0.15s ease, background 0.15s ease;
     }
 
     .kickoff-panning-slider::-webkit-slider-thumb:hover {
       background: var(--btn-yellow-hover);
-      transform: scaleY(1.15);
+      transform: scale(1.18);
     }
 
     .kickoff-panning-slider::-webkit-slider-thumb:active {
       cursor: grabbing;
       background: #eab308;
+      transform: scale(1.1);
     }
 
     .kickoff-panning-slider::-moz-range-thumb {
-      width: 60px;
-      height: 14px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
       background: var(--btn-yellow);
-      border: 2px solid var(--border-dark);
-      border-radius: 7px;
+      border: 3.5px solid #1e293b;
       cursor: grab;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-      transition: background 0.15s ease, transform 0.1s ease;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      transition: transform 0.15s ease, background 0.15s ease;
     }
 
     .btn-kickoff-ready {
@@ -2999,9 +3003,22 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
       backdrop-filter: blur(8px);
       width: 240px;
-      max-height: 230px;
-      overflow-y: auto;
-      scrollbar-width: thin;
+    }
+    .ability-drawer-content::-webkit-scrollbar {
+      width: 8px;
+    }
+    .ability-drawer-content::-webkit-scrollbar-track {
+      background: #1e293b;
+      border-radius: 4px;
+      border: 1px solid #334155;
+    }
+    .ability-drawer-content::-webkit-scrollbar-thumb {
+      background: var(--btn-yellow);
+      border-radius: 4px;
+      border: 1.5px solid #0f172a;
+    }
+    .ability-drawer-content::-webkit-scrollbar-thumb:hover {
+      background: var(--btn-yellow-hover);
     }
     .drawer-section-title {
       font-size: 9.5px;
@@ -4562,7 +4579,7 @@
     /* Rocket League Club Matchup Banner at Kickoff */
     .kickoff-club-banner {
       position: absolute;
-      top: 14%;
+      top: 16%;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(15, 23, 42, 0.94);
@@ -4571,11 +4588,13 @@
       padding: 12px 28px;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 16px;
       box-shadow: 0 12px 28px rgba(0,0,0,0.6), 0 0 20px rgba(250, 204, 21, 0.35);
       animation: kickoffBannerSlide 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
       z-index: 1000;
       pointer-events: none;
+      white-space: nowrap;
     }
     @keyframes kickoffBannerSlide {
       from { transform: translate(-50%, -35px) scale(0.85); opacity: 0; }
@@ -6543,6 +6562,11 @@
         <button class="corner-action-btn" id="btn-sound-toggle" title="Audio & Music Settings">
           <svg class="hud-btn-svg" id="sound-icon-svg" viewBox="0 0 24 24">
             <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+          </svg>
+        </button>
+        <button class="corner-action-btn" id="btn-fullscreen-toggle" onclick="toggleFullscreen()" title="Full Screen (F / Safari & Chrome)" aria-label="Toggle Fullscreen">
+          <svg class="hud-btn-svg" id="fullscreen-icon-svg" viewBox="0 0 24 24">
+            <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
           </svg>
         </button>
       </div>
@@ -16153,7 +16177,7 @@
         const rampFactor = Math.max(0.65, Math.pow(spd / 0.65, 0.55));
         this.vx *= rampFactor;
         this.vy *= rampFactor;
-        if (spd < 0.008) {
+        if (spd < 0.05) {
           this.vx = 0;
           this.vy = 0;
         }
@@ -16478,7 +16502,7 @@
         const rampFactor = Math.max(0.65, Math.pow(spd / 0.65, 0.55));
         this.vx *= rampFactor;
         this.vy *= rampFactor;
-        if (spd < 0.008) {
+        if (spd < 0.05) {
           this.vx = 0;
           this.vy = 0;
         }
@@ -17107,14 +17131,19 @@
   function handleResize() {
     const winW = window.innerWidth || document.documentElement.clientWidth || BASE_VIRTUAL_WIDTH;
     const winH = window.innerHeight || document.documentElement.clientHeight || BASE_VIRTUAL_HEIGHT;
-    const scale = Math.min(winW / BASE_VIRTUAL_WIDTH, winH / BASE_VIRTUAL_HEIGHT);
+
+    // Effective container dimensions (matches #app-container aspect-ratio constraint: 16:10)
+    const effectiveW = Math.min(winW, winH * (16 / 10));
+    const effectiveH = Math.min(winH, winW * (10 / 16));
+
+    const scale = Math.min(effectiveW / BASE_VIRTUAL_WIDTH, effectiveH / BASE_VIRTUAL_HEIGHT);
     document.documentElement.style.setProperty('--game-scale', scale.toString());
 
-    // Dynamically calculate stadium background SVG viewBox to prevent zooming and vertical cropping on any aspect ratio
+    // Dynamically calculate stadium background SVG viewBox to prevent zooming and vertical cropping
     const stadiumBg = document.getElementById('stadium-bg');
     if (stadiumBg) {
       const targetH = 700;
-      const vbW = Math.max(1120, targetH * (winW / winH));
+      const vbW = Math.max(1120, targetH * (effectiveW / effectiveH));
       const vbL = (1120 - vbW) / 2;
       stadiumBg.setAttribute('viewBox', `${vbL} 0 ${vbW} 700`);
       stadiumBg.setAttribute('preserveAspectRatio', 'none');
@@ -17123,7 +17152,7 @@
     const walkwaySvg = document.getElementById('svg-walkway-scene');
     if (walkwaySvg) {
       const targetH = 700;
-      const vbW = Math.max(1120, targetH * (winW / winH));
+      const vbW = Math.max(1120, targetH * (effectiveW / effectiveH));
       const vbL = (1120 - vbW) / 2;
       walkwaySvg.setAttribute('viewBox', `${vbL} 0 ${vbW} 700`);
       walkwaySvg.setAttribute('preserveAspectRatio', 'none');
@@ -19057,11 +19086,87 @@
   }
   window.renderAchievementsUI = renderAchievementsUI;
 
-  // Keyboard shortcuts for in-match features (Tab/S for Scoreboard, R for Arm Player Ability)
+  // --- UNIVERSAL FULLSCREEN CONTROLLER (SAFARI & GOOGLE CHROME COMPATIBLE) ---
+  function isFullscreenActive() {
+    return !!(
+      document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      document.mozFullScreenElement ||
+      document.msFullscreenElement
+    );
+  }
+
+  function updateFullscreenUI() {
+    const isFs = isFullscreenActive();
+    const fsBtn = document.getElementById('btn-fullscreen-toggle');
+    const fsIcon = document.getElementById('fullscreen-icon-svg');
+    if (fsBtn) {
+      fsBtn.title = isFs ? "Exit Fullscreen (Esc / F)" : "Full Screen (F / Safari & Chrome)";
+      fsBtn.setAttribute('aria-label', isFs ? "Exit Fullscreen" : "Full Screen");
+    }
+    if (fsIcon) {
+      if (isFs) {
+        // Exit fullscreen icon: corners pointing inwards
+        fsIcon.innerHTML = '<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z" fill="#ffffff"/>';
+      } else {
+        // Enter fullscreen icon: corners pointing outwards
+        fsIcon.innerHTML = '<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" fill="#ffffff"/>';
+      }
+    }
+    setTimeout(() => {
+      if (typeof handleResize === 'function') handleResize();
+    }, 100);
+  }
+
+  function toggleFullscreen() {
+    if (typeof sound !== 'undefined' && sound.playButtonClick) {
+      sound.playButtonClick();
+    }
+    try {
+      if (isFullscreenActive()) {
+        const exitFn = document.exitFullscreen ||
+                       document.webkitExitFullscreen ||
+                       document.mozCancelFullScreen ||
+                       document.msExitFullscreen;
+        if (exitFn) {
+          const res = exitFn.call(document);
+          if (res && typeof res.catch === 'function') {
+            res.catch(err => console.warn('Exit fullscreen error:', err));
+          }
+        }
+      } else {
+        const docEl = document.documentElement;
+        const reqFn = docEl.requestFullscreen ||
+                      docEl.webkitRequestFullscreen ||
+                      docEl.mozRequestFullScreen ||
+                      docEl.msRequestFullscreen;
+        if (reqFn) {
+          const res = reqFn.call(docEl);
+          if (res && typeof res.catch === 'function') {
+            res.catch(err => console.warn('Request fullscreen error:', err));
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Fullscreen request not allowed or supported:', err);
+    }
+    updateFullscreenUI();
+  }
+  window.toggleFullscreen = toggleFullscreen;
+  window.isFullscreenActive = isFullscreenActive;
+
+  ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evt => {
+    document.addEventListener(evt, updateFullscreenUI);
+  });
+
+  // Keyboard shortcuts for in-match features (Tab/S for Scoreboard, R for Arm Player Ability, F for Fullscreen)
   window.addEventListener('keydown', (e) => {
     if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
 
-    if (e.key === 'Tab' || e.key === 's' || e.key === 'S') {
+    if (e.key === 'f' || e.key === 'F') {
+      e.preventDefault();
+      toggleFullscreen();
+    } else if (e.key === 'Tab' || e.key === 's' || e.key === 'S') {
       const activeScreen = localStorage.getItem('ps_active_screen');
       if (activeScreen === 'match') {
         e.preventDefault();
@@ -19441,14 +19546,9 @@
       return;
     }
 
-    // If screen is smaller, we don't fit them all in, we get rid of them!
+    // Retain fans smoothly on all devices (scaled cleanly within virtual canvas)
     const winW = window.innerWidth || document.documentElement.clientWidth || BASE_VIRTUAL_WIDTH;
     const winH = window.innerHeight || document.documentElement.clientHeight || BASE_VIRTUAL_HEIGHT;
-    const isSmallScreen = (winH < 620 || winW < 1100);
-    if (isSmallScreen) {
-      animatedFans = [];
-      return;
-    }
 
     const skinTones = ['#fcd34d', '#fbcfe8', '#fed7aa', '#fde047', '#fdba74', '#f5d0b5', '#d4a373'];
     const shirtColors = [
@@ -19529,16 +19629,16 @@
       // Note: Bottom Grandstand fans relocated to Top & Sides, freeing bottom middle for animated LED billboard!
     } else {
       // Horizontal Mode:
-      // 1. Top Grandstand (Clean 2 neat rows of cheering fans)
-      for (let row = 0; row < 2; row++) {
-        const rowBaseY = p.y - 18 - row * 22;
-        if (rowBaseY < 14) continue;
-        for (let x = p.x + 24; x <= p.x + p.w - 24; x += (36 + Math.random() * 12)) {
+      // 1. Top Grandstand (Lively 3 neat rows of cheering fans)
+      for (let row = 0; row < 3; row++) {
+        const rowBaseY = p.y - 16 - row * 20;
+        if (rowBaseY < 12) continue;
+        for (let x = p.x + 18; x <= p.x + p.w - 18; x += (24 + Math.random() * 6)) {
           const isJumping = Math.random() < 0.35;
           rawFans.push({
-            x: x + (Math.random() - 0.5) * 6,
-            y: rowBaseY + (Math.random() - 0.5) * 4,
-            radius: 7.2 + (Math.random() - 0.5) * 1.2,
+            x: x + (Math.random() - 0.5) * 4,
+            y: rowBaseY + (Math.random() - 0.5) * 3,
+            radius: 7.2 + (Math.random() - 0.5) * 1.0,
             skin: skinTones[Math.floor(Math.random() * skinTones.length)],
             shirt: shirtColors[Math.floor(Math.random() * shirtColors.length)],
             scarf: Math.random() > 0.45 ? scarfColors[Math.floor(Math.random() * scarfColors.length)] : null,
@@ -19551,45 +19651,53 @@
         }
       }
 
-      // 2. Left Grandstand (1 Clean Column behind Left Goal)
+      // 2. Left Grandstand (2 Neat Columns behind Left Goal)
       const leftLimit = p.x - GOAL_DEPTH - 14;
       if (leftLimit > 25) {
-        for (let y = p.y + 24; y <= p.y + p.h - 24; y += 42) {
-          const isJumping = Math.random() < 0.35;
-          rawFans.push({
-            x: leftLimit,
-            y: y,
-            radius: 7.2,
-            skin: skinTones[Math.floor(Math.random() * skinTones.length)],
-            shirt: shirtColors[Math.floor(Math.random() * shirtColors.length)],
-            scarf: Math.random() > 0.45 ? scarfColors[Math.floor(Math.random() * scarfColors.length)] : null,
-            hat: hatTypes[Math.floor(Math.random() * hatTypes.length)],
-            phase: Math.random() * Math.PI * 2,
-            isJumping: isJumping,
-            jumpHeight: 4.5 + Math.random() * 5.0,
-            jumpSpeed: 0.004 + Math.random() * 0.005
-          });
+        for (let col = 0; col < 2; col++) {
+          const colX = leftLimit - col * 18;
+          if (colX < 14) continue;
+          for (let y = p.y + 18; y <= p.y + p.h - 18; y += (26 + Math.random() * 4)) {
+            const isJumping = Math.random() < 0.35;
+            rawFans.push({
+              x: colX,
+              y: y,
+              radius: 7.2,
+              skin: skinTones[Math.floor(Math.random() * skinTones.length)],
+              shirt: shirtColors[Math.floor(Math.random() * shirtColors.length)],
+              scarf: Math.random() > 0.45 ? scarfColors[Math.floor(Math.random() * scarfColors.length)] : null,
+              hat: hatTypes[Math.floor(Math.random() * hatTypes.length)],
+              phase: Math.random() * Math.PI * 2,
+              isJumping: isJumping,
+              jumpHeight: 4.5 + Math.random() * 5.0,
+              jumpSpeed: 0.004 + Math.random() * 0.005
+            });
+          }
         }
       }
 
-      // 3. Right Grandstand (1 Clean Column behind Right Goal)
+      // 3. Right Grandstand (2 Neat Columns behind Right Goal)
       const rightLimit = p.x + p.w + GOAL_DEPTH + 14;
       if (rightLimit < CANVAS_WIDTH - 25) {
-        for (let y = p.y + 24; y <= p.y + p.h - 24; y += 42) {
-          const isJumping = Math.random() < 0.35;
-          rawFans.push({
-            x: rightLimit,
-            y: y,
-            radius: 7.2,
-            skin: skinTones[Math.floor(Math.random() * skinTones.length)],
-            shirt: shirtColors[Math.floor(Math.random() * shirtColors.length)],
-            scarf: Math.random() > 0.45 ? scarfColors[Math.floor(Math.random() * scarfColors.length)] : null,
-            hat: hatTypes[Math.floor(Math.random() * hatTypes.length)],
-            phase: Math.random() * Math.PI * 2,
-            isJumping: isJumping,
-            jumpHeight: 4.5 + Math.random() * 5.0,
-            jumpSpeed: 0.004 + Math.random() * 0.005
-          });
+        for (let col = 0; col < 2; col++) {
+          const colX = rightLimit + col * 18;
+          if (colX > CANVAS_WIDTH - 14) continue;
+          for (let y = p.y + 18; y <= p.y + p.h - 18; y += (26 + Math.random() * 4)) {
+            const isJumping = Math.random() < 0.35;
+            rawFans.push({
+              x: colX,
+              y: y,
+              radius: 7.2,
+              skin: skinTones[Math.floor(Math.random() * skinTones.length)],
+              shirt: shirtColors[Math.floor(Math.random() * shirtColors.length)],
+              scarf: Math.random() > 0.45 ? scarfColors[Math.floor(Math.random() * scarfColors.length)] : null,
+              hat: hatTypes[Math.floor(Math.random() * hatTypes.length)],
+              phase: Math.random() * Math.PI * 2,
+              isJumping: isJumping,
+              jumpHeight: 4.5 + Math.random() * 5.0,
+              jumpSpeed: 0.004 + Math.random() * 0.005
+            });
+          }
         }
       }
       // Note: Bottom Grandstand fans relocated to Top & Sides, freeing bottom middle for animated LED billboard!
@@ -24617,6 +24725,12 @@
       soundBtn.style.display = 'flex';
     }
 
+    // 4. Universal Fullscreen Button: stays on every single screen
+    const fsBtn = document.getElementById('btn-fullscreen-toggle');
+    if (fsBtn) {
+      fsBtn.style.display = 'flex';
+    }
+
     const stadiumBg = document.getElementById('stadium-bg');
     const appContainer = document.getElementById('app-container');
     const curTheme = (typeof STADIUM_THEMES !== 'undefined' && STADIUM_THEMES[currentStadiumIndex]) || { sky: '#38bdf8', stands: '#7c3aed' };
@@ -25702,6 +25816,14 @@
         sound.init();
         sound.syncUI();
         document.getElementById('modal-sound-settings').classList.add('active');
+      });
+    }
+
+    // 1b. Universal Fullscreen Button (Top-Right on EVERY screen next to sound) -> Safari & Chrome Fullscreen
+    const fullscreenToggleBtn = document.getElementById('btn-fullscreen-toggle');
+    if (fullscreenToggleBtn) {
+      fullscreenToggleBtn.addEventListener('click', () => {
+        toggleFullscreen();
       });
     }
 
@@ -27347,6 +27469,15 @@
       }
     }
 
+    // Ensure all power-ups start completely disarmed at kickoff
+    discs.forEach(d => {
+      d.isArmed = false;
+      d.vx = 0;
+      d.vy = 0;
+    });
+    const drawerPip = document.getElementById('drawer-armed-pip');
+    if (drawerPip) drawerPip.style.display = 'none';
+
     // Apply formations
     applyFormationToTeam('p1', p1Formation);
 
@@ -27618,11 +27749,11 @@
     generateStadiumFans();
     resetPitchEntities();
 
-    // Give Disc 1 Tornado Shot fully charged and armed
+    // Give Disc 1 Tornado Shot fully charged without being auto-armed
     if (discs[0]) {
       discs[0].powerup = DISC_POWERUPS_DATABASE.find(p => p.id === 'tornado') || DISC_POWERUPS_DATABASE[0];
       discs[0].cooldownCurrent = discs[0].powerup.cooldownReq;
-      discs[0].isArmed = true;
+      discs[0].isArmed = false;
     }
 
     gameState = 'AIMING';
@@ -27658,8 +27789,8 @@
         pDisc = new Disc(p.x + p.w * 0.48, p.y + p.h * 0.50, 'p1', 0, tornadoPower, getUserEquippedSkin());
       }
       pDisc.powerup = tornadoPower;
-      pDisc.cooldownCurrent = tornadoPower.cooldownReq;
-      pDisc.isArmed = true;
+      pDisc.cooldownCurrent = 0;
+      pDisc.isArmed = false;
       discs.push(pDisc);
 
       activeManagerPowers = [
@@ -27782,7 +27913,7 @@
     if (currentTurn === 'p2') {
       // 1. Decrement Manager Power Cooldowns
       activeManagerPowers.forEach(mp => {
-        if (mp.cdRemaining > 0) mp.cdRemaining--;
+        if (mp && mp.cdRemaining > 0) mp.cdRemaining--;
       });
 
       // 2. Increment turn-based player cooldowns
@@ -30039,6 +30170,7 @@
   }
 
   function toggleArmSpecificDisc(discId) {
+    if (isTutorialMode) return;
     const targetDisc = discs.find(d => d.id == discId);
     if (!targetDisc || !targetDisc.powerup) return;
 
@@ -30155,7 +30287,7 @@
       });
       sound.playWhistle();
     } else if (pid === 'divine_decree') {
-      activeManagerPowers.forEach(p => p.cdRemaining = 0);
+      activeManagerPowers.forEach(p => { if (p) p.cdRemaining = 0; });
       discs.forEach(d => {
         if (d.team === 'p1' && d.powerup) d.cooldownCurrent = d.powerup.cooldownReq;
       });
@@ -30615,8 +30747,8 @@
 
       if (isTutorialMode) {
         tutorialUsedAbility = true;
-        disc.cooldownCurrent = disc.powerup ? disc.powerup.cooldownReq : 1;
-        disc.isArmed = true;
+        disc.cooldownCurrent = 0;
+        disc.isArmed = false;
       } else {
         disc.cooldownCurrent = 0;
         disc.isArmed = false;
@@ -30678,6 +30810,7 @@
   };
 
   // --- PHYSICS ENGINE & GOAL DETECTION ---
+  let movingFramesSafetyCounter = 0;
   function updatePhysics() {
     if (isPaused) return;
 
@@ -30954,14 +31087,34 @@
 
     // Turn movement completion
     if (gameState === 'MOVING') {
+      movingFramesSafetyCounter++;
+
+      // Pre-snap any microscopic velocities below threshold
+      discs.forEach(d => {
+        if (Math.hypot(d.vx, d.vy) < 0.05) { d.vx = 0; d.vy = 0; }
+      });
+      if (ball && Math.hypot(ball.vx, ball.vy) < 0.05) {
+        ball.vx = 0; ball.vy = 0;
+      }
+
       let isMoving = false;
-      if (ball && Math.hypot(ball.vx, ball.vy) > 0) isMoving = true;
+      if (ball && Math.hypot(ball.vx, ball.vy) >= 0.05) isMoving = true;
       if (!isMoving) {
         for (const d of discs) {
-          if (Math.hypot(d.vx, d.vy) > 0) { isMoving = true; break; }
+          if (Math.hypot(d.vx, d.vy) >= 0.05) { isMoving = true; break; }
         }
       }
+
+      // Hard safety watchdog: if objects take longer than 4.5 seconds (270 frames), force stop
+      if (movingFramesSafetyCounter > 270) {
+        discs.forEach(d => { d.vx = 0; d.vy = 0; });
+        if (ball) { ball.vx = 0; ball.vy = 0; }
+        isMoving = false;
+        movingFramesSafetyCounter = 0;
+      }
+
       if (!isMoving) {
+        movingFramesSafetyCounter = 0;
         if (isTutorialMode) {
           if (!isTutorialScored) {
             gameState = 'AIMING';
@@ -30972,7 +31125,7 @@
             if (tutorialStep === 1) {
               if (txt) txt.textContent = 'Drag back and shoot the ball into the goal!';
             } else {
-              if (txt) txt.textContent = 'Your Tornado Shot is ARMED! Shoot the ball to launch your cyclone into the goal!';
+              if (txt) txt.textContent = 'Drag your puck to shoot into the goal!';
             }
             if (btn) btn.style.display = 'none';
             if (overlay) overlay.style.display = 'flex';
@@ -30981,6 +31134,8 @@
           switchTurn();
         }
       }
+    } else {
+      movingFramesSafetyCounter = 0;
     }
 
     // Update Shockwaves & Particles
@@ -31378,7 +31533,7 @@
           // Energy Siphon
           if (disc && disc.isEnergySiphon) {
             activeManagerPowers.forEach(mp => {
-              if (mp.cdRemaining > 0) mp.cdRemaining = Math.max(0, mp.cdRemaining - 1);
+              if (mp && mp.cdRemaining > 0) mp.cdRemaining = Math.max(0, mp.cdRemaining - 1);
             });
             updateManagerPowersHUD();
             sound.playKick(1.2);
