@@ -6836,7 +6836,6 @@
         </div>
 
         <button class="btn-go" id="btn-login-go">START</button>
-        <button type="button" id="btn-play-guest" onclick="playAsGuest()" style="width:100%; margin-top:12px; background:rgba(255,255,255,0.85); border:3.5px solid var(--border-dark); color:var(--text-dark); padding:12px 20px; font-size:16px; font-weight:900; letter-spacing:1px; border-radius:18px; cursor:pointer; box-shadow:0 6px 0 var(--border-dark); transition:all 0.15s;" onmouseover="this.style.background='#ffffff'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(255,255,255,0.85)'; this.style.transform='none'">PLAY AS GUEST</button>
       </div>
     </div>
 
@@ -8715,7 +8714,7 @@
             </svg>
             <div style="display:flex; flex-direction:column;">
               <span style="font-size: 12px; font-weight: 900; color: #ffffff;">Leaderboard #1 Crown Multiplier</span>
-              <span style="font-size: 10px; font-weight: 700; color: #c084fc;" id="leaderboard-multiplier-desc">Be #1 in any category to earn +1.5x coins per category!</span>
+              <span style="font-size: 10px; font-weight: 700; color: #c084fc;" id="leaderboard-multiplier-desc">Reach #1 in any leaderboard category to unlock a 2.0x match PB payout multiplier!</span>
             </div>
           </div>
           <span class="leaderboard-multiplier-badge" id="leaderboard-multiplier-val">1.0x Active</span>
@@ -10312,6 +10311,25 @@
       removedFromLeaderboard: prev.removedFromLeaderboard || false
     };
     localStorage.setItem('ps_accounts_db', JSON.stringify(accounts));
+
+    if (typeof fbRtdb !== 'undefined' && fbRtdb) {
+      fbRtdb.ref('users/' + key).update({
+        username: username,
+        password: password || prev.password || '',
+        miniId: miniId || prev.miniId || myMiniId,
+        pocketbucks: parseInt(localStorage.getItem('ps_pocketbucks_' + key) || '0', 10),
+        unlockedSkins: JSON.parse(localStorage.getItem('ps_unlocked_skins_' + key) || '["sym_star"]'),
+        equippedSkin: localStorage.getItem('ps_equipped_skin_' + key) || 'sym_star',
+        unlockedColors: JSON.parse(localStorage.getItem('ps_unlocked_colors_' + key) || '["c_royal_blue","c_crimson_red"]'),
+        equippedColor: localStorage.getItem('ps_equipped_color_' + key) || '#3b82f6',
+        tutorialDone: (tutorialDone !== undefined ? tutorialDone : (prev.tutorialDone || false)),
+        banned: prev.banned || false,
+        banReason: prev.banReason || '',
+        kicked: prev.kicked || false,
+        removedFromLeaderboard: prev.removedFromLeaderboard || false,
+        lastLogin: Date.now()
+      }).catch(() => {});
+    }
 
     if (fbDb) {
       const docId = (currentUser && currentUser.uid) ? currentUser.uid : ('user_' + key.replace(/[^a-z0-9]/g, ''));
@@ -14941,6 +14959,13 @@
   }
 
   function syncUserFieldToCloud(field, val) {
+    const uKey = getCurrentUserKey();
+    if (uKey && typeof fbRtdb !== 'undefined' && fbRtdb) {
+      fbRtdb.ref('users/' + uKey + '/' + field).set(val).catch(() => {});
+      if (field === 'pocketbucks') {
+        fbRtdb.ref('leaderboard/' + uKey + '/pocketbucks').set(val).catch(() => {});
+      }
+    }
     if (fbDb && currentUser) {
       const updateObj = {};
       updateObj[field] = val;
@@ -19536,10 +19561,12 @@
     // Firebase Auth & Realtime Database Setup
     try {
       if (window.firebase) {
-        fbApp = firebase.initializeApp(firebaseConfig);
+        fbApp = !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
         fbAuth = firebase.auth();
         fbDb = firebase.firestore();
         fbRtdb = firebase.database();
+        window.fbRtdb = fbRtdb;
+        window.fbAuth = fbAuth;
 
         fbAuth.onAuthStateChanged(user => {
           if (user) {
@@ -22375,19 +22402,100 @@
     return clean;
   }
 
+  let isLeaderboardRealtimeListening = false;
   function fetchCloudLeaderboards() {
     try {
-      if (typeof fbDb !== 'undefined' && fbDb) {
+      if (typeof fbRtdb !== 'undefined' && fbRtdb) {
+        const handleServerData = (lbVal, usersVal) => {
+          let cloudDb = getCleanLeaderboardDb();
+          const userMap = new Map();
+
+          // 1. Ingest all registered users from Realtime Database
+          if (usersVal && typeof usersVal === 'object') {
+            Object.entries(usersVal).forEach(([k, uDoc]) => {
+              if (!uDoc) return;
+              const uId = (uDoc.username || k || '').toLowerCase().replace(/^user_/, '');
+              if (!uId || FAKE_LEADERBOARD_ACCOUNTS.includes(uId)) return;
+              if (isLeaderboardSuppressed(uId, uDoc.username)) return;
+
+              const stats = uDoc.lifetimeStats || uDoc.stats || {};
+              userMap.set(uId, {
+                id: uId,
+                name: uDoc.username || k,
+                isUser: true,
+                color: uDoc.equippedColor || '#3b82f6',
+                skin: uDoc.equippedSkin || 'sym_star',
+                pocketbucks: (typeof uDoc.pocketbucks === 'number') ? uDoc.pocketbucks : (parseInt(uDoc.pocketbucks, 10) || 0),
+                cratesOpened: stats.career_crates_opened || 0,
+                skinsCount: Array.isArray(uDoc.unlockedSkins) ? uDoc.unlockedSkins.length : 1,
+                matchesPlayed: stats.career_matches_played || 0,
+                matchesWon: stats.career_matches_won || 0,
+                matchesLost: stats.career_matches_lost || 0,
+                tourneysWon: stats.career_tourney_champs || 0,
+                playtimeSeconds: stats.career_playtime_seconds || 0,
+                seasonYear: (uDoc.season && uDoc.season.year) || 1,
+                seasonWeek: (uDoc.season && uDoc.season.week) || 1,
+                seasonScore: (uDoc.season && uDoc.season.score) || 1,
+                updatedAt: uDoc.lastLogin || Date.now()
+              });
+            });
+          }
+
+          // 2. Ingest explicit leaderboard entries
+          if (lbVal && typeof lbVal === 'object') {
+            Object.entries(lbVal).forEach(([k, data]) => {
+              if (!data) return;
+              const entryId = (data.id || k || '').toLowerCase().replace(/^user_/, '');
+              if (!entryId || FAKE_LEADERBOARD_ACCOUNTS.includes(entryId)) return;
+              if (isLeaderboardSuppressed(entryId, data.name)) return;
+
+              const existing = userMap.get(entryId) || {};
+              userMap.set(entryId, Object.assign({}, existing, data, {
+                id: entryId,
+                name: data.name || existing.name || entryId,
+                pocketbucks: (data.pocketbucks !== undefined) ? data.pocketbucks : (existing.pocketbucks || 0),
+                cratesOpened: (data.cratesOpened !== undefined) ? data.cratesOpened : (existing.cratesOpened || 0)
+              }));
+            });
+          }
+
+          // Combine with any existing local cache
+          userMap.forEach((entry, id) => {
+            const idx = cloudDb.findIndex(e => (e.id || '').toLowerCase() === id);
+            if (idx >= 0) cloudDb[idx] = Object.assign({}, cloudDb[idx], entry);
+            else cloudDb.push(entry);
+          });
+
+          cloudDb = cloudDb.filter(e => e && e.id && !isLeaderboardSuppressed(e.id, e.name));
+          localStorage.setItem('ps_cloud_leaderboard_db', JSON.stringify(cloudDb));
+          renderLeaderboardUI();
+        };
+
+        // Realtime sync listener on /leaderboard
+        if (!isLeaderboardRealtimeListening) {
+          isLeaderboardRealtimeListening = true;
+          fbRtdb.ref('leaderboard').on('value', snapshot => {
+            const lbVal = snapshot.val() || {};
+            fbRtdb.ref('users').once('value').then(userSnap => {
+              handleServerData(lbVal, userSnap.val() || {});
+            }).catch(() => {
+              handleServerData(lbVal, null);
+            });
+          });
+        } else {
+          // One-shot refresh
+          fbRtdb.ref('leaderboard').once('value').then(lbSnap => {
+            fbRtdb.ref('users').once('value').then(userSnap => {
+              handleServerData(lbSnap.val() || {}, userSnap.val() || {});
+            });
+          });
+        }
+      } else if (typeof fbDb !== 'undefined' && fbDb) {
         fbDb.collection('leaderboard').get().then(snapshot => {
           let cloudDb = getCleanLeaderboardDb();
           snapshot.forEach(doc => {
-            const docIdLower = doc.id.toLowerCase();
-            if (FAKE_LEADERBOARD_ACCOUNTS.includes(docIdLower)) {
-              if (fbDb) fbDb.collection('leaderboard').doc(doc.id).delete().catch(() => {});
-              return;
-            }
             const data = doc.data();
-            if (data && data.id && !data.id.startsWith('rival_') && !isLeaderboardSuppressed(data.id, data.name)) {
+            if (data && data.id && !isLeaderboardSuppressed(data.id, data.name)) {
               const idx = cloudDb.findIndex(e => e.id === data.id);
               if (idx >= 0) cloudDb[idx] = data;
               else cloudDb.push(data);
@@ -22397,29 +22505,10 @@
           localStorage.setItem('ps_cloud_leaderboard_db', JSON.stringify(cloudDb));
           renderLeaderboardUI();
         }).catch(() => {});
-      } else if (typeof fbRtdb !== 'undefined' && fbRtdb) {
-        fbRtdb.ref('leaderboard').once('value', snapshot => {
-          const val = snapshot.val();
-          if (val) {
-            let cloudDb = getCleanLeaderboardDb();
-            Object.entries(val).forEach(([k, data]) => {
-              if (FAKE_LEADERBOARD_ACCOUNTS.includes(k.toLowerCase())) {
-                if (fbRtdb) fbRtdb.ref('leaderboard/' + k).remove().catch(() => {});
-                return;
-              }
-              if (data && data.id && !data.id.startsWith('rival_') && !isLeaderboardSuppressed(data.id, data.name)) {
-                const idx = cloudDb.findIndex(e => e.id === data.id);
-                if (idx >= 0) cloudDb[idx] = data;
-                else cloudDb.push(data);
-              }
-            });
-            cloudDb = cloudDb.filter(e => !isLeaderboardSuppressed(e.id, e.name));
-            localStorage.setItem('ps_cloud_leaderboard_db', JSON.stringify(cloudDb));
-            renderLeaderboardUI();
-          }
-        }).catch(() => {});
       }
-    } catch (e) {}
+    } catch (e) {
+      console.warn('Leaderboard fetch notice:', e);
+    }
   }
   window.fetchCloudLeaderboards = fetchCloudLeaderboards;
 
@@ -22428,7 +22517,7 @@
       const uKey = getCurrentUserKey();
       const accountName = myUsername || localStorage.getItem('ps_username') || 'Player';
       if (isLeaderboardSuppressed(uKey, accountName)) {
-        return; // Suppressed from leaderboard
+        return;
       }
 
       const stats = (typeof getUserLifetimeStats === 'function') ? getUserLifetimeStats() : {};
@@ -22448,9 +22537,9 @@
         matchesLost: stats.career_matches_lost || 0,
         tourneysWon: stats.career_tourney_champs || 0,
         playtimeSeconds: getUserPlaytimeSeconds(),
-        seasonYear: seasonProg.year,
-        seasonWeek: seasonProg.week,
-        seasonScore: seasonProg.score,
+        seasonYear: seasonProg.year || 1,
+        seasonWeek: seasonProg.week || 1,
+        seasonScore: seasonProg.score || 1,
         updatedAt: Date.now()
       };
 
@@ -22463,11 +22552,13 @@
       }
       localStorage.setItem('ps_cloud_leaderboard_db', JSON.stringify(cloudDb));
 
-      if (typeof fbDb !== 'undefined' && fbDb) {
-        fbDb.collection('leaderboard').doc(uKey).set(userRecord, { merge: true }).catch(() => {});
-      }
       if (typeof fbRtdb !== 'undefined' && fbRtdb) {
         fbRtdb.ref('leaderboard/' + uKey).set(userRecord).catch(() => {});
+        fbRtdb.ref('users/' + uKey + '/pocketbucks').set(userRecord.pocketbucks).catch(() => {});
+        fbRtdb.ref('users/' + uKey + '/lifetimeStats').set(stats).catch(() => {});
+      }
+      if (typeof fbDb !== 'undefined' && fbDb) {
+        fbDb.collection('leaderboard').doc(uKey).set(userRecord, { merge: true }).catch(() => {});
       }
 
       if (!isSilent) {
@@ -22501,8 +22592,8 @@
         }
       });
 
-      if (top1Count === 0) return 1.0;
-      return 1.0 + (1.5 * top1Count);
+      if (top1Count >= 1) return 2.0;
+      return 1.0;
     } catch (e) {
       return 1.0;
     }
@@ -22698,10 +22789,9 @@
     }
     if (multDesc) {
       if (mult > 1.0) {
-        const count = Math.round((mult - 1.0) / 1.5);
-        multDesc.textContent = `Dominating ${count} category leaderboards! Match PB payouts are multiplied by ${mult.toFixed(1)}x!`;
+        multDesc.textContent = 'Leaderboard #1 Crown Multiplier active! Match PB payouts are multiplied by 2.0x!';
       } else {
-        multDesc.textContent = 'Reach #1 in any leaderboard category to unlock +1.5x coins per category!';
+        multDesc.textContent = 'Reach #1 in any leaderboard category to unlock a 2.0x match PB payout multiplier!';
       }
     }
 
@@ -25471,13 +25561,18 @@
           if (docData.equippedSkin) localStorage.setItem('ps_equipped_skin_' + uKey, docData.equippedSkin);
           if (docData.unlockedColors) localStorage.setItem('ps_unlocked_colors_' + uKey, JSON.stringify(docData.unlockedColors));
           if (docData.equippedColor) localStorage.setItem('ps_equipped_color_' + uKey, docData.equippedColor);
+          if (docData.unlockedPuckAbilities) localStorage.setItem('ps_unlocked_puck_abilities_' + uKey, JSON.stringify(docData.unlockedPuckAbilities));
+          if (docData.unlockedPlayerPowers) localStorage.setItem('ps_unlocked_player_powers_' + uKey, JSON.stringify(docData.unlockedPlayerPowers));
+          if (docData.unlockedExplosions) localStorage.setItem('ps_unlocked_explosions_' + uKey, JSON.stringify(docData.unlockedExplosions));
+          if (docData.equippedExplosion) localStorage.setItem('ps_equipped_explosion_' + uKey, docData.equippedExplosion);
+          if (docData.lifetimeStats) localStorage.setItem('ps_lifetime_stats_' + uKey, JSON.stringify(docData.lifetimeStats));
+          if (docData.achievementsState) localStorage.setItem('ps_achievements_state_' + uKey, JSON.stringify(docData.achievementsState));
           if (docData.tutorialDone !== undefined) localStorage.setItem('ps_football_tutorial_' + uKey, docData.tutorialDone ? 'true' : 'false');
         }
 
         updateUserBarUI();
         if (typeof startUserDocRealtimeGuard === 'function') {
-          const guardId = (currentUser && currentUser.uid) ? currentUser.uid : ('user_' + uKey.replace(/[^a-z0-9]/g, ''));
-          startUserDocRealtimeGuard(guardId);
+          startUserDocRealtimeGuard(uKey);
         }
         sound.playKick(0.6);
 
@@ -25496,152 +25591,128 @@
         }
       }
 
-      if (fbAuth) {
-        // Try sign-in in the cloud
-        fbAuth.signInWithEmailAndPassword(authEmail, authPass)
-          .then(res => {
-            currentUser = res.user;
-            if (!currentUser.displayName) currentUser.updateProfile({ displayName: u });
-
-            if (fbDb) {
-              fbDb.collection('users').doc(currentUser.uid).get().then(docSnap => {
-                const data = docSnap.exists ? docSnap.data() : null;
-                
-                // Ban check in cloud
-                if (data && data.banned) {
-                  fbAuth.signOut();
-                  currentUser = null;
-                  errorEl.className = 'login-error-msg error';
-                  errorEl.style.display = 'block';
-                  errorEl.textContent = 'This account is banned: ' + (data.banReason || 'Violation of rules');
-                  sound.playCountdownBeep(true);
-                  return;
-                }
-
-                // Update lastLogin and password in cloud
-                fbDb.collection('users').doc(currentUser.uid).set({
-                  username: u,
-                  password: p,
-                  email: authEmail,
-                  miniId: (data && data.miniId) || myMiniId,
-                  lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true }).catch(() => {});
-
-                completeLoginSuccess(u, (data && data.miniId) || myMiniId, false, data);
-              }).catch(() => {
-                completeLoginSuccess(u, myMiniId, false, null);
-              });
-            } else {
-              completeLoginSuccess(u, myMiniId, false, null);
-            }
-          })
-          .catch(err => {
-            // If user does not exist in Firebase (e.g. deleted from console or brand new account)
-            if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email') {
-              fbAuth.createUserWithEmailAndPassword(authEmail, authPass)
-                .then(res => {
-                  currentUser = res.user;
-                  currentUser.updateProfile({ displayName: u });
-
-                  const newDoc = {
-                    uid: currentUser.uid,
-                    username: u,
-                    password: p,
-                    email: authEmail,
-                    miniId: myMiniId,
-                    pocketbucks: 0,
-                    unlockedSkins: ['sym_star'],
-                    equippedSkin: 'sym_star',
-                    unlockedColors: ['c_royal_blue', 'c_crimson_red'],
-                    equippedColor: '#3b82f6',
-                    tutorialDone: false,
-                    banned: false,
-                    kicked: false,
-                    removedFromLeaderboard: false,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                  };
-
-                  if (fbDb) {
-                    fbDb.collection('users').doc(currentUser.uid).set(newDoc).catch(() => {});
-                  }
-
-                  completeLoginSuccess(u, myMiniId, true, newDoc);
-                })
-                .catch(createErr => {
-                  if (createErr.code === 'auth/email-already-in-use') {
-                    const storedAccount = getStoredAccount(uKey);
-                    if (storedAccount && (!storedAccount.password || storedAccount.password === p)) {
-                      completeLoginSuccess(storedAccount.username, storedAccount.miniId, false, null);
-                      return;
-                    }
-                    errorEl.className = 'login-error-msg error';
-                    errorEl.style.display = 'block';
-                    errorEl.textContent = 'Wrong password for this account.';
-                    sound.playCountdownBeep(true);
-                  } else {
-                    const storedAccount = getStoredAccount(uKey);
-                    if (storedAccount && (!storedAccount.password || storedAccount.password === p)) {
-                      completeLoginSuccess(storedAccount.username, storedAccount.miniId, false, null);
-                      return;
-                    }
-                    errorEl.className = 'login-error-msg error';
-                    errorEl.style.display = 'block';
-                    errorEl.textContent = createErr.message || 'Authentication failed.';
-                    sound.playCountdownBeep(true);
-                  }
-                });
-            } else if (err.code === 'auth/wrong-password') {
-              errorEl.className = 'login-error-msg error';
-              errorEl.style.display = 'block';
-              errorEl.textContent = 'Wrong password, try again.';
-              sound.playCountdownBeep(true);
-            } else {
-              // Local fallback if offline
-              const storedAccount = getStoredAccount(uKey);
-              if (storedAccount) {
-                if (storedAccount.banned) {
-                  errorEl.className = 'login-error-msg error';
-                  errorEl.style.display = 'block';
-                  errorEl.textContent = 'This account is banned: ' + (storedAccount.banReason || 'Violation of rules');
-                  sound.playCountdownBeep(true);
-                  return;
-                }
-                if (storedAccount.password !== p) {
-                  errorEl.className = 'login-error-msg error';
-                  errorEl.style.display = 'block';
-                  errorEl.textContent = 'Wrong password, try again.';
-                  sound.playCountdownBeep(true);
-                  return;
-                }
-                completeLoginSuccess(storedAccount.username, storedAccount.miniId, false, null);
-              } else {
-                saveStoredAccount(u, p, myMiniId, false);
-                completeLoginSuccess(u, myMiniId, true, null);
-              }
-            }
-          });
-      } else {
-        // Offline / No Firebase SDK fallback
+      function fallbackLocalLogin() {
         const storedAccount = getStoredAccount(uKey);
         if (storedAccount) {
           if (storedAccount.banned) {
             errorEl.className = 'login-error-msg error';
             errorEl.style.display = 'block';
-            errorEl.textContent = 'This account is banned.';
+            errorEl.textContent = 'This account is banned: ' + (storedAccount.banReason || 'Violation of rules');
+            sound.playCountdownBeep(true);
             return;
           }
-          if (storedAccount.password !== p) {
+          if (storedAccount.password && storedAccount.password !== p) {
             errorEl.className = 'login-error-msg error';
             errorEl.style.display = 'block';
             errorEl.textContent = 'Wrong password, try again.';
+            sound.playCountdownBeep(true);
             return;
           }
-          completeLoginSuccess(storedAccount.username, storedAccount.miniId, false, null);
+          completeLoginSuccess(storedAccount.username, storedAccount.miniId, false, storedAccount);
         } else {
           saveStoredAccount(u, p, myMiniId, false);
           completeLoginSuccess(u, myMiniId, true, null);
         }
+      }
+
+      // Background Firebase Auth attempt (optional helper, non-blocking)
+      if (typeof fbAuth !== 'undefined' && fbAuth) {
+        fbAuth.signInWithEmailAndPassword(authEmail, authPass).catch(() => {
+          fbAuth.createUserWithEmailAndPassword(authEmail, authPass).catch(() => {});
+        });
+      }
+
+      // Primary Authentication & Cross-Device Cloud Sync via Firebase Realtime Database
+      if (typeof fbRtdb !== 'undefined' && fbRtdb) {
+        fbRtdb.ref('users/' + uKey).once('value').then(snap => {
+          if (snap.exists()) {
+            const cloudData = snap.val() || {};
+
+            // Cloud ban check
+            if (cloudData.banned) {
+              errorEl.className = 'login-error-msg error';
+              errorEl.style.display = 'block';
+              errorEl.textContent = 'This account is banned: ' + (cloudData.banReason || 'Violation of rules');
+              sound.playCountdownBeep(true);
+              return;
+            }
+
+            // Cloud password verification
+            if (cloudData.password && cloudData.password !== p) {
+              errorEl.className = 'login-error-msg error';
+              errorEl.style.display = 'block';
+              errorEl.textContent = 'Wrong password for this account.';
+              sound.playCountdownBeep(true);
+              return;
+            }
+
+            // Update password in cloud if it was blank, plus lastLogin
+            const updates = { lastLogin: Date.now() };
+            if (!cloudData.password) updates.password = p;
+            fbRtdb.ref('users/' + uKey).update(updates).catch(() => {});
+
+            // Ensure player is on leaderboard
+            const cloudPB = (typeof cloudData.pocketbucks === 'number') ? cloudData.pocketbucks : (parseInt(cloudData.pocketbucks) || 0);
+            const cloudStats = cloudData.lifetimeStats || {};
+            fbRtdb.ref('leaderboard/' + uKey).update({
+              username: cloudData.username || u,
+              miniId: cloudData.miniId || myMiniId,
+              pocketbucks: cloudPB,
+              cratesOpened: cloudStats.career_crates_opened || 0,
+              wins: cloudStats.career_wins || 0,
+              goals: cloudStats.career_goals || 0,
+              lastUpdated: Date.now()
+            }).catch(() => {});
+
+            completeLoginSuccess(cloudData.username || u, cloudData.miniId || myMiniId, false, cloudData);
+          } else {
+            // New cloud account on Realtime Database
+            const newDoc = {
+              username: u,
+              password: p,
+              miniId: myMiniId,
+              pocketbucks: 0,
+              unlockedSkins: ['sym_star'],
+              equippedSkin: 'sym_star',
+              unlockedColors: ['c_royal_blue', 'c_crimson_red'],
+              equippedColor: '#3b82f6',
+              unlockedPuckAbilities: [],
+              unlockedPlayerPowers: [],
+              unlockedExplosions: ['exp_classic'],
+              equippedExplosion: 'exp_classic',
+              lifetimeStats: { career_crates_opened: 0, career_wins: 0, career_goals: 0 },
+              achievementsState: {},
+              tutorialDone: false,
+              banned: false,
+              banReason: '',
+              kicked: false,
+              removedFromLeaderboard: false,
+              createdAt: Date.now(),
+              lastLogin: Date.now()
+            };
+
+            fbRtdb.ref('users/' + uKey).set(newDoc).then(() => {
+              fbRtdb.ref('leaderboard/' + uKey).set({
+                username: u,
+                miniId: myMiniId,
+                pocketbucks: 0,
+                cratesOpened: 0,
+                wins: 0,
+                goals: 0,
+                lastUpdated: Date.now()
+              }).catch(() => {});
+              completeLoginSuccess(u, myMiniId, true, newDoc);
+            }).catch(err => {
+              console.warn('Error creating RTDB user:', err);
+              fallbackLocalLogin();
+            });
+          }
+        }).catch(err => {
+          console.warn('RTDB login read error:', err);
+          fallbackLocalLogin();
+        });
+      } else {
+        fallbackLocalLogin();
       }
     });
 
@@ -28871,7 +28942,7 @@
       incrementLifetimeStat('career_matches_lost', 1);
     }
 
-    // Rocket League Coin Multiplier (Points / 500) & Leaderboard #1 Stacking Multiplier (+1.5x per #1 rank)
+    // Rocket League Coin Multiplier (Points / 500) & Leaderboard #1 Multiplier (2.0x for holding #1 rank in any category)
     const baseMultiplier = Math.max(1.0, Math.round(((matchPoints.p1 || 0) / 500) * 10) / 10);
     const lbMultiplier = (typeof getLeaderboardMultiplier === 'function') ? getLeaderboardMultiplier() : 1.0;
     const multiplier = Math.round(baseMultiplier * lbMultiplier * 10) / 10;
@@ -32688,106 +32759,134 @@
   async function adminFetchUsers(showToast = false) {
     const statusEl = document.getElementById('admin-connection-status');
     const countEl = document.getElementById('admin-user-count');
-    if (statusEl) statusEl.textContent = '↻ Syncing Firestore...';
+    if (statusEl) statusEl.textContent = '↻ Syncing Firebase RTDB...';
 
     adminUsersCache = [];
     const FAKE_ACCOUNTS = ['playerone', 'player1', 'sammy', 'new', 'blunarius', 'regularplayer', 'guest', 'player'];
+    const deletedAccounts = JSON.parse(localStorage.getItem('ps_deleted_accounts') || '[]');
+    const excludedLb = JSON.parse(localStorage.getItem('ps_excluded_from_lb') || '[]');
+    const userDocMap = new Map();
 
-    if (fbDb) {
+    if (typeof fbRtdb !== 'undefined' && fbRtdb) {
       try {
-        const snap = await fbDb.collection('users').get();
-        const deletedAccounts = JSON.parse(localStorage.getItem('ps_deleted_accounts') || '[]');
-        const excludedLb = JSON.parse(localStorage.getItem('ps_excluded_from_lb') || '[]');
+        const snap = await fbRtdb.ref('users').once('value');
+        if (snap.exists()) {
+          const val = snap.val() || {};
+          Object.keys(val).forEach(key => {
+            const d = val[key] || {};
+            const uname = (d.username || key || '').trim();
+            const uKey = uname.toLowerCase();
 
-        const userDocMap = new Map();
-
-        snap.forEach(doc => {
-          const d = doc.data() || {};
-          const uname = (d.username || doc.id.replace(/^user_/, '') || '').trim();
-          const uKey = uname.toLowerCase();
-
-          // Purge any fake accounts from Firestore immediately
-          if (FAKE_ACCOUNTS.includes(uKey) || FAKE_ACCOUNTS.includes(doc.id.toLowerCase())) {
-            fbDb.collection('users').doc(doc.id).delete().catch(() => {});
-            return;
-          }
-          if (deletedAccounts.includes(uKey) || deletedAccounts.includes(doc.id.toLowerCase())) return;
-
-          const isBanned = !!d.banned || !!localStorage.getItem('ps_banned_' + uKey);
-          const banReason = d.banReason || localStorage.getItem('ps_banned_' + uKey) || '';
-
-          const userObj = {
-            docId: doc.id,
-            username: uname || 'User',
-            password: d.password || '',
-            miniId: d.miniId || '#????',
-            pocketbucks: (typeof d.pocketbucks === 'number') ? d.pocketbucks : (parseInt(d.pocketbucks) || 0),
-            unlockedSkins: Array.isArray(d.unlockedSkins) ? d.unlockedSkins : ['sym_star'],
-            equippedSkin: d.equippedSkin || 'sym_star',
-            unlockedColors: Array.isArray(d.unlockedColors) ? d.unlockedColors : ['c_royal_blue'],
-            equippedColor: d.equippedColor || '#3b82f6',
-            banned: isBanned,
-            banReason: banReason,
-            kicked: !!d.kicked,
-            removedFromLeaderboard: !!d.removedFromLeaderboard || excludedLb.includes(uKey),
-            lastLogin: d.lastLogin ? (d.lastLogin.toMillis ? d.lastLogin.toMillis() : Date.now()) : 0
-          };
-
-          if (!userDocMap.has(uKey)) {
-            userDocMap.set(uKey, userObj);
-          } else {
-            const existing = userDocMap.get(uKey);
-            // If duplicate found: prefer the real UID document (length > 20 and not starting with user_)
-            if (doc.id.length > 20 && !doc.id.startsWith('user_')) {
-              if (existing.docId.startsWith('user_')) {
-                fbDb.collection('users').doc(existing.docId).delete().catch(() => {});
-              }
-              userDocMap.set(uKey, Object.assign({}, existing, userObj));
-            } else if (existing.docId.length > 20 && !existing.docId.startsWith('user_')) {
-              if (doc.id.startsWith('user_')) {
-                fbDb.collection('users').doc(doc.id).delete().catch(() => {});
-              }
-            } else {
-              userDocMap.set(uKey, Object.assign({}, existing, userObj));
+            // Purge any fake accounts
+            if (FAKE_ACCOUNTS.includes(uKey) || FAKE_ACCOUNTS.includes(key.toLowerCase())) {
+              fbRtdb.ref('users/' + key).remove().catch(() => {});
+              return;
             }
-          }
-        });
+            if (deletedAccounts.includes(uKey) || deletedAccounts.includes(key.toLowerCase())) return;
 
-        adminUsersCache = Array.from(userDocMap.values());
+            const isBanned = !!d.banned || !!localStorage.getItem('ps_banned_' + uKey);
+            const banReason = d.banReason || localStorage.getItem('ps_banned_' + uKey) || '';
+
+            const userObj = {
+              docId: key,
+              username: uname || 'User',
+              password: d.password || '',
+              miniId: d.miniId || '#????',
+              pocketbucks: (typeof d.pocketbucks === 'number') ? d.pocketbucks : (parseInt(d.pocketbucks) || 0),
+              unlockedSkins: Array.isArray(d.unlockedSkins) ? d.unlockedSkins : ['sym_star'],
+              equippedSkin: d.equippedSkin || 'sym_star',
+              unlockedColors: Array.isArray(d.unlockedColors) ? d.unlockedColors : ['c_royal_blue'],
+              equippedColor: d.equippedColor || '#3b82f6',
+              banned: isBanned,
+              banReason: banReason,
+              kicked: !!d.kicked,
+              removedFromLeaderboard: !!d.removedFromLeaderboard || excludedLb.includes(uKey),
+              lastLogin: d.lastLogin || Date.now()
+            };
+
+            userDocMap.set(uKey, userObj);
+          });
+        }
+
+        // Also merge players from leaderboard so every player on the server appears in admin
+        const lbSnap = await fbRtdb.ref('leaderboard').once('value');
+        if (lbSnap.exists()) {
+          const lbVal = lbSnap.val() || {};
+          Object.keys(lbVal).forEach(key => {
+            const d = lbVal[key] || {};
+            const uname = (d.name || d.username || key || '').trim();
+            const uKey = uname.toLowerCase().replace(/^user_/, '');
+            if (FAKE_ACCOUNTS.includes(uKey) || FAKE_ACCOUNTS.includes(key.toLowerCase())) return;
+            if (deletedAccounts.includes(uKey) || deletedAccounts.includes(key.toLowerCase())) return;
+            if (!userDocMap.has(uKey)) {
+              userDocMap.set(uKey, {
+                docId: key,
+                username: uname || key,
+                password: '',
+                miniId: d.miniId || '#????',
+                pocketbucks: (typeof d.pocketbucks === 'number') ? d.pocketbucks : (parseInt(d.pocketbucks) || 0),
+                unlockedSkins: [d.skin || 'sym_star'],
+                equippedSkin: d.skin || 'sym_star',
+                unlockedColors: [d.color || '#3b82f6'],
+                equippedColor: d.color || '#3b82f6',
+                banned: !!localStorage.getItem('ps_banned_' + uKey),
+                banReason: localStorage.getItem('ps_banned_' + uKey) || '',
+                kicked: false,
+                removedFromLeaderboard: excludedLb.includes(uKey),
+                lastLogin: d.updatedAt || Date.now()
+              });
+            }
+          });
+        }
 
         if (statusEl) {
-          statusEl.textContent = '● Firebase Online';
+          statusEl.textContent = '● Firebase Online (RTDB)';
           statusEl.style.color = '#22c55e';
         }
       } catch (err) {
-        console.warn('Admin fetch Firestore notice:', err);
-        if (statusEl) {
-          statusEl.textContent = '○ Offline / Local Mirror';
-          statusEl.style.color = '#f59e0b';
-        }
-      }
-    } else {
-      if (statusEl) {
-        statusEl.textContent = '○ Offline / Local Mirror';
-        statusEl.style.color = '#f59e0b';
+        console.warn('Admin fetch RTDB notice:', err);
       }
     }
 
-    // Ensure active user and bloonairius are always available in the UI
+    // Merge from local accounts DB mirror if any exist
+    const localAccs = (typeof getStoredAccounts === 'function') ? getStoredAccounts() : {};
+    Object.keys(localAccs).forEach(k => {
+      const uKey = k.toLowerCase();
+      if (FAKE_ACCOUNTS.includes(uKey) || deletedAccounts.includes(uKey)) return;
+      if (!userDocMap.has(uKey)) {
+        const acc = localAccs[k] || {};
+        userDocMap.set(uKey, {
+          docId: uKey,
+          username: acc.username || k,
+          password: acc.password || '',
+          miniId: acc.miniId || '#????',
+          pocketbucks: parseInt(localStorage.getItem('ps_pocketbucks_' + uKey) || '0', 10),
+          unlockedSkins: JSON.parse(localStorage.getItem('ps_unlocked_skins_' + uKey) || '["sym_star"]'),
+          equippedSkin: localStorage.getItem('ps_equipped_skin_' + uKey) || 'sym_star',
+          unlockedColors: JSON.parse(localStorage.getItem('ps_unlocked_colors_' + uKey) || '["c_royal_blue"]'),
+          equippedColor: localStorage.getItem('ps_equipped_color_' + uKey) || '#3b82f6',
+          banned: !!acc.banned || !!localStorage.getItem('ps_banned_' + uKey),
+          banReason: acc.banReason || localStorage.getItem('ps_banned_' + uKey) || '',
+          kicked: !!acc.kicked,
+          removedFromLeaderboard: !!acc.removedFromLeaderboard || excludedLb.includes(uKey),
+          lastLogin: acc.lastLogin || Date.now()
+        });
+      }
+    });
+
+    // Ensure active user and bloonairius are always present
     const activeU = (window.myUsername || myUsername || localStorage.getItem('ps_username') || '').trim().toLowerCase();
-    const existingNames = new Set(adminUsersCache.map(u => (u.username || '').toLowerCase()));
-    
     ['bloonairius', activeU].forEach(uKey => {
-      if (uKey && !existingNames.has(uKey) && !FAKE_ACCOUNTS.includes(uKey)) {
+      if (uKey && !userDocMap.has(uKey) && !FAKE_ACCOUNTS.includes(uKey) && !deletedAccounts.includes(uKey)) {
         const prettyName = (uKey === 'bloonairius') ? 'Bloonairius' : (uKey.charAt(0).toUpperCase() + uKey.slice(1));
-        adminUsersCache.push({
-          docId: 'user_' + uKey,
+        userDocMap.set(uKey, {
+          docId: uKey,
           username: prettyName,
           password: (uKey === 'bloonairius') ? 'password123' : '',
           miniId: (uKey === activeU) ? myMiniId : '#BL01',
-          pocketbucks: parseInt(localStorage.getItem('ps_pocketbucks_' + uKey) || '0', 10),
-          unlockedSkins: ['sym_star'],
-          equippedSkin: 'sym_star',
+          pocketbucks: parseInt(localStorage.getItem('ps_pocketbucks_' + uKey) || (uKey === 'bloonairius' ? '5000' : '0'), 10),
+          unlockedSkins: (uKey === 'bloonairius') ? ['sym_star', 'skin_neon_dragon', 'skin_golden_crown', 'skin_cosmic_nebula'] : ['sym_star'],
+          equippedSkin: (uKey === 'bloonairius') ? 'skin_neon_dragon' : 'sym_star',
           unlockedColors: ['c_royal_blue'],
           equippedColor: '#3b82f6',
           banned: false,
@@ -32796,9 +32895,10 @@
           removedFromLeaderboard: false,
           lastLogin: Date.now()
         });
-        existingNames.add(uKey);
       }
     });
+
+    adminUsersCache = Array.from(userDocMap.values());
 
     // Sort placing bloonairius at top, then alphabetical
     adminUsersCache.sort((a, b) => {
@@ -32814,42 +32914,30 @@
   window.adminFetchUsers = adminFetchUsers;
 
   async function adminPurgeFakeAccounts() {
-    if (!fbDb) {
-      adminNotify('Firebase offline: cannot purge database.');
-      return;
-    }
     const FAKE_ACCOUNTS = ['playerone', 'player1', 'sammy', 'new', 'blunarius', 'regularplayer', 'guest', 'player'];
-    try {
-      const snap = await fbDb.collection('users').get();
-      let purgedCount = 0;
-      const seenUsers = new Map();
-
-      for (const doc of snap.docs) {
-        const d = doc.data() || {};
-        const uname = (d.username || doc.id).toLowerCase();
-        if (FAKE_ACCOUNTS.includes(uname) || FAKE_ACCOUNTS.includes(doc.id.toLowerCase())) {
-          await fbDb.collection('users').doc(doc.id).delete().catch(() => {});
-          purgedCount++;
-          continue;
-        }
-        if (seenUsers.has(uname)) {
-          const prevDocId = seenUsers.get(uname);
-          let docToDelete = doc.id;
-          if (doc.id.length > 20 && !doc.id.startsWith('user_')) {
-            docToDelete = prevDocId;
-            seenUsers.set(uname, doc.id);
+    let purgedCount = 0;
+    if (typeof fbRtdb !== 'undefined' && fbRtdb) {
+      try {
+        const snap = await fbRtdb.ref('users').once('value');
+        if (snap.exists()) {
+          const val = snap.val() || {};
+          for (const key of Object.keys(val)) {
+            const uname = (val[key].username || key).toLowerCase();
+            if (FAKE_ACCOUNTS.includes(uname) || FAKE_ACCOUNTS.includes(key.toLowerCase())) {
+              await fbRtdb.ref('users/' + key).remove().catch(() => {});
+              await fbRtdb.ref('leaderboard/' + key).remove().catch(() => {});
+              purgedCount++;
+            }
           }
-          await fbDb.collection('users').doc(docToDelete).delete().catch(() => {});
-          purgedCount++;
-        } else {
-          seenUsers.set(uname, doc.id);
         }
+        adminNotify(`Purged ${purgedCount} test accounts from Firebase RTDB.`);
+        adminFetchUsers(true);
+      } catch (e) {
+        console.error('Purge error:', e);
+        adminNotify('Error purging accounts: ' + e.message);
       }
-      adminNotify(`Purged ${purgedCount} duplicate/test accounts from Firestore.`);
-      adminFetchUsers(true);
-    } catch (e) {
-      console.error('Purge error:', e);
-      adminNotify('Error purging accounts: ' + e.message);
+    } else {
+      adminNotify('Firebase offline: cannot purge database.');
     }
   }
   window.adminPurgeFakeAccounts = adminPurgeFakeAccounts;
@@ -33087,7 +33175,25 @@
     const uKey = (userObj.username || '').toLowerCase();
     Object.assign(userObj, updates);
 
-    // 1. Cloud Firestore write with timeout
+    // 1. Firebase Realtime Database write
+    if (typeof fbRtdb !== 'undefined' && fbRtdb && uKey) {
+      fbRtdb.ref('users/' + uKey).update(updates).catch(() => {});
+      if (updates.pocketbucks !== undefined) {
+        fbRtdb.ref('leaderboard/' + uKey + '/pocketbucks').set(updates.pocketbucks).catch(() => {});
+      }
+      if (updates.removedFromLeaderboard) {
+        fbRtdb.ref('leaderboard/' + uKey).remove().catch(() => {});
+      } else if (updates.removedFromLeaderboard === false) {
+        fbRtdb.ref('leaderboard/' + uKey).update({
+          username: userObj.username,
+          miniId: userObj.miniId,
+          pocketbucks: userObj.pocketbucks,
+          lastUpdated: Date.now()
+        }).catch(() => {});
+      }
+    }
+
+    // 2. Cloud Firestore write with timeout
     if (fbDb && userObj.docId) {
       try {
         await Promise.race([
@@ -33408,7 +33514,13 @@
     if (!excluded.includes(uKey)) excluded.push(uKey);
     localStorage.setItem('ps_excluded_from_lb', JSON.stringify(excluded));
 
-    // 5. Cloud Firestore deletion
+    // 5. Firebase Realtime Database deletion
+    if (typeof fbRtdb !== 'undefined' && fbRtdb) {
+      fbRtdb.ref('users/' + uKey).remove().catch(() => {});
+      fbRtdb.ref('leaderboard/' + uKey).remove().catch(() => {});
+    }
+
+    // 6. Cloud Firestore deletion
     if (fbDb) {
       try {
         await Promise.race([
@@ -33453,84 +33565,93 @@
   }
   window.adminConfirmDeleteAccount = adminConfirmDeleteAccount;
 
+  let rtdbUserGuardRef = null;
   function startUserDocRealtimeGuard(uid) {
+    if (rtdbUserGuardRef) {
+      try { rtdbUserGuardRef.off(); } catch (e) {}
+      rtdbUserGuardRef = null;
+    }
     if (userDocUnsubscribe) {
       try { userDocUnsubscribe(); } catch (e) {}
       userDocUnsubscribe = null;
     }
-    if (!fbDb || !uid) return;
-    try {
-      userDocUnsubscribe = fbDb.collection('users').doc(uid).onSnapshot(docSnap => {
-        if (!docSnap.exists) {
-          if (uid === 'user_bloonairius' || (myUsername && myUsername.toLowerCase() === 'bloonairius')) {
-            if (fbDb) {
-              fbDb.collection('users').doc(uid).set({
-                username: 'Bloonairius',
-                password: 'password123',
-                miniId: '#BLON',
-                pocketbucks: parseInt(localStorage.getItem('ps_pocketbucks_bloonairius') || '5000', 10),
-                unlockedSkins: ['sym_star', 'skin_neon_dragon', 'skin_golden_crown', 'skin_cosmic_nebula'],
-                equippedSkin: 'skin_neon_dragon',
-                unlockedColors: ['c_royal_blue', 'c_crimson_red', 'c_cyber_gold'],
-                equippedColor: '#3b82f6',
-                tutorialDone: true,
-                banned: false,
-                banReason: '',
-                kicked: false,
-                removedFromLeaderboard: false,
-                lastLogin: Date.now()
-              }, { merge: true }).catch(() => {});
+
+    const uKey = (myUsername || uid || '').toLowerCase().replace(/^user_/, '');
+    if (!uKey) return;
+
+    // 1. Primary Realtime Database Guard
+    if (typeof fbRtdb !== 'undefined' && fbRtdb) {
+      try {
+        rtdbUserGuardRef = fbRtdb.ref('users/' + uKey);
+        rtdbUserGuardRef.on('value', snap => {
+          if (!snap.exists()) {
+            if (uKey === 'bloonairius') return;
+            if (typeof adminNotify === 'function') adminNotify('Your account was deleted by an administrator.');
+            if (fbAuth) fbAuth.signOut().catch(() => {});
+            currentUser = null;
+            myUsername = '';
+            localStorage.removeItem('ps_username');
+            showScreen('screen-login');
+            const errorEl = document.getElementById('login-error');
+            if (errorEl) {
+              errorEl.className = 'login-error-msg error';
+              errorEl.style.display = 'block';
+              errorEl.textContent = 'Your account was deleted by an administrator.';
             }
             return;
           }
-          adminNotify('Your account was deleted by an administrator.');
-          if (fbAuth) fbAuth.signOut();
-          currentUser = null;
-          myUsername = '';
-          localStorage.removeItem('ps_username');
-          showScreen('screen-main-menu');
-          return;
-        }
-        const data = docSnap.data();
-        if (!data) return;
-        const uKey = (myUsername || '').toLowerCase();
 
-        if ((data.banned || data.kicked) && uKey !== 'bloonairius') {
-          adminNotify('Session terminated: ' + (data.banReason || 'You have been kicked by an administrator.'));
-          if (data.kicked && !data.banned && fbDb) {
-            fbDb.collection('users').doc(uid).update({ kicked: false }).catch(() => {});
+          const data = snap.val();
+          if (!data) return;
+
+          if ((data.banned || data.kicked) && uKey !== 'bloonairius') {
+            if (typeof adminNotify === 'function') adminNotify('Session terminated: ' + (data.banReason || 'You have been kicked by an administrator.'));
+            if (data.kicked && !data.banned) {
+              fbRtdb.ref('users/' + uKey).update({ kicked: false }).catch(() => {});
+            }
+            if (fbAuth) fbAuth.signOut().catch(() => {});
+            currentUser = null;
+            myUsername = '';
+            localStorage.removeItem('ps_username');
+            showScreen('screen-login');
+            const errorEl = document.getElementById('login-error');
+            if (errorEl) {
+              errorEl.className = 'login-error-msg error';
+              errorEl.style.display = 'block';
+              errorEl.textContent = 'Session terminated: ' + (data.banReason || 'You have been kicked by an administrator.');
+            }
+            return;
           }
-          if (fbAuth) fbAuth.signOut();
-          currentUser = null;
-          myUsername = '';
-          localStorage.removeItem('ps_username');
-          showScreen('screen-main-menu');
-          return;
-        }
 
-        if (typeof data.pocketbucks === 'number') {
-          localStorage.setItem('ps_pocketbucks_' + uKey, data.pocketbucks.toString());
-          if (typeof updatePocketBucksDisplays === 'function') updatePocketBucksDisplays();
-        }
+          if (typeof data.pocketbucks === 'number') {
+            localStorage.setItem('ps_pocketbucks_' + uKey, data.pocketbucks.toString());
+            if (typeof updatePocketBucksDisplays === 'function') updatePocketBucksDisplays();
+          }
 
-        if (Array.isArray(data.unlockedSkins)) {
-          localStorage.setItem('ps_unlocked_skins_' + uKey, JSON.stringify(data.unlockedSkins));
-          const currEq = localStorage.getItem('ps_equipped_skin_' + uKey) || 'sym_star';
-          if (!data.unlockedSkins.includes(currEq)) {
-            localStorage.setItem('ps_equipped_skin_' + uKey, 'sym_star');
+          if (Array.isArray(data.unlockedSkins)) {
+            localStorage.setItem('ps_unlocked_skins_' + uKey, JSON.stringify(data.unlockedSkins));
+            const currEq = localStorage.getItem('ps_equipped_skin_' + uKey) || 'sym_star';
+            if (!data.unlockedSkins.includes(currEq)) {
+              localStorage.setItem('ps_equipped_skin_' + uKey, 'sym_star');
+              if (typeof updateUserBarUI === 'function') updateUserBarUI();
+            }
+          }
+
+          if (Array.isArray(data.unlockedColors)) {
+            localStorage.setItem('ps_unlocked_colors_' + uKey, JSON.stringify(data.unlockedColors));
+          }
+
+          if (data.username && data.username !== myUsername) {
+            myUsername = data.username;
+            localStorage.setItem('ps_username', myUsername);
             if (typeof updateUserBarUI === 'function') updateUserBarUI();
           }
-        }
+        }, err => {
+          console.warn('RTDB realtime guard listener notice:', err);
+        });
+      } catch (e) {}
+    }
 
-        if (data.username && data.username !== myUsername) {
-          myUsername = data.username;
-          localStorage.setItem('ps_username', myUsername);
-          if (typeof updateUserBarUI === 'function') updateUserBarUI();
-        }
-      }, err => {
-        console.warn('Realtime guard listener notice:', err);
-      });
-    } catch (e) {}
   }
 
   // Active session heartbeat to immediately kick banned or deleted accounts
