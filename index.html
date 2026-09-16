@@ -58,8 +58,11 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      touch-action: manipulation;
-      overscroll-behavior: none;
+      touch-action: none !important;
+      overscroll-behavior: none !important;
+      -webkit-overflow-scrolling: auto;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     #app-container {
@@ -78,6 +81,8 @@
       overflow: hidden;
       background: #000000;
       transition: background 0.5s ease;
+      touch-action: none !important;
+      overscroll-behavior: none !important;
     }
 
     /* Background Cartoon Stadium SVG (Fills the aspect-ratio-constrained app container) */
@@ -131,6 +136,8 @@
       box-shadow: none;
       border-radius: 0;
       z-index: 2;
+      touch-action: none !important;
+      overscroll-behavior: none !important;
     }
 
     #stadium-bg.gliding {
@@ -713,15 +720,15 @@
       height: 15px;
     }
 
-    /* 8 Sports Positions */
+    /* 8 Sports Positions - Perfectly Symmetrical Across Vertical Center */
     #btn-sport-football   { top: 18%; left: 12%; }
-    #btn-sport-basketball { top: 28%; left: 33%; }
-    #btn-sport-tennis     { top: 28%; left: 55%; }
-    #btn-sport-hockey     { top: 18%; left: 76%; }
+    #btn-sport-basketball { top: 28%; left: 34%; }
+    #btn-sport-tennis     { top: 28%; right: 34%; left: auto; }
+    #btn-sport-hockey     { top: 18%; right: 12%; left: auto; }
     #btn-sport-baseball   { top: 58%; left: 12%; }
-    #btn-sport-volleyball { top: 68%; left: 33%; }
-    #btn-sport-bowling    { top: 68%; left: 55%; }
-    #btn-sport-golf       { top: 58%; left: 76%; }
+    #btn-sport-volleyball { top: 68%; left: 34%; }
+    #btn-sport-bowling    { top: 68%; right: 34%; left: auto; }
+    #btn-sport-golf       { top: 58%; right: 12%; left: auto; }
 
     /* =========================================================
        SCREEN 4: FOOTBALL MODES (BIGGER BUTTONS)
@@ -915,8 +922,8 @@
       position: absolute;
       top: 0;
       left: 0;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       pointer-events: none;
       z-index: 85;
       overflow: hidden;
@@ -4114,6 +4121,74 @@
       background: #475569;
       color: #fff;
     }
+    .lobby-setting-btn {
+      background: #0f172a;
+      border: 1.5px solid #475569;
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 4px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .lobby-setting-btn.active {
+      background: #3b82f6;
+      border-color: #60a5fa;
+      color: #ffffff;
+    }
+    .lobby-copy-btn {
+      background: #1e293b;
+      color: #38bdf8;
+      border: 1.5px solid #38bdf8;
+      border-radius: 10px;
+      padding: 6px 13px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+    .lobby-copy-btn:hover {
+      background: #38bdf8;
+      color: #0f172a;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.35);
+    }
+    .lobby-copy-btn:active {
+      transform: translateY(1px);
+    }
+    .lobby-leave-btn {
+      background: rgba(239, 68, 68, 0.12);
+      color: #f87171;
+      border: 1.5px solid #ef4444;
+      border-radius: 10px;
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      min-height: 32px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+    .lobby-leave-btn:hover {
+      background: #ef4444;
+      color: #ffffff;
+      transform: translateY(-1px) scale(1.06);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+    .lobby-leave-btn:active {
+      transform: translateY(1px) scale(0.96);
+    }
     .profile-stats-row {
       display: flex;
       align-items: center;
@@ -5385,7 +5460,7 @@
         gap: 8px;
         padding: 0 10px;
         top: 8px;
-        left: 44%;
+        left: 50%;
         transform: translateX(-50%);
       }
 
@@ -7907,7 +7982,7 @@
             </svg>
             <div class="cmd-title">1v1 Match Lobby</div>
           </div>
-          <button class="cmd-close-btn" onclick="showScreen('screen-online-hub')">✕</button>
+          <button class="cmd-close-btn" onclick="closeOnlineModal()">✕</button>
         </div>
 
         <!-- Player Mini ID Bar -->
@@ -7933,6 +8008,84 @@
             <div style="font-size:11px; color:#94a3b8;">ROOM CODE:</div>
             <div id="active-room-code-display" style="font-size:22px; font-weight:900; color:#facc15; letter-spacing:3px;">---</div>
             <div id="room-waiting-label" style="font-size:12px; color:#38bdf8; margin-top:4px;">Waiting for opponent to connect...</div>
+          </div>
+
+          <!-- Interactive Online Match Lobby with Ready-Up & Settings -->
+          <div id="online-lobby-panel" style="display:none; margin-top:14px; background:#0b1120; border:2.5px solid #38bdf8; border-radius:18px; padding:16px; text-align:left;">
+            <!-- Header: Room Code and Actions -->
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1.5px solid #334155; padding-bottom:10px; margin-bottom:12px;">
+              <div>
+                <div style="font-size:10px; color:#94a3b8; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;">Room Code</div>
+                <div id="lobby-room-code" style="font-size:22px; font-weight:900; color:#facc15; letter-spacing:2px; line-height:1.1;">PKT-000</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <button type="button" class="lobby-copy-btn" onclick="copyRoomCode(event)">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                  <span id="lobby-copy-text">Copy Code</span>
+                </button>
+                <button type="button" class="lobby-leave-btn" onclick="leaveOnlineRoom()" title="Leave Room" aria-label="Leave Room">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- 1v1 Versus Cards -->
+            <div style="display:grid; grid-template-columns: 1fr auto 1fr; gap:10px; align-items:center; margin-bottom:14px;">
+              <!-- Host (Left / Blue) -->
+              <div style="background:#1e293b; border:2px solid #3b82f6; border-radius:12px; padding:10px; text-align:center;">
+                <div style="font-size:10px; font-weight:800; color:#38bdf8; text-transform:uppercase; margin-bottom:2px;">HOST (P1)</div>
+                <div id="lobby-host-name" style="font-size:13px; font-weight:900; color:#ffffff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Host</div>
+                <div id="lobby-host-status" style="margin-top:6px; display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:900; background:#334155; color:#94a3b8;">NOT READY</div>
+              </div>
+
+              <div style="font-size:14px; font-weight:900; color:var(--btn-yellow);">VS</div>
+
+              <!-- Guest (Right / Red) -->
+              <div style="background:#1e293b; border:2px solid #ef4444; border-radius:12px; padding:10px; text-align:center;">
+                <div style="font-size:10px; font-weight:800; color:#f87171; text-transform:uppercase; margin-bottom:2px;">GUEST (P2)</div>
+                <div id="lobby-guest-name" style="font-size:13px; font-weight:900; color:#ffffff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Waiting...</div>
+                <div id="lobby-guest-status" style="margin-top:6px; display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:900; background:#334155; color:#94a3b8;">WAITING</div>
+              </div>
+            </div>
+
+            <!-- Host Match Settings -->
+            <div style="background:#1e293b; border:1.5px solid #334155; border-radius:12px; padding:10px; margin-bottom:14px;">
+              <div style="font-size:10.5px; font-weight:800; color:#94a3b8; text-transform:uppercase; margin-bottom:8px; display:flex; justify-content:space-between;">
+                <span>Match Settings</span>
+                <span id="lobby-settings-hint" style="color:#64748b;">(Host Controls)</span>
+              </div>
+              
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span style="font-size:12px; font-weight:800; color:#ffffff;">Target Goals:</span>
+                <div style="display:flex; gap:6px;">
+                  <button type="button" class="lobby-setting-btn active" id="btn-goal-3" onclick="setOnlineLobbyGoals(3)">3</button>
+                  <button type="button" class="lobby-setting-btn" id="btn-goal-5" onclick="setOnlineLobbyGoals(5)">5</button>
+                  <button type="button" class="lobby-setting-btn" id="btn-goal-7" onclick="setOnlineLobbyGoals(7)">7</button>
+                </div>
+              </div>
+
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:12px; font-weight:800; color:#ffffff;">Stadium:</span>
+                <select id="lobby-stadium-select" onchange="setOnlineLobbyStadium(this.value)" style="background:#0f172a; color:#fff; border:1.5px solid #475569; border-radius:8px; padding:3px 8px; font-weight:800; font-size:11px;">
+                  <option value="0">Classic Grass</option>
+                  <option value="1">Cyber Neon</option>
+                  <option value="2">Golden Sand</option>
+                  <option value="3">Frostbite Ice</option>
+                  <option value="4">Inferno Magma</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Ready Up Button -->
+            <button type="button" id="btn-lobby-ready" onclick="toggleOnlineReady()" style="width:100%; height:44px; border-radius:12px; background:#10b981; color:#ffffff; font-size:14px; font-weight:900; text-transform:uppercase; letter-spacing:1px; cursor:pointer; border:none; box-shadow:0 4px 14px rgba(16,185,129,0.35); transition:all 0.2s;">
+              READY UP ✓
+            </button>
           </div>
         </div>
 
@@ -9038,6 +9191,7 @@
             </div>
           </div>
           <div style="display:flex; align-items:center; gap:10px;">
+            <button class="admin-btn-action" style="background:rgba(239,68,68,0.18); border-color:#ef4444; color:#f87171;" onclick="adminPurgeFakeAccounts()" title="Purge fake and orphaned duplicate test accounts from database">Purge Test Accounts</button>
             <button class="admin-btn-action" style="background:#1e293b; border-color:#475569;" onclick="adminFetchUsers(true)">↻ Refresh</button>
             <button class="cmd-close-btn" onclick="closeAdminPanelModal()">✕</button>
           </div>
@@ -9806,10 +9960,50 @@
 
     <!-- POST MATCH SCREEN -->
     <div class="ui-layer" id="screen-postmatch">
-      <div class="login-card" style="text-align:center;">
-        <div class="login-title" id="postmatch-title">VICTORY!</div>
-        <div class="login-sub" id="postmatch-sub">Final Score: 3 - 1</div>
-        <button class="btn-go" style="margin-top:10px;" id="btn-postmatch-continue">Continue</button>
+      <div class="login-card" style="text-align:center; max-width:520px; width:92%; padding:26px 22px; border-radius:22px; border:3.5px solid #334155; box-shadow: 0 16px 40px rgba(0,0,0,0.85); background:#0f172a;">
+        <!-- Victory / Defeat Header Badge -->
+        <div id="postmatch-result-badge" style="display:inline-flex; align-items:center; gap:8px; padding:6px 18px; border-radius:24px; font-size:12px; font-weight:900; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:12px; background:rgba(34,197,94,0.15); border:1.5px solid #22c55e; color:#22c55e;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2l2.4 7.2h7.6l-6.1 4.5 2.3 7.3-6.2-4.6-6.2 4.6 2.3-7.3-6.1-4.5h7.6z"/></svg>
+          <span id="postmatch-result-text">MATCH COMPLETE</span>
+        </div>
+
+        <div class="login-title" id="postmatch-title" style="font-size:26px; font-weight:900; letter-spacing:1px; margin-bottom:4px; color:#ffffff;">VICTORY!</div>
+        <div class="login-sub" id="postmatch-sub" style="font-size:14px; font-weight:700; color:#94a3b8; margin-bottom:14px;">Final Score: 3 - 1</div>
+
+        <!-- Series / Tournament Context Tag -->
+        <div id="postmatch-series-banner" style="display:none; background:rgba(56,189,248,0.12); border:1.5px solid #38bdf8; border-radius:12px; padding:8px 14px; font-size:12.5px; font-weight:800; color:#38bdf8; margin-bottom:14px;">
+        </div>
+
+        <!-- Rewards Breakdown Grid -->
+        <div id="postmatch-rewards-grid" style="background:#1e293b; border:2px solid #334155; border-radius:16px; padding:14px 16px; margin-bottom:18px; display:flex; flex-direction:column; gap:10px; text-align:left;">
+          
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; border-bottom:1px solid #334155; padding-bottom:8px;">
+            <span style="font-size:12px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;">Match Points</span>
+            <span id="postmatch-stat-points" style="font-size:15px; font-weight:900; color:#facc15; text-align:right;">0 PTS</span>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; border-bottom:1px solid #334155; padding-bottom:8px;">
+            <span style="font-size:12px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;">Match Multiplier</span>
+            <span id="postmatch-stat-diff" style="font-size:12.5px; font-weight:800; color:#38bdf8; text-align:right;">1.0x (Rookie)</span>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; border-bottom:1px solid #334155; padding-bottom:8px;">
+            <span style="font-size:12px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;">Points & Rank Boost</span>
+            <span id="postmatch-stat-multiplier" style="font-size:12.5px; font-weight:800; color:#a78bfa; text-align:right;">1.0x</span>
+          </div>
+
+          <!-- Total PocketBucks Earned Badge -->
+          <div style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(135deg, rgba(250,204,21,0.18), rgba(234,179,8,0.06)); border:2px solid #facc15; border-radius:12px; padding:10px 14px; margin-top:2px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="#facc15"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10h8M8 14h8" stroke="#1e293b" stroke-width="2" stroke-linecap="round"/></svg>
+              <span style="font-size:13px; font-weight:900; color:#ffffff; text-transform:uppercase; letter-spacing:0.5px;">PocketBucks Awarded</span>
+            </div>
+            <span id="postmatch-payout-total" style="font-size:20px; font-weight:900; color:#facc15; text-shadow:0 0 12px rgba(250,204,21,0.5);">+0 PB</span>
+          </div>
+
+        </div>
+
+        <button class="btn-go" style="width:100%; height:48px; font-size:15px; font-weight:900; border-radius:14px; margin-top:0;" id="btn-postmatch-continue">Continue ➔</button>
       </div>
     </div>
 
@@ -13165,7 +13359,7 @@
     {
       id: 'crate_novice_skin',
       name: 'Novice Skin Crate',
-      price: 150,
+      price: 300,
       rarity: 'common',
       desc: 'Great for beginners! Contains 70% Common, 25% Rare, 5% Epic skins.',
       odds: { common: 0.70, rare: 0.25, epic: 0.05, legendary: 0, mythic: 0 }
@@ -13173,7 +13367,7 @@
     {
       id: 'crate_veteran_skin',
       name: 'Veteran Skin Crate',
-      price: 375,
+      price: 750,
       rarity: 'epic',
       desc: 'High tier vault! Contains 50% Rare, 35% Epic, 13% Legendary, 2% Mythic skins.',
       odds: { common: 0, rare: 0.50, epic: 0.35, legendary: 0.13, mythic: 0.02 }
@@ -13181,7 +13375,7 @@
     {
       id: 'crate_master_skin',
       name: 'Master Skin Crate',
-      price: 750,
+      price: 1500,
       rarity: 'legendary',
       desc: 'Elite cosmic vault! Contains 50% Epic, 35% Legendary, 15% Mythic animated skins.',
       odds: { common: 0, rare: 0, epic: 0.50, legendary: 0.35, mythic: 0.15 }
@@ -13192,7 +13386,7 @@
     {
       id: 'crate_prism_color',
       name: 'Prism Starter Crate',
-      price: 75,
+      price: 150,
       rarity: 'common',
       desc: 'Unlocks vibrant Common and Rare team colors.',
       odds: { common: 0.65, rare: 0.35, epic: 0, legendary: 0, mythic: 0 }
@@ -13200,7 +13394,7 @@
     {
       id: 'crate_chroma_color',
       name: 'Vibrant Chroma Crate',
-      price: 225,
+      price: 450,
       rarity: 'rare',
       desc: 'Unlocks Rare, Epic, and Legendary saturated neon hues.',
       odds: { common: 0, rare: 0.50, epic: 0.40, legendary: 0.10, mythic: 0 }
@@ -13208,7 +13402,7 @@
     {
       id: 'crate_spectrum_color',
       name: 'Mythic Spectrum Crate',
-      price: 525,
+      price: 1050,
       rarity: 'legendary',
       desc: 'Unlocks Legendary metallics and Mythic animated chromatic shades.',
       odds: { common: 0, rare: 0, epic: 0.30, legendary: 0.50, mythic: 0.20 }
@@ -13221,7 +13415,7 @@
       name: 'Novice Puck Ability Crate',
       category: 'puck_ability',
       rarity: 'common',
-      price: 225,
+      price: 450,
       desc: 'Contains on-field puck abilities! 70% Common, 25% Rare, 5% Epic.',
       odds: { common: 0.70, rare: 0.25, epic: 0.05, legendary: 0, mythic: 0 }
     },
@@ -13230,7 +13424,7 @@
       name: 'Pro Puck Ability Crate',
       category: 'puck_ability',
       rarity: 'epic',
-      price: 525,
+      price: 1050,
       desc: 'High tier puck abilities! 30% Common, 45% Rare, 20% Epic, 5% Legendary.',
       odds: { common: 0.30, rare: 0.45, epic: 0.20, legendary: 0.05, mythic: 0 }
     },
@@ -13239,7 +13433,7 @@
       name: 'Master Puck Ability Crate',
       category: 'puck_ability',
       rarity: 'legendary',
-      price: 1125,
+      price: 2250,
       desc: 'Ultimate vault! 20% Rare, 45% Epic, 25% Legendary, 10% Mythic.',
       odds: { common: 0, rare: 0.20, epic: 0.45, legendary: 0.25, mythic: 0.10 }
     },
@@ -13248,7 +13442,7 @@
       name: 'Novice Player Power Crate',
       category: 'player_power',
       rarity: 'common',
-      price: 300,
+      price: 600,
       desc: 'Tactical manager powers! 70% Common, 25% Rare, 5% Epic.',
       odds: { common: 0.70, rare: 0.25, epic: 0.05, legendary: 0, mythic: 0 }
     },
@@ -13257,7 +13451,7 @@
       name: 'Pro Player Power Crate',
       category: 'player_power',
       rarity: 'epic',
-      price: 675,
+      price: 1350,
       desc: 'Pro tactical abilities! 25% Common, 50% Rare, 20% Epic, 5% Legendary.',
       odds: { common: 0.25, rare: 0.50, epic: 0.20, legendary: 0.05, mythic: 0 }
     },
@@ -13266,7 +13460,7 @@
       name: 'Master Player Power Crate',
       category: 'player_power',
       rarity: 'legendary',
-      price: 1350,
+      price: 2700,
       desc: 'Divine manager vault! 20% Rare, 45% Epic, 25% Legendary, 10% Mythic.',
       odds: { common: 0, rare: 0.20, epic: 0.45, legendary: 0.25, mythic: 0.10 }
     }
@@ -13561,7 +13755,7 @@
       id: 'crate_fuse_pack',
       name: 'Fuse Starter Pack',
       rarity: 'common',
-      price: 375,
+      price: 750,
       desc: 'Contains celebratory goal explosions! 80% Common, 20% Rare.',
       odds: { common: 0.80, rare: 0.20, epic: 0, legendary: 0, mythic: 0 }
     },
@@ -13569,7 +13763,7 @@
       id: 'crate_blaze_vault',
       name: 'Blaze Explosion Crate',
       rarity: 'rare',
-      price: 900,
+      price: 1800,
       desc: 'High tier energetic detonations! 50% Rare, 40% Epic, 10% Legendary.',
       odds: { common: 0, rare: 0.50, epic: 0.40, legendary: 0.10, mythic: 0 }
     },
@@ -13577,7 +13771,7 @@
       id: 'crate_cosmic_detonator',
       name: 'Cosmic Supernova Vault',
       rarity: 'legendary',
-      price: 1875,
+      price: 3750,
       desc: 'Elite celestial fireworks! 50% Legendary, 35% Epic, 15% Mythic animated explosions.',
       odds: { common: 0, rare: 0, epic: 0.35, legendary: 0.50, mythic: 0.15 }
     }
@@ -15337,12 +15531,15 @@
       });
     }, 20);
 
-    const cardWidth = 144;
-    const viewportWidth = 720;
-    const centerOffset = (viewportWidth / 2) - (cardWidth / 2);
-    const targetTranslateX = -(32 * cardWidth) + centerOffset;
-
     setTimeout(() => {
+      const viewportEl = tape.parentElement; // .crate-spinner-viewport
+      const targetCard = document.getElementById('reel-card-32');
+      let targetTranslateX = -3611;
+      if (viewportEl && targetCard) {
+        const cardCenter = targetCard.offsetLeft + (targetCard.offsetWidth / 2);
+        const viewportCenter = viewportEl.clientWidth / 2;
+        targetTranslateX = Math.round(viewportCenter - cardCenter);
+      }
       tape.style.transition = 'transform 3.8s cubic-bezier(0.12, 0.85, 0.22, 1)';
       tape.style.transform = `translateX(${targetTranslateX}px)`;
     }, 50);
@@ -16132,10 +16329,26 @@
     }
 
     update() {
-      if (this.isFrozen || this.isAnchorLocked) {
+      if (this.isFrozen) {
         this.vx = 0;
         this.vy = 0;
         return;
+      }
+
+      if (this.isAnchorLocked) {
+        if (this.isAnchorShooting) {
+          const spd = Math.hypot(this.vx, this.vy);
+          if (spd < 0.45) {
+            this.vx = 0;
+            this.vy = 0;
+            this.isAnchorShooting = false;
+            return;
+          }
+        } else {
+          this.vx = 0;
+          this.vy = 0;
+          return;
+        }
       }
 
       if (this.isQuickFeint) {
@@ -16188,14 +16401,27 @@
       const color = this.team === 'p1' ? p1Color : p2Color;
       c.save();
 
-      // If Ability is Armed: Rotating Cartoon Energy Ring
+      // If Ability is Armed: Multi-layered Pulsing Glow Aura & Neon Energy Rings
       if (this.isArmed) {
         const now = Date.now();
+        c.save();
+        const pulse = Math.sin(now * 0.008) * 4;
         c.beginPath();
-        c.arc(this.x, this.y, this.radius + 8, now * 0.005, now * 0.005 + Math.PI * 1.5);
-        c.lineWidth = 5.5;
+        c.arc(this.x, this.y, this.radius + 14 + pulse, 0, Math.PI * 2);
+        c.lineWidth = 4.5;
         c.strokeStyle = '#facc15';
+        c.shadowColor = '#facc15';
+        c.shadowBlur = 18;
         c.stroke();
+        c.restore();
+
+        c.save();
+        c.beginPath();
+        c.arc(this.x, this.y, this.radius + 8, -now * 0.006, -now * 0.006 + Math.PI * 1.6);
+        c.lineWidth = 3.5;
+        c.strokeStyle = '#38bdf8';
+        c.stroke();
+        c.restore();
       }
 
       // Flat Bold Cartoon Disc (NO SHADOWS)
@@ -16436,32 +16662,101 @@
         c.stroke();
       }
 
+      // Friendly Team Puck Number Tag (#1, #2, #3...) matching the ability drawer
+      const puckNum = (typeof this.id === 'number' ? (this.id < 10 ? this.id + 1 : this.id - 9) : (parseInt(this.id, 10) + 1 || 1));
+      if (this.team === 'p1' || is2Player || gameState === 'KICKOFF_SETUP') {
+        const tagRadius = 9.5;
+        const tagX = this.x + this.radius * 0.62;
+        const tagY = this.y - this.radius * 0.62;
+        c.save();
+        c.beginPath();
+        c.arc(tagX, tagY, tagRadius, 0, Math.PI * 2);
+        c.fillStyle = this.isArmed ? '#facc15' : '#0f172a';
+        c.fill();
+        c.lineWidth = 2;
+        c.strokeStyle = '#ffffff';
+        c.stroke();
+        c.font = 'bold 9px ' + (getComputedStyle(document.body).fontFamily || 'sans-serif');
+        c.fillStyle = this.isArmed ? '#0f172a' : '#ffffff';
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.fillText(`#${puckNum}`, tagX, tagY);
+        c.restore();
+      }
+
+      // Armed Puck Visual Beacon (Floating Billboard Badge + Pointer Arrow)
+      if (this.isArmed) {
+        const now = Date.now();
+        const beaconY = this.y - this.radius - 28 + Math.sin(now * 0.007) * 4;
+        c.save();
+
+        const pillW = 104;
+        const pillH = 22;
+        const pillX = this.x - pillW / 2;
+        const pillY = beaconY - pillH / 2;
+        const pillRadius = 11;
+
+        c.shadowColor = '#facc15';
+        c.shadowBlur = 14;
+        c.fillStyle = '#0f172a';
+        c.beginPath();
+        c.roundRect(pillX, pillY, pillW, pillH, pillRadius);
+        c.fill();
+
+        c.lineWidth = 2.5;
+        c.strokeStyle = '#facc15';
+        c.stroke();
+
+        // Downward pointing golden chevron arrow
+        c.beginPath();
+        c.moveTo(this.x - 7, beaconY + 11);
+        c.lineTo(this.x + 7, beaconY + 11);
+        c.lineTo(this.x, beaconY + 19);
+        c.closePath();
+        c.fillStyle = '#facc15';
+        c.fill();
+        c.strokeStyle = '#1e293b';
+        c.lineWidth = 1.5;
+        c.stroke();
+
+        // Text inside pill badge
+        c.shadowBlur = 0;
+        c.font = 'bold 10px ' + (getComputedStyle(document.body).fontFamily || 'sans-serif');
+        c.fillStyle = '#facc15';
+        c.textAlign = 'center';
+        c.textBaseline = 'middle';
+        c.fillText(`ARMED - PUCK #${puckNum}`, this.x, beaconY);
+        c.restore();
+      }
+
       // Ability Hover / Touch Highlight Indicator (Glow ring + Pointing Chevron Beacon)
       if (hoveredAbilityDiscId === this.id || (this._mobileHighlightTimer && this._mobileHighlightTimer > 0)) {
         if (this._mobileHighlightTimer) this._mobileHighlightTimer--;
-        c.save();
-        const pulse = Math.sin(Date.now() * 0.015) * 3;
-        c.beginPath();
-        c.arc(this.x, this.y, this.radius + 12 + pulse, 0, Math.PI * 2);
-        c.lineWidth = 4.5;
-        c.strokeStyle = '#facc15';
-        c.shadowColor = '#facc15';
-        c.shadowBlur = 16;
-        c.stroke();
+        if (!this.isArmed) {
+          c.save();
+          const pulse = Math.sin(Date.now() * 0.015) * 3;
+          c.beginPath();
+          c.arc(this.x, this.y, this.radius + 12 + pulse, 0, Math.PI * 2);
+          c.lineWidth = 4.5;
+          c.strokeStyle = '#facc15';
+          c.shadowColor = '#facc15';
+          c.shadowBlur = 16;
+          c.stroke();
 
-        // Downward animated pointing chevron arrow above puck
-        const arrowY = this.y - this.radius - 20 + Math.sin(Date.now() * 0.015) * 4;
-        c.fillStyle = '#facc15';
-        c.beginPath();
-        c.moveTo(this.x - 10, arrowY - 12);
-        c.lineTo(this.x + 10, arrowY - 12);
-        c.lineTo(this.x, arrowY);
-        c.closePath();
-        c.fill();
-        c.strokeStyle = '#1e293b';
-        c.lineWidth = 2.5;
-        c.stroke();
-        c.restore();
+          // Downward animated pointing chevron arrow above puck
+          const arrowY = this.y - this.radius - 20 + Math.sin(Date.now() * 0.015) * 4;
+          c.fillStyle = '#facc15';
+          c.beginPath();
+          c.moveTo(this.x - 10, arrowY - 12);
+          c.lineTo(this.x + 10, arrowY - 12);
+          c.lineTo(this.x, arrowY);
+          c.closePath();
+          c.fill();
+          c.strokeStyle = '#1e293b';
+          c.lineWidth = 2.5;
+          c.stroke();
+          c.restore();
+        }
       }
 
       c.restore();
@@ -17741,7 +18036,8 @@
 
     // P2 Team Header
     const p2NameEl = document.getElementById('sb-p2-team-name');
-    if (p2NameEl) p2NameEl.textContent = p2Name || (activeDifficulty ? `${activeDifficulty.toUpperCase()} BOT` : 'Red Stars');
+    const p2Fallback = is2Player ? 'Player 2' : (activeDifficulty ? `${activeDifficulty.toUpperCase()} BOT` : 'Red Stars');
+    if (p2NameEl) p2NameEl.textContent = p2Name || p2Fallback;
     const p2ColorPip = document.getElementById('sb-p2-color-pip');
     if (p2ColorPip) p2ColorPip.style.background = p2Color || '#ef4444';
     const p2PtsBadge = document.getElementById('sb-p2-total-pts');
@@ -17769,7 +18065,7 @@
       const p2Discs = discs.filter(d => d.team === 'p2');
       p2Body.innerHTML = p2Discs.map((d, i) => `
         <tr>
-          <td>${d.name || `Bot ${i + 1}`}</td>
+          <td>${d.name || (is2Player ? `Puck ${i + 1}` : `Bot ${i + 1}`)}</td>
           <td style="color:#facc15; font-weight:900;">${d.points || 0}</td>
           <td>${d.goals || 0}</td>
           <td>${d.assists || 0}</td>
@@ -19285,6 +19581,8 @@
   // --- FIREBASE REALTIME DATABASE CROSS-DEVICE MULTIPLAYER ---
   let activeRoomCode = null;
   let isRoomHost = false;
+  let myOnlineReady = false;
+  let activeOnlineRoomListener = null;
   let lastProcessedShotTime = 0;
 
   function createOnlineRoom() {
@@ -19295,43 +19593,36 @@
     const code = 'PKT-' + Math.floor(100 + Math.random() * 900);
     activeRoomCode = code;
     isRoomHost = true;
+    myOnlineReady = false;
 
+    const lobbyPanel = document.getElementById('online-lobby-panel');
     const statusBox = document.getElementById('room-status-box');
-    const codeDisp = document.getElementById('active-room-code-display');
-    const waitLabel = document.getElementById('room-waiting-label');
-    if (statusBox) statusBox.style.display = 'block';
-    if (codeDisp) codeDisp.textContent = code;
-    if (waitLabel) waitLabel.textContent = 'Waiting for Player 2 to join...';
+    if (statusBox) statusBox.style.display = 'none';
+    if (lobbyPanel) lobbyPanel.style.display = 'block';
 
     const roomRef = fbRtdb.ref('match_rooms/' + code);
     roomRef.set({
       host: myUsername || 'Player 1',
       hostId: myMiniId,
       hostColor: getUserEquippedColor() || '#3b82f6',
-      status: 'waiting',
+      hostReady: false,
+      guest: null,
+      guestId: null,
+      guestColor: '#ef4444',
+      guestReady: false,
+      targetGoals: 3,
+      stadiumIndex: 0,
+      status: 'lobby',
       createdAt: Date.now()
     });
 
     roomRef.onDisconnect().remove();
 
-    roomRef.on('value', (snapshot) => {
-      const data = snapshot.val();
-      if (!data) return;
-
-      if (data.status === 'playing' && isRoomHost) {
-        p1Name = (myUsername || 'Player 1');
-        p1Color = getUserEquippedColor() || '#3b82f6';
-        p2Name = data.guest || 'Player 2';
-        p2Color = data.guestColor || '#ef4444';
-        activeGameMode = 'online';
-        is2Player = false;
-        activeDifficulty = 'pro';
-        currentStadiumIndex = 0;
-        applyStadiumTheme(0);
-        triggerCinematicMatchKickoff();
-        listenToOnlineMatchRoom(code);
-      }
-    });
+    if (activeOnlineRoomListener) {
+      activeOnlineRoomListener.off();
+    }
+    activeOnlineRoomListener = roomRef;
+    roomRef.on('value', onOnlineRoomDataUpdate);
   }
   window.createOnlineRoom = createOnlineRoom;
 
@@ -19361,30 +19652,224 @@
 
       activeRoomCode = code;
       isRoomHost = false;
+      myOnlineReady = false;
+
+      const lobbyPanel = document.getElementById('online-lobby-panel');
+      const statusBox = document.getElementById('room-status-box');
+      if (statusBox) statusBox.style.display = 'none';
+      if (lobbyPanel) lobbyPanel.style.display = 'block';
 
       roomRef.update({
         guest: myUsername || 'Player 2',
         guestId: myMiniId,
         guestColor: getUserEquippedColor() || '#ef4444',
-        status: 'playing'
+        guestReady: false,
+        status: 'lobby'
       });
 
-      roomRef.onDisconnect().update({ status: 'opponent_left' });
+      roomRef.onDisconnect().update({ guest: null, guestReady: false, status: 'lobby' });
 
-      p1Name = data.host || 'Player 1';
-      p1Color = data.hostColor || '#3b82f6';
-      p2Name = (myUsername || 'Player 2');
-      p2Color = getUserEquippedColor() || '#ef4444';
-      activeGameMode = 'online';
-      is2Player = false;
-      activeDifficulty = 'pro';
-      currentStadiumIndex = 0;
-      applyStadiumTheme(0);
-      triggerCinematicMatchKickoff();
-      listenToOnlineMatchRoom(code);
+      if (activeOnlineRoomListener) {
+        activeOnlineRoomListener.off();
+      }
+      activeOnlineRoomListener = roomRef;
+      roomRef.on('value', onOnlineRoomDataUpdate);
     });
   }
   window.joinOnlineRoom = joinOnlineRoom;
+
+  function onOnlineRoomDataUpdate(snapshot) {
+    const data = snapshot.val();
+    if (!data) {
+      leaveOnlineRoom(false);
+      return;
+    }
+
+    const codeEl = document.getElementById('lobby-room-code');
+    if (codeEl) codeEl.textContent = activeRoomCode || '---';
+
+    const hostNameEl = document.getElementById('lobby-host-name');
+    if (hostNameEl) hostNameEl.textContent = data.host || 'Player 1';
+    const hostStatusEl = document.getElementById('lobby-host-status');
+    if (hostStatusEl) {
+      if (data.hostReady) {
+        hostStatusEl.textContent = 'READY ✓';
+        hostStatusEl.style.background = 'rgba(34,197,94,0.2)';
+        hostStatusEl.style.color = '#22c55e';
+      } else {
+        hostStatusEl.textContent = 'NOT READY';
+        hostStatusEl.style.background = '#334155';
+        hostStatusEl.style.color = '#94a3b8';
+      }
+    }
+
+    const guestNameEl = document.getElementById('lobby-guest-name');
+    const guestStatusEl = document.getElementById('lobby-guest-status');
+    if (data.guest) {
+      if (guestNameEl) guestNameEl.textContent = data.guest;
+      if (guestStatusEl) {
+        if (data.guestReady) {
+          guestStatusEl.textContent = 'READY ✓';
+          guestStatusEl.style.background = 'rgba(34,197,94,0.2)';
+          guestStatusEl.style.color = '#22c55e';
+        } else {
+          guestStatusEl.textContent = 'NOT READY';
+          guestStatusEl.style.background = '#334155';
+          guestStatusEl.style.color = '#94a3b8';
+        }
+      }
+    } else {
+      if (guestNameEl) guestNameEl.textContent = 'Waiting for opponent...';
+      if (guestStatusEl) {
+        guestStatusEl.textContent = 'WAITING';
+        guestStatusEl.style.background = '#334155';
+        guestStatusEl.style.color = '#94a3b8';
+      }
+    }
+
+    const tGoals = data.targetGoals || 3;
+    [3, 5, 7].forEach(g => {
+      const btn = document.getElementById(`btn-goal-${g}`);
+      if (btn) {
+        if (g === tGoals) btn.classList.add('active');
+        else btn.classList.remove('active');
+        btn.disabled = !isRoomHost;
+      }
+    });
+
+    const stadSelect = document.getElementById('lobby-stadium-select');
+    if (stadSelect) {
+      stadSelect.value = (data.stadiumIndex !== undefined) ? data.stadiumIndex : 0;
+      stadSelect.disabled = !isRoomHost;
+    }
+    const hint = document.getElementById('lobby-settings-hint');
+    if (hint) hint.textContent = isRoomHost ? '(Host Controls)' : '(Host Controls - Synced)';
+
+    const readyBtn = document.getElementById('btn-lobby-ready');
+    const isMeReady = isRoomHost ? data.hostReady : data.guestReady;
+    if (readyBtn) {
+      if (isMeReady) {
+        readyBtn.textContent = 'WAITING FOR OPPONENT... (CLICK TO UNREADY)';
+        readyBtn.style.background = '#3b82f6';
+      } else {
+        readyBtn.textContent = 'READY UP ✓';
+        readyBtn.style.background = '#10b981';
+      }
+      readyBtn.disabled = (!data.guest && isRoomHost);
+    }
+
+    // Both players ready -> Host initiates kickoff for both!
+    if (data.status === 'playing' || (data.hostReady && data.guestReady && data.status === 'lobby')) {
+      if (isRoomHost && data.status !== 'playing') {
+        fbRtdb.ref('match_rooms/' + activeRoomCode).update({ status: 'playing' });
+        return;
+      }
+
+      p1Name = data.host || 'Player 1';
+      p1Color = data.hostColor || '#3b82f6';
+      p2Name = data.guest || 'Player 2';
+      p2Color = data.guestColor || '#ef4444';
+      targetGoals = data.targetGoals || 3;
+      currentStadiumIndex = (data.stadiumIndex !== undefined) ? data.stadiumIndex : 0;
+      activeGameMode = 'online';
+      is2Player = false;
+      activeDifficulty = 'pro';
+      applyStadiumTheme(currentStadiumIndex);
+
+      const lobbyPanel = document.getElementById('online-lobby-panel');
+      if (lobbyPanel) lobbyPanel.style.display = 'none';
+      const onlineModal = document.getElementById('modal-online');
+      if (onlineModal) onlineModal.style.display = 'none';
+
+      triggerCinematicMatchKickoff();
+      listenToOnlineMatchRoom(activeRoomCode);
+    }
+  }
+
+  function toggleOnlineReady() {
+    if (!activeRoomCode || !fbRtdb) return;
+    myOnlineReady = !myOnlineReady;
+    const roomRef = fbRtdb.ref('match_rooms/' + activeRoomCode);
+    if (isRoomHost) {
+      roomRef.update({ hostReady: myOnlineReady });
+    } else {
+      roomRef.update({ guestReady: myOnlineReady });
+    }
+  }
+  window.toggleOnlineReady = toggleOnlineReady;
+
+  function setOnlineLobbyGoals(goals) {
+    if (!isRoomHost || !activeRoomCode || !fbRtdb) return;
+    fbRtdb.ref('match_rooms/' + activeRoomCode).update({ targetGoals: goals });
+  }
+  window.setOnlineLobbyGoals = setOnlineLobbyGoals;
+
+  function setOnlineLobbyStadium(idx) {
+    if (!isRoomHost || !activeRoomCode || !fbRtdb) return;
+    fbRtdb.ref('match_rooms/' + activeRoomCode).update({ stadiumIndex: parseInt(idx, 10) });
+  }
+  window.setOnlineLobbyStadium = setOnlineLobbyStadium;
+
+  function closeOnlineModal() {
+    if (activeRoomCode) {
+      leaveOnlineRoom(true);
+    }
+    showScreen('screen-online-hub');
+  }
+  window.closeOnlineModal = closeOnlineModal;
+
+  function leaveOnlineRoom(cleanup = true) {
+    try {
+      if (activeRoomCode && fbRtdb && cleanup) {
+        try {
+          if (isRoomHost) {
+            fbRtdb.ref('match_rooms/' + activeRoomCode).remove().catch(() => {});
+          } else {
+            fbRtdb.ref('match_rooms/' + activeRoomCode).update({ guest: null, guestReady: false, status: 'lobby' }).catch(() => {});
+          }
+        } catch (fbErr) {
+          console.warn('Firebase RTDB cleanup notice:', fbErr);
+        }
+      }
+      if (activeOnlineRoomListener) {
+        try {
+          activeOnlineRoomListener.off();
+        } catch (lErr) {}
+        activeOnlineRoomListener = null;
+      }
+    } catch (err) {
+      console.warn('Error during leaveOnlineRoom:', err);
+    } finally {
+      activeRoomCode = null;
+      isRoomHost = false;
+      myOnlineReady = false;
+      const lobbyPanel = document.getElementById('online-lobby-panel');
+      if (lobbyPanel) lobbyPanel.style.display = 'none';
+      const statusBox = document.getElementById('room-status-box');
+      if (statusBox) statusBox.style.display = 'none';
+      const roomInput = document.getElementById('input-room-code');
+      if (roomInput) roomInput.value = '';
+      const activeCodeDisplay = document.getElementById('active-room-code-display');
+      if (activeCodeDisplay) activeCodeDisplay.textContent = '---';
+    }
+  }
+  window.leaveOnlineRoom = leaveOnlineRoom;
+
+  function copyRoomCode(e) {
+    if (!activeRoomCode) return;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(activeRoomCode).catch(() => {});
+      }
+    } catch (err) {}
+    const label = document.getElementById('lobby-copy-text');
+    if (label) {
+      const orig = label.textContent;
+      label.textContent = 'COPIED!';
+      setTimeout(() => { if (label) label.textContent = orig; }, 1500);
+    }
+  }
+  window.copyRoomCode = copyRoomCode;
 
   function listenToOnlineMatchRoom(code) {
     if (!fbRtdb) return;
@@ -20644,6 +21129,13 @@
     if (myIdEl) myIdEl.textContent = myMiniId;
     const statusMsg = document.getElementById('online-status-msg');
     if (statusMsg) statusMsg.style.display = 'none';
+
+    if (!activeRoomCode) {
+      const lobbyPanel = document.getElementById('online-lobby-panel');
+      if (lobbyPanel) lobbyPanel.style.display = 'none';
+      const statusBox = document.getElementById('room-status-box');
+      if (statusBox) statusBox.style.display = 'none';
+    }
 
     renderOnlineQuickFriendsList();
     showScreen('modal-online');
@@ -27166,6 +27658,8 @@
   function triggerCinematicMatchKickoff() {
     if (isKickoffInProgress) return;
     isKickoffInProgress = true;
+    isTutorialMode = false;
+    isTutorialScored = false;
 
     sound.init();
     sound.playWhoosh();
@@ -27206,6 +27700,8 @@
     // 3. Switch Viewport to Inside Match Pitch at 3.0s
     setTimeout(() => {
       isKickoffInProgress = false;
+      isTutorialMode = false;
+      isTutorialScored = false;
       showScreen('match');
       if (stage3d) stage3d.classList.remove('active');
 
@@ -27227,7 +27723,6 @@
       generateStadiumFans();
 
       // Setup match state and rack the discs in formation
-      isTutorialMode = false;
       scores = { p1: 0, p2: 0 };
       matchPoints = { p1: 0, p2: 0 };
       lastShootingDisc = null;
@@ -27437,6 +27932,19 @@
     gameState = 'KICKOFF_SETUP';
     isDragging = false;
     selectedDisc = null;
+
+    // Ensure Match HUD, Settings gear, and Scoreboard button are visible on match pitch
+    const matchHud = document.getElementById('match-hud');
+    if (matchHud) matchHud.style.display = 'flex';
+    const settingsBtn = document.getElementById('btn-match-settings');
+    if (settingsBtn) settingsBtn.style.display = 'flex';
+    const scoreboardBtn = document.getElementById('btn-match-scoreboard');
+    if (scoreboardBtn) scoreboardBtn.style.display = 'flex';
+
+    // Ensure Stadium Grandstand Fans are active
+    if (!animatedFans || animatedFans.length === 0 || !cachedCrowdCanvas) {
+      generateStadiumFans();
+    }
 
     if (turnClockInterval) {
       clearInterval(turnClockInterval);
@@ -27892,7 +28400,7 @@
 
     updateHUD();
 
-    if (!is2Player && currentTurn === 'p2') {
+    if (!is2Player && activeGameMode !== 'online' && currentTurn === 'p2') {
       planAITurn();
     }
   }
@@ -28368,18 +28876,13 @@
     const lbMultiplier = (typeof getLeaderboardMultiplier === 'function') ? getLeaderboardMultiplier() : 1.0;
     const multiplier = Math.round(baseMultiplier * lbMultiplier * 10) / 10;
 
-    document.getElementById('postmatch-title').textContent = `${winnerName} WINS!`;
-    document.getElementById('postmatch-sub').textContent = `Final Score: ${scores.p1} - ${scores.p2}`;
-    document.getElementById('btn-postmatch-continue').textContent = 'Continue ➔';
-
-    // Payout PocketBucks on Player 1 Victory against bots!
+    // PocketBucks payout calculation
+    let payout = 0;
     if (isP1 && !is2Player && (activeGameMode === 'quickplay' || activeGameMode === 'tournament')) {
       const basePayout = calculateMatchPayout(activeGameMode, activeDifficulty, targetGoals, (activeGameMode === 'tournament' ? tourneySeriesMax : quickplaySeriesMax), (activeGameMode === 'tournament' ? tourneySize : 16));
-      const payout = Math.round(basePayout * multiplier);
+      payout = Math.round(basePayout * multiplier);
       addPocketBucks(payout);
       incrementLifetimeStat('career_pb_earned', payout);
-      const lbBonusNotice = (lbMultiplier > 1.0) ? ` • ${lbMultiplier.toFixed(1)}x Rank #1 Boost!` : '';
-      document.getElementById('postmatch-sub').textContent = `Final: ${scores.p1} - ${scores.p2} • +${payout} PocketBucks (${matchPoints.p1 || 0} PTS • ${multiplier.toFixed(1)}x Multiplier${lbBonusNotice})`;
 
       // Career bot victories tracking
       incrementLifetimeStat('career_bot_wins', 1);
@@ -28391,7 +28894,61 @@
         incrementLifetimeStat('win_godtier', 1);
         if (scores.p2 === 0) incrementLifetimeStat('godtier_shutout', 1);
       }
+    } else if (!isP1 && !is2Player && (activeGameMode === 'quickplay' || activeGameMode === 'tournament')) {
+      // Consolation payout for match completion
+      payout = Math.max(10, Math.round(15 * multiplier));
+      addPocketBucks(payout);
+      incrementLifetimeStat('career_pb_earned', payout);
+    } else if (is2Player) {
+      // 2P Pass & Play reward
+      payout = Math.round(35 * multiplier);
+      addPocketBucks(payout);
+      incrementLifetimeStat('career_pb_earned', payout);
     }
+
+    // Populate Post-Match Screen Elements
+    const resBadge = document.getElementById('postmatch-result-badge');
+    const resText = document.getElementById('postmatch-result-text');
+    const titleEl = document.getElementById('postmatch-title');
+    const subEl = document.getElementById('postmatch-sub');
+    const seriesBanner = document.getElementById('postmatch-series-banner');
+    const statPoints = document.getElementById('postmatch-stat-points');
+    const statDiff = document.getElementById('postmatch-stat-diff');
+    const statMultiplier = document.getElementById('postmatch-stat-multiplier');
+    const payoutTotal = document.getElementById('postmatch-payout-total');
+    if (seriesBanner) {
+      seriesBanner.style.display = 'none';
+      seriesBanner.textContent = '';
+    }
+
+    if (is2Player) {
+      if (resBadge) { resBadge.style.background = 'rgba(59,130,246,0.15)'; resBadge.style.borderColor = '#3b82f6'; resBadge.style.color = '#38bdf8'; }
+      if (resText) resText.textContent = 'LOCAL 2P COMPLETE';
+      if (titleEl) titleEl.textContent = `${winnerName} WINS!`;
+      if (subEl) subEl.textContent = `${p1Name} ${scores.p1} - ${scores.p2} ${p2Name}`;
+      if (statPoints) statPoints.textContent = `P1: ${matchPoints.p1 || 0} PTS | P2: ${matchPoints.p2 || 0} PTS`;
+      if (statDiff) statDiff.textContent = 'Pass & Play Friendly';
+      if (statMultiplier) statMultiplier.textContent = `${multiplier.toFixed(1)}x Match Boost`;
+      if (payoutTotal) payoutTotal.textContent = `+${payout} PB`;
+    } else {
+      if (isP1) {
+        if (resBadge) { resBadge.style.background = 'rgba(34,197,94,0.15)'; resBadge.style.borderColor = '#22c55e'; resBadge.style.color = '#22c55e'; }
+        if (resText) resText.textContent = 'MATCH VICTORY';
+        if (titleEl) titleEl.textContent = `${p1Name} WINS!`;
+      } else {
+        if (resBadge) { resBadge.style.background = 'rgba(239,68,68,0.15)'; resBadge.style.borderColor = '#ef4444'; resBadge.style.color = '#ef4444'; }
+        if (resText) resText.textContent = 'MATCH DEFEAT';
+        if (titleEl) titleEl.textContent = `${winnerName} WINS`;
+      }
+      if (subEl) subEl.textContent = `${p1Name} ${scores.p1} - ${scores.p2} ${p2Name}`;
+      if (statPoints) statPoints.textContent = `${matchPoints.p1 || 0} PTS`;
+      const diffLabels = { rookie: 'Rookie (1.0x)', 'semi-pro': 'Semi-Pro (1.2x)', semipro: 'Semi-Pro (1.2x)', pro: 'Pro (1.5x)', master: 'Master (2.0x)', 'god-tier': 'God-Tier (3.0x)', godtier: 'God-Tier (3.0x)' };
+      if (statDiff) statDiff.textContent = diffLabels[activeDifficulty] || `${(activeDifficulty || 'Normal').toUpperCase()}`;
+      const lbBonusText = (lbMultiplier > 1.0) ? ` (+${lbMultiplier.toFixed(1)}x Rank #1)` : '';
+      if (statMultiplier) statMultiplier.textContent = `${multiplier.toFixed(1)}x Multiplier${lbBonusText}`;
+      if (payoutTotal) payoutTotal.textContent = `+${payout} PB`;
+    }
+    document.getElementById('btn-postmatch-continue').textContent = 'Continue ➔';
 
     if (activeGameMode === 'quickplay') {
       if (quickplaySeriesMax > 1) {
@@ -28402,8 +28959,11 @@
 
         if (p1Won || p2Won) {
           const seriesWinnerName = p1Won ? p1Name : p2Name;
-          document.getElementById('postmatch-title').textContent = `${seriesWinnerName} WINS SERIES!`;
-          document.getElementById('postmatch-sub').textContent = `Series Score: ${quickplaySeriesScore.p1} - ${quickplaySeriesScore.p2} (Game Score: ${scores.p1} - ${scores.p2})`;
+          if (titleEl) titleEl.textContent = `${seriesWinnerName} WINS SERIES!`;
+          if (seriesBanner) {
+            seriesBanner.style.display = 'block';
+            seriesBanner.textContent = `Series Final: ${quickplaySeriesScore.p1} - ${quickplaySeriesScore.p2} (Best of ${quickplaySeriesMax})`;
+          }
           document.getElementById('btn-postmatch-continue').textContent = 'Finish Series ➔';
           if (p1Won) {
             sound.playCrowdCheerSurge();
@@ -28411,8 +28971,11 @@
           }
         } else {
           const nextGameNum = quickplaySeriesScore.p1 + quickplaySeriesScore.p2 + 1;
-          document.getElementById('postmatch-title').textContent = `${winnerName} WINS GAME ${nextGameNum - 1}!`;
-          document.getElementById('postmatch-sub').textContent = `Series: ${p1Name} ${quickplaySeriesScore.p1} - ${quickplaySeriesScore.p2} ${p2Name} (First to ${winsNeeded})`;
+          if (titleEl) titleEl.textContent = `${winnerName} WINS GAME ${nextGameNum - 1}!`;
+          if (seriesBanner) {
+            seriesBanner.style.display = 'block';
+            seriesBanner.textContent = `Series: ${p1Name} ${quickplaySeriesScore.p1} - ${quickplaySeriesScore.p2} ${p2Name} (First to ${winsNeeded})`;
+          }
           document.getElementById('btn-postmatch-continue').textContent = `Play Game ${nextGameNum} ➔`;
         }
       }
@@ -28467,7 +29030,9 @@
           } else {
             // Grand Final Complete!
             if (cur.winner === cur.team1) {
-              document.getElementById('postmatch-title').textContent = `TOURNAMENT CHAMPIONS!`;
+              if (titleEl) titleEl.textContent = `TOURNAMENT CHAMPIONS!`;
+              if (resBadge) { resBadge.style.background = 'rgba(250,204,21,0.2)'; resBadge.style.borderColor = '#facc15'; resBadge.style.color = '#facc15'; }
+              if (resText) resText.textContent = 'CHAMPIONSHIP VICTORY';
               sound.playCrowdCheerSurge();
               incrementLifetimeStat('career_tourney_champs', 1);
               if (tourneySize === 4) incrementLifetimeStat('tourney_champ_4', 1);
@@ -28480,12 +29045,18 @@
               }
             }
           }
-          document.getElementById('postmatch-sub').textContent = `Series Score: ${cur.series1} - ${cur.series2}`;
+          if (seriesBanner) {
+            seriesBanner.style.display = 'block';
+            seriesBanner.textContent = `Tournament Series Score: ${cur.series1} - ${cur.series2}`;
+          }
           document.getElementById('btn-postmatch-continue').textContent = 'View Bracket ➔';
         } else {
           const nextGameNum = cur.series1 + cur.series2 + 1;
-          document.getElementById('postmatch-title').textContent = `${winnerName} WINS GAME ${nextGameNum - 1}!`;
-          document.getElementById('postmatch-sub').textContent = `Series: ${cur.team1} ${cur.series1} - ${cur.series2} ${cur.team2} (First to ${winsNeeded})`;
+          if (titleEl) titleEl.textContent = `${winnerName} WINS GAME ${nextGameNum - 1}!`;
+          if (seriesBanner) {
+            seriesBanner.style.display = 'block';
+            seriesBanner.textContent = `Tournament Series: ${cur.team1} ${cur.series1} - ${cur.series2} ${cur.team2} (First to ${winsNeeded})`;
+          }
           document.getElementById('btn-postmatch-continue').textContent = `Play Game ${nextGameNum} ➔`;
         }
       }
@@ -28517,7 +29088,10 @@
           if (isGrandFinal) {
             if (cur.winner && cur.winner.isUser) {
               document.getElementById('postmatch-title').textContent = 'TOURNAMENT CHAMPIONS!';
-              document.getElementById('postmatch-sub').textContent = 'Grand Final Victory! +1,500 PocketBucks Bonus Claimed!';
+              const banner = document.getElementById('postmatch-series-banner');
+              if (banner) { banner.style.display = 'block'; banner.textContent = 'Grand Final Victory! +1,500 Championship PocketBucks Awarded!'; }
+              const pTot = document.getElementById('postmatch-payout-total');
+              if (pTot) pTot.textContent = '+1500 PB';
               sound.playCrowdCheerSurge();
               addPocketBucks(1500);
               incrementLifetimeStat('career_tourney_champs', 1);
@@ -28527,7 +29101,8 @@
               document.getElementById('btn-postmatch-continue').textContent = 'Champion Podium ➔';
             } else {
               document.getElementById('postmatch-title').textContent = `${cur.winner.name} WINS GRAND FINAL!`;
-              document.getElementById('postmatch-sub').textContent = `Series Score: ${cur.series1} - ${cur.series2}`;
+              const banner = document.getElementById('postmatch-series-banner');
+              if (banner) { banner.style.display = 'block'; banner.textContent = `Series Score: ${cur.series1} - ${cur.series2}`; }
               document.getElementById('btn-postmatch-continue').textContent = 'View Bracket ➔';
             }
           } else {
@@ -28535,13 +29110,15 @@
             onlineTourneyState.currentRoundIdx = roundIdx + 1;
             const userWon = cur.winner && cur.winner.isUser;
             document.getElementById('postmatch-title').textContent = userWon ? 'ROUND VICTORY!' : 'KNOCKED OUT!';
-            document.getElementById('postmatch-sub').textContent = userWon ? `Advanced to Next Round! (Series: ${cur.series1} - ${cur.series2})` : `Eliminated from tournament.`;
+            const banner = document.getElementById('postmatch-series-banner');
+            if (banner) { banner.style.display = 'block'; banner.textContent = userWon ? `Advanced to Next Round! (Series: ${cur.series1} - ${cur.series2})` : `Eliminated from tournament.`; }
             document.getElementById('btn-postmatch-continue').textContent = 'View Bracket ➔';
           }
         } else {
           const nextGameNum = (cur.series1 || 0) + (cur.series2 || 0) + 1;
           document.getElementById('postmatch-title').textContent = `${winnerName} WINS GAME ${nextGameNum - 1}!`;
-          document.getElementById('postmatch-sub').textContent = `Series: ${cur.team1.name} ${cur.series1} - ${cur.series2} ${cur.team2.name} (First to ${winsNeeded})`;
+          const banner = document.getElementById('postmatch-series-banner');
+          if (banner) { banner.style.display = 'block'; banner.textContent = `Series: ${cur.team1.name} ${cur.series1} - ${cur.series2} ${cur.team2.name} (First to ${winsNeeded})`; }
           document.getElementById('btn-postmatch-continue').textContent = `Play Game ${nextGameNum} ➔`;
         }
       }
@@ -28566,6 +29143,8 @@
           oppTeam.gd = oppTeam.gf - oppTeam.ga;
 
           let coinsEarned = 0;
+          const banner = document.getElementById('postmatch-series-banner');
+          const pTot = document.getElementById('postmatch-payout-total');
           if (scores.p1 > scores.p2) {
             userTeam.w++; userTeam.pts += 3;
             oppTeam.l++;
@@ -28573,21 +29152,29 @@
             const mult = getCapacityMultiplier(season.stadiumCapacity || 1);
             coinsEarned = Math.round(100 * mult);
             season.pocketCoins = (season.pocketCoins || 0) + coinsEarned;
+            addPocketBucks(coinsEarned);
             document.getElementById('postmatch-title').textContent = `${p1Name} VICTORIOUS!`;
-            document.getElementById('postmatch-sub').textContent = `Final: ${scores.p1} - ${scores.p2} • +${coinsEarned} PocketBucks Earned! (${season.pocketCoins} Total)`;
+            if (banner) { banner.style.display = 'block'; banner.textContent = `Season Matchday ${season.currentWeek} Win • ${coinsEarned} PocketBucks Awarded`; }
+            if (pTot) pTot.textContent = `+${coinsEarned} PB`;
             sound.playCrowdCheerSurge();
           } else if (scores.p1 === scores.p2) {
             userTeam.d++; userTeam.pts += 1;
             oppTeam.d++; oppTeam.pts += 1;
             season.record.d++;
+            coinsEarned = 25;
+            addPocketBucks(coinsEarned);
             document.getElementById('postmatch-title').textContent = `DRAW MATCH`;
-            document.getElementById('postmatch-sub').textContent = `Final: ${scores.p1} - ${scores.p2} • +0 PocketBucks`;
+            if (banner) { banner.style.display = 'block'; banner.textContent = `Season Matchday ${season.currentWeek} Draw • +25 PocketBucks Earned`; }
+            if (pTot) pTot.textContent = `+25 PB`;
           } else {
             userTeam.l++;
             oppTeam.w++; oppTeam.pts += 3;
             season.record.l++;
+            coinsEarned = 10;
+            addPocketBucks(coinsEarned);
             document.getElementById('postmatch-title').textContent = `${p2Name} WINS!`;
-            document.getElementById('postmatch-sub').textContent = `Final: ${scores.p1} - ${scores.p2} • +0 PocketBucks (Defeat)`;
+            if (banner) { banner.style.display = 'block'; banner.textContent = `Season Matchday ${season.currentWeek} Defeat • +10 PB Consolation`; }
+            if (pTot) pTot.textContent = `+10 PB`;
           }
 
           // Update this matchday in schedule calendar
@@ -28627,13 +29214,15 @@
             const sorted = [...season.teams].sort((a, b) => b.pts - a.pts || b.gd - a.gd);
             const userRank = sorted.findIndex(t => t.isUser) + 1;
             if (userRank === 1) {
-              document.getElementById('postmatch-title').textContent = `LEAGUE CHAMPIONS! `;
-              document.getElementById('postmatch-sub').textContent = `Finished #1 in the league! +500 Championship PocketBucks Bonus!`;
+              document.getElementById('postmatch-title').textContent = `LEAGUE CHAMPIONS!`;
+              if (banner) { banner.style.display = 'block'; banner.textContent = `Finished #1 in the league! +500 Championship PocketBucks Bonus Awarded!`; }
+              if (pTot) pTot.textContent = `+500 PB`;
+              addPocketBucks(500);
               season.pocketCoins = (season.pocketCoins || 0) + 500;
               sound.playCrowdCheerSurge();
             } else {
               document.getElementById('postmatch-title').textContent = `SEASON COMPLETED!`;
-              document.getElementById('postmatch-sub').textContent = `Finished Rank #${userRank} (${userTeam.pts} PTS)`;
+              if (banner) { banner.style.display = 'block'; banner.textContent = `Finished Rank #${userRank} (${userTeam.pts} PTS)`; }
             }
             // Season completed: refresh transfer market pool for the next campaign!
             season.transferMarket = [];
@@ -30076,9 +30665,19 @@
     }
 
     wrapper.style.display = 'flex';
-    const teamDiscs = discs.filter(d => d.team === 'p1' && d.powerup);
+    const activeTurnTeam = (is2Player && currentTurn === 'p2') ? 'p2' : 'p1';
+    const teamDiscs = discs.filter(d => d.team === activeTurnTeam && d.powerup);
     const anyArmed = teamDiscs.some(d => d.isArmed);
     if (pip) pip.style.display = anyArmed ? 'inline-block' : 'none';
+
+    const labelEl = document.getElementById('drawer-label-text');
+    if (labelEl) {
+      if (is2Player) {
+        labelEl.textContent = (currentTurn === 'p2') ? `${(p2Name || 'P2').toUpperCase()} ABILITIES` : `${(p1Name || 'P1').toUpperCase()} ABILITIES`;
+      } else {
+        labelEl.textContent = 'POWERS & ABILITIES';
+      }
+    }
 
     if (!isAbilityDrawerOpen) {
       wrapper.classList.add('collapsed');
@@ -30110,6 +30709,8 @@
         }).join('');
       }
     }
+
+    const activeTeamColor = (activeTurnTeam === 'p2') ? (p2Color || '#ef4444') : (getUserEquippedColor() || p1Color || '#3b82f6');
 
     hud.innerHTML = teamDiscs.map((disc, idx) => {
       const pow = disc.powerup;
@@ -30146,7 +30747,7 @@
              onmouseenter="setHoveredAbilityDisc('${disc.id}')"
              onmouseleave="clearHoveredAbilityDisc()"
              onclick="toggleArmSpecificDisc('${disc.id}')">
-          <div class="puck-num-badge" style="background:${getUserEquippedColor()};">#${idx + 1}</div>
+          <div class="puck-num-badge" style="background:${activeTeamColor};">#${idx + 1}</div>
           <div class="puck-ability-top-left-badge">
             <div class="puck-ability-top-name">${pow.name}</div>
             ${statusHtml}
@@ -30214,6 +30815,9 @@
     const mp = activeManagerPowers[slotIdx];
     if (!mp || mp.cdRemaining > 0) return;
 
+    const friendlyTeam = (is2Player && currentTurn === 'p2') ? 'p2' : 'p1';
+    const enemyTeam = (friendlyTeam === 'p1') ? 'p2' : 'p1';
+
     const pid = mp.id;
     const now = Date.now();
     if (pid === 'freeze_ball') {
@@ -30231,7 +30835,7 @@
       sound.playWhistle();
     } else if (pid === 'energy_surge') {
       discs.forEach(d => {
-        if (d.team === 'p1') d.cooldownCurrent += 2;
+        if (d.team === friendlyTeam) d.cooldownCurrent += 2;
       });
       sound.playCountdownBeep(true);
     } else if (pid === 'tactical_whistle') {
@@ -30254,7 +30858,7 @@
       goalpostMagnetTimer = 2;
       sound.playWhistle();
     } else if (pid === 'red_card') {
-      const opps = discs.filter(d => d.team === 'p2' && d.x > -500);
+      const opps = discs.filter(d => d.team === enemyTeam && d.x > -500);
       if (opps.length > 0) {
         const target = opps[0];
         benchedDiscInfo = { id: target.id, origX: target.x, origY: target.y, turnsLeft: 1 };
@@ -30283,13 +30887,13 @@
       tempestStormTimer = 3;
       tempestStormEndTime = now + 3000;
       discs.forEach(d => {
-        if (d.team === 'p2') d.isFrozen = true;
+        if (d.team === enemyTeam) d.isFrozen = true;
       });
       sound.playWhistle();
     } else if (pid === 'divine_decree') {
       activeManagerPowers.forEach(p => { if (p) p.cdRemaining = 0; });
       discs.forEach(d => {
-        if (d.team === 'p1' && d.powerup) d.cooldownCurrent = d.powerup.cooldownReq;
+        if (d.team === friendlyTeam && d.powerup) d.cooldownCurrent = d.powerup.cooldownReq;
       });
       sound.playCrowdCheerSurge();
     }
@@ -30369,17 +30973,45 @@
       }
 
       if (gameState !== 'AIMING') return;
-      if (!is2Player && currentTurn === 'p2') return;
+      if (!is2Player && activeGameMode !== 'online' && currentTurn === 'p2') return;
 
-      const toleranceMultiplier = isTouch ? 2.2 : 1.5;
+      if (activeGameMode === 'online') {
+        if (isRoomHost && currentTurn !== 'p1') return;
+        if (!isRoomHost && currentTurn !== 'p2') return;
+      }
+
+      const toleranceMultiplier = isTouch ? 2.6 : 1.6;
       let foundDisc = null;
 
-      for (const disc of discs) {
-        if (disc.team === currentTurn) {
-          const d = Math.hypot(pos.x - disc.x, pos.y - disc.y);
-          if (d <= disc.radius * toleranceMultiplier) {
-            foundDisc = disc;
-            break;
+      // 1. First priority: Check if player is tapping or dragging the armed puck
+      const armedDisc = discs.find(d => d.team === currentTurn && d.isArmed);
+      if (armedDisc) {
+        let allowArmed = true;
+        if (activeGameMode === 'online') {
+          if (isRoomHost && armedDisc.team !== 'p1') allowArmed = false;
+          if (!isRoomHost && armedDisc.team !== 'p2') allowArmed = false;
+        }
+        if (allowArmed) {
+          const d = Math.hypot(pos.x - armedDisc.x, pos.y - armedDisc.y);
+          if (d <= armedDisc.radius * (isTouch ? 3.2 : 2.2)) {
+            foundDisc = armedDisc;
+          }
+        }
+      }
+
+      // 2. Otherwise check all friendly team discs
+      if (!foundDisc) {
+        for (const disc of discs) {
+          if (disc.team === currentTurn) {
+            if (activeGameMode === 'online') {
+              if (isRoomHost && disc.team !== 'p1') continue;
+              if (!isRoomHost && disc.team !== 'p2') continue;
+            }
+            const d = Math.hypot(pos.x - disc.x, pos.y - disc.y);
+            if (d <= disc.radius * toleranceMultiplier) {
+              foundDisc = disc;
+              break;
+            }
           }
         }
       }
@@ -30417,10 +31049,16 @@
         const dy = dragStart.y - dragCurrent.y;
         const dist = Math.hypot(dx, dy);
 
-        if (dist > 10) {
+        if (dist > 6) {
           const angle = Math.atan2(dy, dx);
           const clamped = Math.min(dist, MAX_DRAG);
           executeShot(selectedDisc, angle, clamped);
+        } else if (selectedDisc.isArmed) {
+          // Responsive iPad Tap-to-fire: if player tapped armed puck without dragging, auto-aim at ball
+          if (ball) {
+            const angle = Math.atan2(ball.y - selectedDisc.y, ball.x - selectedDisc.x);
+            executeShot(selectedDisc, angle, MAX_DRAG * 0.75);
+          }
         }
 
         selectedDisc = null;
@@ -30433,9 +31071,23 @@
     window.addEventListener('mouseup', handleEnd);
 
     canvas.addEventListener('touchstart', (e) => { e.preventDefault(); handleStart(getPos(e), true); }, { passive: false });
-    window.addEventListener('touchmove', (e) => { if (isDragging) { e.preventDefault(); handleMove(getPos(e)); } }, { passive: false });
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); if (isDragging) handleMove(getPos(e)); }, { passive: false });
+    window.addEventListener('touchmove', (e) => {
+      if (isDragging) {
+        e.preventDefault();
+        handleMove(getPos(e));
+      }
+    }, { passive: false });
     window.addEventListener('touchend', (e) => { if (isDragging) { e.preventDefault(); handleEnd(); } }, { passive: false });
     canvas.addEventListener('touchcancel', handleEnd);
+
+    // Safari Fullscreen Gesture Anchor: prevent vertical swipe-down from dragging page or exiting fullscreen
+    document.addEventListener('touchmove', (e) => {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+      const scrollable = e.target && e.target.closest && e.target.closest('.scrollable, .modal-scroll-body, .achievements-grid, .trading-list, .locker-items-grid, .online-friends-list, .kickoff-formations-scroll, .crate-spinner-tape');
+      if (scrollable) return;
+      if (e.cancelable) e.preventDefault();
+    }, { passive: false });
 
     window.addEventListener('orientationchange', () => {
       setTimeout(handleResize, 150);
@@ -30450,26 +31102,40 @@
 
     let power = (distance / MAX_DRAG) * MAX_POWER;
 
-    // Dual Strike / Tandem Play Aim Handler (Disabled in 2v2 Teams Mode)
+    // Dual Strike & Triple Tandem Play: Simultaneously launch teammate pucks without stalling shot
     if (disc && disc.isArmed && !is2v2Teams && (disc.powerup.id === 'dual_strike' || disc.powerup.id === 'triple_tandem')) {
-      if (!tandemAimState.active) {
-        tandemAimState.active = true;
-        tandemAimState.disc1 = disc;
-        tandemAimState.angle1 = angle;
-        tandemAimState.power1 = power;
-        const tBtn = document.getElementById('btn-tandem-fire');
-        if (tBtn) tBtn.style.display = 'block';
-        const metaEl = document.getElementById('disc-ability-hud-meta');
-        if (metaEl) metaEl.textContent = 'Player 1 trajectory locked! Now select & aim 2nd player!';
-        return;
-      } else {
-        tandemAimState.disc2 = disc;
-        tandemAimState.angle2 = angle;
-        tandemAimState.power2 = power;
-        const tBtn = document.getElementById('btn-tandem-fire');
-        if (tBtn) tBtn.style.display = 'block';
-        return;
+      const teammates = discs.filter(d => d.team === disc.team && d !== disc);
+      if (teammates.length > 0) {
+        if (disc.powerup.id === 'dual_strike') {
+          // Simultaneously fire nearest teammate towards the ball
+          let partner = teammates[0];
+          if (ball) {
+            let minD = Infinity;
+            teammates.forEach(tm => {
+              const d = Math.hypot(tm.x - ball.x, tm.y - ball.y);
+              if (d < minD) { minD = d; partner = tm; }
+            });
+            const pAng = Math.atan2(ball.y - partner.y, ball.x - partner.x);
+            partner.vx = Math.cos(pAng) * (power * 0.9);
+            partner.vy = Math.sin(pAng) * (power * 0.9);
+          } else {
+            partner.vx = Math.cos(angle) * (power * 0.9);
+            partner.vy = Math.sin(angle) * (power * 0.9);
+          }
+          for (let i = 0; i < 14; i++) particles.push(new Particle(partner.x, partner.y, '#38bdf8', 1.5));
+        } else if (disc.powerup.id === 'triple_tandem') {
+          // Simultaneously fire all teammates in coordinated strike
+          teammates.forEach((tm, tIdx) => {
+            const spread = (tIdx === 0 ? -0.25 : 0.25);
+            tm.vx = Math.cos(angle + spread) * (power * 0.85);
+            tm.vy = Math.sin(angle + spread) * (power * 0.85);
+            for (let i = 0; i < 12; i++) particles.push(new Particle(tm.x, tm.y, '#facc15', 1.5));
+          });
+        }
       }
+      tandemAimState = { active: false, disc1: null, angle1: 0, power1: 0, disc2: null, angle2: 0, power2: 0 };
+      const tBtn = document.getElementById('btn-tandem-fire');
+      if (tBtn) tBtn.style.display = 'none';
     }
 
     // Regular armed abilities
@@ -30530,6 +31196,7 @@
         for (let i = 0; i < 12; i++) particles.push(new Particle(disc.x, disc.y, '#f43f5e', 1.5));
       } else if (pid === 'anchor_lock') {
         disc.isAnchorLocked = true;
+        disc.isAnchorShooting = true;
         sound.playDiscHit(1.2);
         for (let i = 0; i < 12; i++) particles.push(new Particle(disc.x, disc.y, '#94a3b8', 1.4));
       } else if (pid === 'quick_feint') {
@@ -32024,7 +32691,6 @@
     if (statusEl) statusEl.textContent = '↻ Syncing Firestore...';
 
     adminUsersCache = [];
-
     const FAKE_ACCOUNTS = ['playerone', 'player1', 'sammy', 'new', 'blunarius', 'regularplayer', 'guest', 'player'];
 
     if (fbDb) {
@@ -32033,10 +32699,12 @@
         const deletedAccounts = JSON.parse(localStorage.getItem('ps_deleted_accounts') || '[]');
         const excludedLb = JSON.parse(localStorage.getItem('ps_excluded_from_lb') || '[]');
 
+        const userDocMap = new Map();
+
         snap.forEach(doc => {
           const d = doc.data() || {};
-          const uname = d.username || doc.id.replace(/^user_/, '');
-          const uKey = (uname || '').toLowerCase();
+          const uname = (d.username || doc.id.replace(/^user_/, '') || '').trim();
+          const uKey = uname.toLowerCase();
 
           // Purge any fake accounts from Firestore immediately
           if (FAKE_ACCOUNTS.includes(uKey) || FAKE_ACCOUNTS.includes(doc.id.toLowerCase())) {
@@ -32048,9 +32716,9 @@
           const isBanned = !!d.banned || !!localStorage.getItem('ps_banned_' + uKey);
           const banReason = d.banReason || localStorage.getItem('ps_banned_' + uKey) || '';
 
-          adminUsersCache.push({
+          const userObj = {
             docId: doc.id,
-            username: uname,
+            username: uname || 'User',
             password: d.password || '',
             miniId: d.miniId || '#????',
             pocketbucks: (typeof d.pocketbucks === 'number') ? d.pocketbucks : (parseInt(d.pocketbucks) || 0),
@@ -32063,8 +32731,30 @@
             kicked: !!d.kicked,
             removedFromLeaderboard: !!d.removedFromLeaderboard || excludedLb.includes(uKey),
             lastLogin: d.lastLogin ? (d.lastLogin.toMillis ? d.lastLogin.toMillis() : Date.now()) : 0
-          });
+          };
+
+          if (!userDocMap.has(uKey)) {
+            userDocMap.set(uKey, userObj);
+          } else {
+            const existing = userDocMap.get(uKey);
+            // If duplicate found: prefer the real UID document (length > 20 and not starting with user_)
+            if (doc.id.length > 20 && !doc.id.startsWith('user_')) {
+              if (existing.docId.startsWith('user_')) {
+                fbDb.collection('users').doc(existing.docId).delete().catch(() => {});
+              }
+              userDocMap.set(uKey, Object.assign({}, existing, userObj));
+            } else if (existing.docId.length > 20 && !existing.docId.startsWith('user_')) {
+              if (doc.id.startsWith('user_')) {
+                fbDb.collection('users').doc(doc.id).delete().catch(() => {});
+              }
+            } else {
+              userDocMap.set(uKey, Object.assign({}, existing, userObj));
+            }
+          }
         });
+
+        adminUsersCache = Array.from(userDocMap.values());
+
         if (statusEl) {
           statusEl.textContent = '● Firebase Online';
           statusEl.style.color = '#22c55e';
@@ -32083,75 +32773,32 @@
       }
     }
 
-    // Merge local accounts DB and discover any account profiles from localStorage
-    const localAccounts = (typeof getStoredAccounts === 'function') ? getStoredAccounts() : {};
-    const discoveredNames = new Set(Object.keys(localAccounts));
-    const deletedAccounts = JSON.parse(localStorage.getItem('ps_deleted_accounts') || '[]');
-    const excludedLb = JSON.parse(localStorage.getItem('ps_excluded_from_lb') || '[]');
-
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('ps_pocketbucks_')) {
-        const nm = k.replace('ps_pocketbucks_', '').trim().toLowerCase();
-        if (nm && !FAKE_ACCOUNTS.includes(nm) && !deletedAccounts.includes(nm)) discoveredNames.add(nm);
-      }
-      if (k && k.startsWith('ps_unlocked_skins_')) {
-        const nm = k.replace('ps_unlocked_skins_', '').trim().toLowerCase();
-        if (nm && !FAKE_ACCOUNTS.includes(nm) && !deletedAccounts.includes(nm)) discoveredNames.add(nm);
-      }
-    }
+    // Ensure active user and bloonairius are always available in the UI
     const activeU = (window.myUsername || myUsername || localStorage.getItem('ps_username') || '').trim().toLowerCase();
-    if (activeU && !FAKE_ACCOUNTS.includes(activeU) && !deletedAccounts.includes(activeU)) discoveredNames.add(activeU);
-    discoveredNames.add('bloonairius'); // Ensure bloonairius is always present
-
-    for (const key of discoveredNames) {
-      if (FAKE_ACCOUNTS.includes(key) && key !== 'bloonairius') continue;
-      if (deletedAccounts.includes(key)) continue;
-      const existing = adminUsersCache.find(u => (u.username || '').toLowerCase() === key);
-      if (!existing) {
-        const acc = localAccounts[key] || {};
-        const prettyName = (key === 'bloonairius') ? 'Bloonairius' : (acc.username || (key.charAt(0).toUpperCase() + key.slice(1)));
-        const isBanned = !!acc.banned || !!localStorage.getItem('ps_banned_' + key);
-        const banReason = acc.banReason || localStorage.getItem('ps_banned_' + key) || '';
-        const userObj = {
-          docId: 'user_' + key.replace(/[^a-z0-9]/g, ''),
+    const existingNames = new Set(adminUsersCache.map(u => (u.username || '').toLowerCase()));
+    
+    ['bloonairius', activeU].forEach(uKey => {
+      if (uKey && !existingNames.has(uKey) && !FAKE_ACCOUNTS.includes(uKey)) {
+        const prettyName = (uKey === 'bloonairius') ? 'Bloonairius' : (uKey.charAt(0).toUpperCase() + uKey.slice(1));
+        adminUsersCache.push({
+          docId: 'user_' + uKey,
           username: prettyName,
-          password: acc.password || (key === 'bloonairius' ? 'password123' : ''),
-          miniId: acc.miniId || (key === activeU ? myMiniId : ('#' + Math.random().toString(36).substring(2, 6).toUpperCase())),
-          pocketbucks: parseInt(localStorage.getItem('ps_pocketbucks_' + key) || (acc.pocketbucks || '0').toString(), 10),
-          unlockedSkins: JSON.parse(localStorage.getItem('ps_unlocked_skins_' + key) || '["sym_star"]'),
-          equippedSkin: localStorage.getItem('ps_equipped_skin_' + key) || 'sym_star',
-          unlockedColors: JSON.parse(localStorage.getItem('ps_unlocked_colors_' + key) || '["c_royal_blue"]'),
-          equippedColor: localStorage.getItem('ps_equipped_color_' + key) || '#3b82f6',
-          banned: isBanned,
-          banReason: banReason,
-          kicked: !!acc.kicked,
-          removedFromLeaderboard: !!acc.removedFromLeaderboard || excludedLb.includes(key),
-          lastLogin: acc.createdAt || Date.now()
-        };
-        adminUsersCache.push(userObj);
-
-        // Sync to Firestore so future queries find it immediately
-        if (fbDb) {
-          fbDb.collection('users').doc(userObj.docId).set(userObj, { merge: true }).catch(() => {});
-        }
-      }
-    }
-
-    // Deduplicate by lowercase username and filter out any fake accounts
-    const userMap = new Map();
-    adminUsersCache.forEach(u => {
-      const k = (u.username || '').toLowerCase();
-      if (!FAKE_ACCOUNTS.includes(k) || k === 'bloonairius') {
-        if (!userMap.has(k)) {
-          userMap.set(k, u);
-        } else {
-          const prev = userMap.get(k);
-          userMap.set(k, Object.assign({}, prev, u));
-        }
+          password: (uKey === 'bloonairius') ? 'password123' : '',
+          miniId: (uKey === activeU) ? myMiniId : '#BL01',
+          pocketbucks: parseInt(localStorage.getItem('ps_pocketbucks_' + uKey) || '0', 10),
+          unlockedSkins: ['sym_star'],
+          equippedSkin: 'sym_star',
+          unlockedColors: ['c_royal_blue'],
+          equippedColor: '#3b82f6',
+          banned: false,
+          banReason: '',
+          kicked: false,
+          removedFromLeaderboard: false,
+          lastLogin: Date.now()
+        });
+        existingNames.add(uKey);
       }
     });
-    adminUsersCache = Array.from(userMap.values());
 
     // Sort placing bloonairius at top, then alphabetical
     adminUsersCache.sort((a, b) => {
@@ -32165,6 +32812,47 @@
     if (showToast && typeof sound !== 'undefined' && sound.playKick) sound.playKick(0.3);
   }
   window.adminFetchUsers = adminFetchUsers;
+
+  async function adminPurgeFakeAccounts() {
+    if (!fbDb) {
+      adminNotify('Firebase offline: cannot purge database.');
+      return;
+    }
+    const FAKE_ACCOUNTS = ['playerone', 'player1', 'sammy', 'new', 'blunarius', 'regularplayer', 'guest', 'player'];
+    try {
+      const snap = await fbDb.collection('users').get();
+      let purgedCount = 0;
+      const seenUsers = new Map();
+
+      for (const doc of snap.docs) {
+        const d = doc.data() || {};
+        const uname = (d.username || doc.id).toLowerCase();
+        if (FAKE_ACCOUNTS.includes(uname) || FAKE_ACCOUNTS.includes(doc.id.toLowerCase())) {
+          await fbDb.collection('users').doc(doc.id).delete().catch(() => {});
+          purgedCount++;
+          continue;
+        }
+        if (seenUsers.has(uname)) {
+          const prevDocId = seenUsers.get(uname);
+          let docToDelete = doc.id;
+          if (doc.id.length > 20 && !doc.id.startsWith('user_')) {
+            docToDelete = prevDocId;
+            seenUsers.set(uname, doc.id);
+          }
+          await fbDb.collection('users').doc(docToDelete).delete().catch(() => {});
+          purgedCount++;
+        } else {
+          seenUsers.set(uname, doc.id);
+        }
+      }
+      adminNotify(`Purged ${purgedCount} duplicate/test accounts from Firestore.`);
+      adminFetchUsers(true);
+    } catch (e) {
+      console.error('Purge error:', e);
+      adminNotify('Error purging accounts: ' + e.message);
+    }
+  }
+  window.adminPurgeFakeAccounts = adminPurgeFakeAccounts;
 
   function adminSetFilterTab(tab) {
     adminActiveFilterTab = tab;
