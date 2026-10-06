@@ -8988,6 +8988,19 @@
               </div>
             </div>
 
+            <!-- Online Sport Selection -->
+            <div style="background:#1e293b; border:1.5px solid #334155; border-radius:12px; padding:10px; margin-bottom:12px;">
+              <div style="font-size:10.5px; font-weight:800; color:#94a3b8; text-transform:uppercase; margin-bottom:8px; display:flex; justify-content:space-between;">
+                <span>Match Sport</span>
+                <span id="lobby-sport-hint" style="color:#64748b;">(Host Selects)</span>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button type="button" class="chip-btn selected" id="btn-lobby-sport-football" onclick="setOnlineLobbySport('football')" style="flex:1; font-weight:900; font-size:11px; padding:8px 4px;">⚽ FOOTBALL</button>
+                <button type="button" class="chip-btn" id="btn-lobby-sport-basketball" onclick="setOnlineLobbySport('basketball')" style="flex:1; font-weight:900; font-size:11px; padding:8px 4px;">🏀 BASKETBALL</button>
+                <button type="button" class="chip-btn" id="btn-lobby-sport-tennis" onclick="setOnlineLobbySport('tennis')" style="flex:1; font-weight:900; font-size:11px; padding:8px 4px;">🎾 TENNIS</button>
+              </div>
+            </div>
+
             <!-- Host Match Settings -->
             <div style="background:#1e293b; border:1.5px solid #334155; border-radius:12px; padding:10px; margin-bottom:14px;">
               <div style="font-size:10.5px; font-weight:800; color:#94a3b8; text-transform:uppercase; margin-bottom:8px; display:flex; justify-content:space-between;">
@@ -8996,8 +9009,8 @@
               </div>
               
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <span style="font-size:12px; font-weight:800; color:#ffffff;">Target Goals:</span>
-                <div style="display:flex; gap:6px;">
+                <span style="font-size:12px; font-weight:800; color:#ffffff;" id="lobby-target-score-label">Target Goals:</span>
+                <div style="display:flex; gap:6px;" id="lobby-target-score-chips">
                   <button type="button" class="lobby-setting-btn active" id="btn-goal-3" onclick="setOnlineLobbyGoals(3)">3</button>
                   <button type="button" class="lobby-setting-btn" id="btn-goal-5" onclick="setOnlineLobbyGoals(5)">5</button>
                   <button type="button" class="lobby-setting-btn" id="btn-goal-7" onclick="setOnlineLobbyGoals(7)">7</button>
@@ -9005,7 +9018,7 @@
               </div>
 
               <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:12px; font-weight:800; color:#ffffff;">Stadium:</span>
+                <span style="font-size:12px; font-weight:800; color:#ffffff;" id="lobby-stadium-label">Stadium / Arena:</span>
                 <select id="lobby-stadium-select" onchange="setOnlineLobbyStadium(this.value)" style="background:#0f172a; color:#fff; border:1.5px solid #475569; border-radius:8px; padding:3px 8px; font-weight:800; font-size:11px;">
                   <option value="0">Classic Grass</option>
                   <option value="1">Cyber Neon</option>
@@ -14009,27 +14022,112 @@
   let ballFrozenEndTime = 0;
   let isIcyTurf = false;
   let icyTurfTimer = 0;
+  let icyTurfEndTime = 0;
   let isStickyMud = false;
   let stickyMudTimer = 0;
+  let stickyMudEndTime = 0;
   let isGoldenShield = false;
   let goldenShieldTimer = 0;
+  let goldenShieldEndTime = 0;
   let isTempestStorm = false;
   let tempestStormTimer = 0;
   let tempestStormEndTime = 0;
   let isSlowMoWarp = false;
   let isSidelineBarrier = false;
   let sidelineBarrierTimer = 0;
+  let sidelineBarrierEndTime = 0;
   let isStadiumFog = false;
   let stadiumFogTimer = 0;
+  let stadiumFogEndTime = 0;
   let isWindGust = false;
   let windGustTimer = 0;
+  let windGustEndTime = 0;
   let isGoalpostMagnet = false;
   let goalpostMagnetTimer = 0;
+  let goalpostMagnetEndTime = 0;
   let benchedDiscInfo = null;
   let isGravityInversion = false;
   let gravityInversionTimer = 0;
+  let gravityInversionEndTime = 0;
   let slowMoWarpTimer = 0;
   let slowMoWarpEndTime = 0;
+  let buzzerBeaterEndTime = 0;
+  let fullCourtPressEndTime = 0;
+  let heatCheckEndTime = 0;
+  let bballFullcourtPressEndTime = 0;
+
+  function clearAllActivePowers() {
+    isWindGust = false;
+    windGustTimer = 0;
+    windGustEndTime = 0;
+    isBallFrozen = false;
+    ballFrozenTimer = 0;
+    ballFrozenEndTime = 0;
+    isIcyTurf = false;
+    icyTurfTimer = 0;
+    icyTurfEndTime = 0;
+    isStickyMud = false;
+    stickyMudTimer = 0;
+    stickyMudEndTime = 0;
+    isGoldenShield = false;
+    goldenShieldTimer = 0;
+    goldenShieldEndTime = 0;
+    isTempestStorm = false;
+    tempestStormTimer = 0;
+    tempestStormEndTime = 0;
+    isSlowMoWarp = false;
+    slowMoWarpTimer = 0;
+    slowMoWarpEndTime = 0;
+    isSidelineBarrier = false;
+    sidelineBarrierTimer = 0;
+    sidelineBarrierEndTime = 0;
+    isStadiumFog = false;
+    stadiumFogTimer = 0;
+    stadiumFogEndTime = 0;
+    isGoalpostMagnet = false;
+    goalpostMagnetTimer = 0;
+    goalpostMagnetEndTime = 0;
+    isGravityInversion = false;
+    gravityInversionTimer = 0;
+    gravityInversionEndTime = 0;
+    buzzerBeaterEndTime = 0;
+    fullCourtPressEndTime = 0;
+    heatCheckEndTime = 0;
+    bballFullcourtPressEndTime = 0;
+    window.__testPerfectShot = false;
+
+    if (benchedDiscInfo) {
+      if (typeof discs !== 'undefined' && Array.isArray(discs)) {
+        const bd = discs.find(d => d.id === benchedDiscInfo.id);
+        if (bd) {
+          bd.x = benchedDiscInfo.origX;
+          bd.y = benchedDiscInfo.origY;
+          bd.vx = 0;
+          bd.vy = 0;
+        }
+      }
+      benchedDiscInfo = null;
+    }
+
+    if (typeof discs !== 'undefined' && Array.isArray(discs)) {
+      discs.forEach(d => {
+        d.isFrozen = false;
+        d.isStunned = false;
+        d.isArmed = false;
+        d.isBuzzerBeater = false;
+        d.isFireball = false;
+        d.mudSlowTimer = 0;
+      });
+    }
+
+    if (typeof tennisState !== 'undefined') {
+      tennisState.isSmashArmed = false;
+    }
+
+    if (typeof updateManagerPowersHUD === 'function') updateManagerPowersHUD();
+    if (typeof hideDiscAbilityHUD === 'function') hideDiscAbilityHUD();
+  }
+  window.clearAllActivePowers = clearAllActivePowers;
 
   let tandemAimState = {
     active: false,
@@ -28124,7 +28222,8 @@
       guestColor: '#ef4444',
       guestSkin: 'sym_star',
       guestReady: false,
-      targetGoals: 3,
+      sport: (typeof activeSport !== 'undefined' ? activeSport : 'football'),
+      targetGoals: (typeof activeSport !== 'undefined' && activeSport === 'basketball') ? 21 : ((typeof activeSport !== 'undefined' && activeSport === 'tennis') ? 3 : 3),
       stadiumIndex: 0,
       status: 'lobby',
       settings_p1: { teamsize: 3, series: 1, timer: 30 },
@@ -28143,6 +28242,69 @@
     roomRef.on('value', onOnlineRoomDataUpdate);
   }
   window.createOnlineRoom = createOnlineRoom;
+
+  function setOnlineLobbySport(sport) {
+    activeSport = sport;
+    window.activeSport = sport;
+    updateOnlineLobbySportUI(sport);
+    if (!isRoomHost || !activeRoomCode || !fbRtdb) return;
+    const defaultTarget = (sport === 'basketball') ? 21 : (sport === 'tennis' ? 3 : 3);
+    fbRtdb.ref('match_rooms/' + activeRoomCode).update({ sport: sport, targetGoals: defaultTarget }).catch(() => {});
+  }
+  window.setOnlineLobbySport = setOnlineLobbySport;
+
+  function updateOnlineLobbySportUI(sport) {
+    ['football', 'basketball', 'tennis'].forEach(s => {
+      const b = document.getElementById('btn-lobby-sport-' + s);
+      if (b) {
+        if (s === sport) b.classList.add('selected');
+        else b.classList.remove('selected');
+      }
+    });
+
+    const scoreLabel = document.getElementById('lobby-target-score-label');
+    const chipBox = document.getElementById('lobby-target-score-chips');
+    const stadSelect = document.getElementById('lobby-stadium-select');
+
+    if (sport === 'basketball') {
+      if (scoreLabel) scoreLabel.textContent = 'Target Points:';
+      if (chipBox) {
+        chipBox.innerHTML = `
+          <button type="button" class="lobby-setting-btn" id="btn-goal-11" onclick="setOnlineLobbyGoals(11)">11</button>
+          <button type="button" class="lobby-setting-btn" id="btn-goal-15" onclick="setOnlineLobbyGoals(15)">15</button>
+          <button type="button" class="lobby-setting-btn active" id="btn-goal-21" onclick="setOnlineLobbyGoals(21)">21</button>
+        `;
+      }
+      if (stadSelect && typeof BASKETBALL_ARENAS !== 'undefined') {
+        stadSelect.innerHTML = BASKETBALL_ARENAS.map((a, i) => `<option value="${i}">${a.name}</option>`).join('');
+      }
+    } else if (sport === 'tennis') {
+      if (scoreLabel) scoreLabel.textContent = 'Target Sets:';
+      if (chipBox) {
+        chipBox.innerHTML = `
+          <button type="button" class="lobby-setting-btn" id="btn-goal-1" onclick="setOnlineLobbyGoals(1)">1</button>
+          <button type="button" class="lobby-setting-btn active" id="btn-goal-3" onclick="setOnlineLobbyGoals(3)">3</button>
+          <button type="button" class="lobby-setting-btn" id="btn-goal-5" onclick="setOnlineLobbyGoals(5)">5</button>
+        `;
+      }
+      if (stadSelect && typeof TENNIS_COURTS !== 'undefined') {
+        stadSelect.innerHTML = TENNIS_COURTS.map((c, i) => `<option value="${i}">${c.name}</option>`).join('');
+      }
+    } else {
+      if (scoreLabel) scoreLabel.textContent = 'Target Goals:';
+      if (chipBox) {
+        chipBox.innerHTML = `
+          <button type="button" class="lobby-setting-btn active" id="btn-goal-3" onclick="setOnlineLobbyGoals(3)">3</button>
+          <button type="button" class="lobby-setting-btn" id="btn-goal-5" onclick="setOnlineLobbyGoals(5)">5</button>
+          <button type="button" class="lobby-setting-btn" id="btn-goal-7" onclick="setOnlineLobbyGoals(7)">7</button>
+        `;
+      }
+      if (stadSelect && typeof STADIUM_THEMES !== 'undefined') {
+        stadSelect.innerHTML = STADIUM_THEMES.map((t, i) => `<option value="${i}">${t.name}</option>`).join('');
+      }
+    }
+  }
+  window.updateOnlineLobbySportUI = updateOnlineLobbySportUI;
 
   function joinOnlineRoom(codeOverride = null) {
     if (!fbRtdb) {
@@ -28308,6 +28470,15 @@
       return;
     }
 
+    // Sport Synchronization across clients
+    if (data.sport && data.sport !== activeSport) {
+      activeSport = data.sport;
+      window.activeSport = data.sport;
+      if (typeof updateOnlineLobbySportUI === 'function') {
+        updateOnlineLobbySportUI(data.sport);
+      }
+    }
+
     // STATE 3: LIVE MATCH LAUNCH (Both players launch into match in real time!)
     if (data.status === 'playing') {
       p1Name = data.host || 'Player 1';
@@ -28324,7 +28495,23 @@
       activeGameMode = 'online';
       is2Player = false;
       activeDifficulty = 'pro';
-      applyStadiumTheme(currentStadiumIndex);
+
+      if (data.sport) {
+        activeSport = data.sport;
+        window.activeSport = data.sport;
+      }
+
+      if (activeSport === 'basketball') {
+        const bballCount = (typeof BASKETBALL_ARENAS !== 'undefined' ? BASKETBALL_ARENAS.length : 6);
+        currentBballArenaIndex = currentStadiumIndex % bballCount;
+        applyStadiumTheme(currentBballArenaIndex);
+      } else if (activeSport === 'tennis') {
+        const tennisCount = (typeof TENNIS_COURTS !== 'undefined' ? TENNIS_COURTS.length : 5);
+        currentTennisCourtIndex = currentStadiumIndex % tennisCount;
+        applyStadiumTheme(currentTennisCourtIndex);
+      } else {
+        applyStadiumTheme(currentStadiumIndex);
+      }
 
       const lobbyPanel = document.getElementById('online-lobby-panel');
       if (lobbyPanel) lobbyPanel.style.display = 'none';
@@ -28335,7 +28522,11 @@
       const stadSelect = document.getElementById('screen-stadium-select');
       if (stadSelect) stadSelect.classList.remove('active');
 
-      triggerCinematicMatchKickoff();
+      if (activeSport === 'tennis') {
+        startTennisMatchDirect('online', p1Name, p2Name, 'pro');
+      } else {
+        triggerCinematicMatchKickoff();
+      }
       listenToOnlineMatchRoom(activeRoomCode);
     }
   }
@@ -28450,6 +28641,84 @@
         if (shot.isArmed) targetDisc.isArmed = true;
         gameState = 'MOVING';
         if (typeof sound !== 'undefined') sound.playKick(1.0);
+      }
+    });
+
+    // Live remote player abilities
+    roomRef.child('abilities').on('child_added', (snapshot) => {
+      const ab = snapshot.val();
+      if (!ab || ab.senderId === myMiniId) return;
+      if (typeof executeRemoteManagerPower === 'function') {
+        executeRemoteManagerPower(ab.powerId, ab.team);
+      }
+    });
+
+    // Live remote tactics formations
+    roomRef.child('tactics/formations').on('value', (snapshot) => {
+      const data = snapshot.val();
+      if (!data) return;
+      const myTeam = isRoomHost ? 'p1' : 'p2';
+      const enemyTeam = (myTeam === 'p1') ? 'p2' : 'p1';
+      if (data[enemyTeam] && data[enemyTeam].formation) {
+        const formName = data[enemyTeam].formation;
+        if (enemyTeam === 'p1') p1Formation = formName;
+        else p2Formation = formName;
+        applyFormationToTeam(enemyTeam, formName);
+      }
+    });
+
+    // Live remote tactics disc moves
+    roomRef.child('tactics/discs').on('child_changed', (snapshot) => {
+      const val = snapshot.val();
+      if (!val || val.senderId === myMiniId) return;
+      const discId = parseInt(snapshot.key, 10);
+      const targetDisc = discs.find(d => d.id === discId);
+      if (targetDisc && gameState === 'KICKOFF_SETUP') {
+        const p = getPitch();
+        if (p && p.w > 0 && p.h > 0) {
+          targetDisc.x = p.x + val.x * p.w;
+          targetDisc.y = p.y + val.y * p.h;
+          targetDisc.vx = 0;
+          targetDisc.vy = 0;
+        }
+      }
+    });
+
+    // Live dual ready kickoff confirmation
+    roomRef.on('value', (snapshot) => {
+      const roomData = snapshot.val();
+      if (!roomData) return;
+      if (gameState === 'KICKOFF_SETUP') {
+        if (roomData.kickoff_ready_p1 && roomData.kickoff_ready_p2) {
+          const hud = document.getElementById('kickoff-setup-hud');
+          if (hud) hud.style.display = 'none';
+          // Clean up ready flags in room
+          if (isRoomHost) {
+            roomRef.update({ kickoff_ready_p1: null, kickoff_ready_p2: null }).catch(() => {});
+          }
+          startKickoffCountdown();
+        }
+      }
+    });
+
+    // Online Tennis live networking
+    roomRef.child('tennis').on('value', (snap) => {
+      const td = snap.val();
+      if (!td || typeof tennisState === 'undefined' || !tennisState.active) return;
+      const enemyKey = isRoomHost ? 'p2' : 'p1';
+      const remoteRacket = (enemyKey === 'p2') ? tennisState.p2Racket : tennisState.p1Racket;
+      if (td[enemyKey]) {
+        remoteRacket.x = td[enemyKey].x;
+        remoteRacket.y = td[enemyKey].y;
+        remoteRacket.tilt = td[enemyKey].tilt || 0;
+      }
+      // Guest syncs authoritative ball from Host
+      if (!isRoomHost && td.ball && tennisState.ball) {
+        tennisState.ball.x = td.ball.x;
+        tennisState.ball.y = td.ball.y;
+        tennisState.ball.vx = td.ball.vx;
+        tennisState.ball.vy = td.ball.vy;
+        tennisState.ball.isSmash = !!td.ball.isSmash;
       }
     });
 
@@ -37320,8 +37589,8 @@
     // Apply formations
     applyFormationToTeam('p1', p1Formation);
 
-    // Bot picks one of 10 formations (randomized)
-    if (!is2Player) {
+    // Bot picks one of 10 formations (randomized) in single player; keep existing in online/2p
+    if (!is2Player && activeGameMode !== 'online') {
       const randForm = formDatabase[Math.floor(Math.random() * formDatabase.length)];
       p2Formation = randForm;
       applyFormationToTeam('p2', p2Formation);
@@ -37329,20 +37598,53 @@
       applyFormationToTeam('p2', p2Formation);
     }
 
-    // Starting team to setup: if goal scored, conceding team starts, otherwise P1
-    kickoffActiveTeam = scoringTeam ? ((scoringTeam === 'p1') ? 'p2' : 'p1') : 'p1';
-    if (!is2Player) kickoffActiveTeam = 'p1';
+    // Starting team to setup: if online, assign based on host status; if goal scored, conceding team starts
+    if (activeGameMode === 'online') {
+      kickoffActiveTeam = isRoomHost ? 'p1' : 'p2';
+    } else {
+      kickoffActiveTeam = scoringTeam ? ((scoringTeam === 'p1') ? 'p2' : 'p1') : 'p1';
+      if (!is2Player) kickoffActiveTeam = 'p1';
+    }
 
     currentTurn = scoringTeam ? ((scoringTeam === 'p1') ? 'p2' : 'p1') : 'p1';
 
     renderKickoffTacticalHUD();
   }
 
+  function broadcastOnlineTacticsDiscMove(discId, x, y) {
+    if (activeGameMode !== 'online' || !activeRoomCode || !fbRtdb) return;
+    const p = getPitch();
+    if (!p || p.w === 0 || p.h === 0) return;
+    const normX = Math.round(((x - p.x) / p.w) * 1000) / 1000;
+    const normY = Math.round(((y - p.y) / p.h) * 1000) / 1000;
+    fbRtdb.ref('match_rooms/' + activeRoomCode + '/tactics/discs/' + discId).set({
+      x: normX,
+      y: normY,
+      senderId: myMiniId,
+      t: Date.now()
+    }).catch(() => {});
+  }
+  window.broadcastOnlineTacticsDiscMove = broadcastOnlineTacticsDiscMove;
+
+  function broadcastOnlineFormation(team, name) {
+    if (activeGameMode !== 'online' || !activeRoomCode || !fbRtdb) return;
+    fbRtdb.ref('match_rooms/' + activeRoomCode + '/tactics/formations/' + team).set({
+      formation: name,
+      senderId: myMiniId,
+      t: Date.now()
+    }).catch(() => {});
+  }
+  window.broadcastOnlineFormation = broadcastOnlineFormation;
+
   function renderKickoffTacticalHUD() {
     const hud = document.getElementById('kickoff-setup-hud');
     if (!hud) return;
 
     hud.style.display = 'flex';
+
+    if (activeGameMode === 'online') {
+      kickoffActiveTeam = isRoomHost ? 'p1' : 'p2';
+    }
 
     const isBball = (typeof activeSport !== 'undefined' && activeSport === 'basketball');
     const isP1 = (kickoffActiveTeam === 'p1');
@@ -37355,10 +37657,18 @@
     document.getElementById('kickoff-team-icon').style.background = teamColor;
     document.getElementById('kickoff-team-sub').textContent = is2Player 
       ? `${teamName}, select a formation or drag your players in your half!`
-      : (isBball ? 'Select a basketball formation or drag your players freely in your court half!' : 'Select a tactical formation or drag your players freely in your half!');
+      : (activeGameMode === 'online' 
+          ? 'Live Formations: Drag discs or choose formation — opponent sees moves live!' 
+          : (isBball ? 'Select a basketball formation or drag your players freely in your court half!' : 'Select a tactical formation or drag your players freely in your half!'));
 
     const readyBtn = document.getElementById('btn-kickoff-ready');
-    readyBtn.textContent = (is2Player && kickoffActiveTeam === 'p1') ? `${teamName} Ready ➔` : (isBball ? 'Tip-Off / Ready ➔' : 'Ready / Go ➔');
+    if (activeGameMode === 'online') {
+      readyBtn.textContent = 'Ready / Confirm ➔';
+      readyBtn.disabled = false;
+      readyBtn.style.opacity = '1';
+    } else {
+      readyBtn.textContent = (is2Player && kickoffActiveTeam === 'p1') ? `${teamName} Ready ➔` : (isBball ? 'Tip-Off / Ready ➔' : 'Ready / Go ➔');
+    }
 
     const listEl = document.getElementById('kickoff-formations-list');
     listEl.innerHTML = '';
@@ -37376,6 +37686,14 @@
         if (isP1) p1Formation = name;
         else p2Formation = name;
         applyFormationToTeam(kickoffActiveTeam, name);
+        if (activeGameMode === 'online') {
+          broadcastOnlineFormation(kickoffActiveTeam, name);
+          const p = getPitch();
+          const teamDiscs = discs.filter(d => d.team === kickoffActiveTeam);
+          teamDiscs.forEach(d => {
+            broadcastOnlineTacticsDiscMove(d.id, d.x, d.y);
+          });
+        }
         renderKickoffTacticalHUD();
       });
       listEl.appendChild(btn);
@@ -37410,6 +37728,18 @@
   function onKickoffReadyClicked() {
     sound.init();
     sound.playKick(0.5);
+
+    if (activeGameMode === 'online' && activeRoomCode && fbRtdb) {
+      const readyKey = isRoomHost ? 'kickoff_ready_p1' : 'kickoff_ready_p2';
+      fbRtdb.ref('match_rooms/' + activeRoomCode + '/' + readyKey).set(true).catch(() => {});
+      const readyBtn = document.getElementById('btn-kickoff-ready');
+      if (readyBtn) {
+        readyBtn.textContent = 'WAITING FOR OPPONENT... (1/2)';
+        readyBtn.disabled = true;
+        readyBtn.style.opacity = '0.75';
+      }
+      return;
+    }
 
     if (is2Player && kickoffActiveTeam === 'p1') {
       // Switch to Player 2 setup in 2-Player Pass and Play mode
@@ -38248,6 +38578,7 @@
     clearInterval(matchClockInterval);
     sound.stopMatchAtmosphere();
     clearSavedMatch();
+    if (typeof clearAllActivePowers === 'function') clearAllActivePowers();
 
     const isP1 = (winner === 'p1');
     const winnerName = isP1 ? p1Name : p2Name;
@@ -40331,10 +40662,38 @@
     if (!mp || mp.cdRemaining > 0) return;
 
     const friendlyTeam = (is2Player && currentTurn === 'p2') ? 'p2' : 'p1';
-    const enemyTeam = (friendlyTeam === 'p1') ? 'p2' : 'p1';
+    applyManagerPowerEffect(mp.id, friendlyTeam, false);
 
-    const pid = mp.id;
+    if (activeGameMode === 'online') {
+      broadcastOnlineAbility(mp.id, friendlyTeam);
+    }
+
+    mp.cdRemaining = (activeGameMode === 'freeplay') ? 0 : (mp.cooldownRounds || 3);
+    updateManagerPowersHUD();
+    if (selectedDisc) showDiscAbilityHUD(selectedDisc);
+  }
+  window.triggerManagerPower = triggerManagerPower;
+
+  function broadcastOnlineAbility(powerId, team) {
+    if (activeGameMode !== 'online' || !activeRoomCode || !fbRtdb) return;
+    fbRtdb.ref('match_rooms/' + activeRoomCode + '/abilities').push({
+      powerId: powerId,
+      team: team,
+      senderId: myMiniId,
+      timestamp: Date.now()
+    }).catch(() => {});
+  }
+  window.broadcastOnlineAbility = broadcastOnlineAbility;
+
+  function executeRemoteManagerPower(powerId, team) {
+    applyManagerPowerEffect(powerId, team, true);
+  }
+  window.executeRemoteManagerPower = executeRemoteManagerPower;
+
+  function applyManagerPowerEffect(pid, friendlyTeam, isRemote = false) {
+    const enemyTeam = (friendlyTeam === 'p1') ? 'p2' : 'p1';
     const now = Date.now();
+
     if (pid === 'freeze_ball') {
       isBallFrozen = true;
       ballFrozenTimer = 3.0;
@@ -40343,10 +40702,12 @@
     } else if (pid === 'icy_turf') {
       isIcyTurf = true;
       icyTurfTimer = 2;
+      icyTurfEndTime = now + 8000;
       sound.playWhistle();
     } else if (pid === 'sticky_mud') {
       isStickyMud = true;
       stickyMudTimer = 2;
+      stickyMudEndTime = now + 8000;
       sound.playWhistle();
     } else if (pid === 'energy_surge') {
       discs.forEach(d => {
@@ -40359,18 +40720,27 @@
     } else if (pid === 'sideline_barrier') {
       isSidelineBarrier = true;
       sidelineBarrierTimer = 2;
+      sidelineBarrierEndTime = now + 8000;
       sound.playWhistle();
     } else if (pid === 'stadium_fog') {
       isStadiumFog = true;
       stadiumFogTimer = 2;
+      stadiumFogEndTime = now + 8000;
       sound.playWhistle();
     } else if (pid === 'wind_gust') {
       isWindGust = true;
       windGustTimer = 2;
+      windGustEndTime = now + 8000;
       sound.playWhistle();
+      if (typeof triggerFloatingScorePopup === 'function') {
+        const p = getPitch();
+        const userLabel = isRemote ? `${(friendlyTeam === 'p1' ? p1Name : p2Name) || 'Opponent'}: ` : '';
+        triggerFloatingScorePopup(p.x + p.w / 2, p.y + p.h / 2, `${userLabel}WIND GUST! 💨`, '#38bdf8');
+      }
     } else if (pid === 'goalpost_magnet') {
       isGoalpostMagnet = true;
       goalpostMagnetTimer = 2;
+      goalpostMagnetEndTime = now + 8000;
       sound.playWhistle();
     } else if (pid === 'red_card') {
       const opps = discs.filter(d => d.team === enemyTeam && d.x > -500);
@@ -40387,10 +40757,12 @@
     } else if (pid === 'gravity_inversion') {
       isGravityInversion = true;
       gravityInversionTimer = 2;
+      gravityInversionEndTime = now + 8000;
       sound.playWhistle();
     } else if (pid === 'golden_shield') {
       isGoldenShield = true;
       goldenShieldTimer = 1;
+      goldenShieldEndTime = now + 6000;
       sound.playWhistle();
     } else if (pid === 'slow_mo_warp') {
       isSlowMoWarp = true;
@@ -40400,7 +40772,7 @@
     } else if (pid === 'tempest_storm') {
       isTempestStorm = true;
       tempestStormTimer = 3;
-      tempestStormEndTime = now + 3000;
+      tempestStormEndTime = now + 5000;
       discs.forEach(d => {
         if (d.team === enemyTeam) d.isFrozen = true;
       });
@@ -40412,6 +40784,7 @@
       });
       sound.playCrowdCheerSurge();
     } else if (pid === 'full_court_press') {
+      fullCourtPressEndTime = now + 8000;
       discs.forEach(d => {
         if (d.team === friendlyTeam) {
           d.vx *= 1.35; d.vy *= 1.35;
@@ -40441,6 +40814,7 @@
         if (typeof triggerFloatingScorePopup === 'function') triggerFloatingScorePopup(bestTarget.x, bestTarget.y, 'ALLEY-OOP! 🚀', '#38bdf8');
       }
     } else if (pid === 'buzzer_beater') {
+      buzzerBeaterEndTime = now + 8000;
       discs.forEach(d => {
         if (d.team === friendlyTeam) {
           d.isBuzzerBeater = true;
@@ -40456,6 +40830,7 @@
     } else if (pid === 'iron_curtain') {
       isSidelineBarrier = true;
       sidelineBarrierTimer = 3;
+      sidelineBarrierEndTime = now + 8000;
       const p = getPitch();
       const defX = (friendlyTeam === 'p1') ? (p.x + p.w * 0.22) : (p.x + p.w * 0.78);
       for (let y = p.y; y <= p.y + p.h; y += 40) {
@@ -40645,7 +41020,8 @@
       }
     } else if (pid === 'bball_heat_check') {
       window.__testPerfectShot = true;
-      setTimeout(() => { window.__testPerfectShot = false; }, 9000);
+      heatCheckEndTime = now + 8000;
+      setTimeout(() => { window.__testPerfectShot = false; }, 8000);
       discs.forEach(d => {
         if (d.team === friendlyTeam) {
           d.isFireball = true;
@@ -40658,6 +41034,7 @@
         if (p1Disc) triggerFloatingScorePopup(p1Disc.x, p1Disc.y, '🔥 HEAT CHECK! 100% SHOTS! 🔥', '#f97316');
       }
     } else if (pid === 'bball_fullcourt_press') {
+      bballFullcourtPressEndTime = now + 8000;
       discs.forEach(d => {
         if (d.team === friendlyTeam) {
           d.vx *= 1.4;
@@ -40671,11 +41048,7 @@
         if (p1Disc) triggerFloatingScorePopup(p1Disc.x, p1Disc.y, '⚡ FULL-COURT PRESS! ⚡', '#38bdf8');
       }
     }
-
-    mp.cdRemaining = (activeGameMode === 'freeplay') ? 0 : (mp.cooldownRounds || 3);
-    updateManagerPowersHUD();
-    if (selectedDisc) showDiscAbilityHUD(selectedDisc);
-  };
+  }
 
   function updateManagerPowersHUD() {
     const hud = document.getElementById('manager-powers-hud');
@@ -40807,6 +41180,9 @@
         dragCurrent = pos;
         if (gameState === 'KICKOFF_SETUP') {
           clampKickoffDiscPosition(selectedDisc, pos.x, pos.y);
+          if (activeGameMode === 'online') {
+            broadcastOnlineTacticsDiscMove(selectedDisc.id, selectedDisc.x, selectedDisc.y);
+          }
         }
       }
     };
@@ -40814,6 +41190,9 @@
     const handleEnd = () => {
       if (isDragging && selectedDisc && !isPaused) {
         if (gameState === 'KICKOFF_SETUP') {
+          if (activeGameMode === 'online') {
+            broadcastOnlineTacticsDiscMove(selectedDisc.id, selectedDisc.x, selectedDisc.y);
+          }
           selectedDisc = null;
           isDragging = false;
           return;
@@ -41355,6 +41734,69 @@
       } else {
         tempestStormTimer = Math.max(0, (tempestStormEndTime - now) / 1000);
       }
+    }
+    if (isWindGust) {
+      if (now >= windGustEndTime) {
+        isWindGust = false;
+        windGustTimer = 0;
+      }
+    }
+    if (isGoldenShield) {
+      if (now >= goldenShieldEndTime) {
+        isGoldenShield = false;
+        goldenShieldTimer = 0;
+      }
+    }
+    if (isIcyTurf) {
+      if (now >= icyTurfEndTime) {
+        isIcyTurf = false;
+        icyTurfTimer = 0;
+      }
+    }
+    if (isStickyMud) {
+      if (now >= stickyMudEndTime) {
+        isStickyMud = false;
+        stickyMudTimer = 0;
+      }
+    }
+    if (isSidelineBarrier) {
+      if (now >= sidelineBarrierEndTime) {
+        isSidelineBarrier = false;
+        sidelineBarrierTimer = 0;
+      }
+    }
+    if (isStadiumFog) {
+      if (now >= stadiumFogEndTime) {
+        isStadiumFog = false;
+        stadiumFogTimer = 0;
+      }
+    }
+    if (isGoalpostMagnet) {
+      if (now >= goalpostMagnetEndTime) {
+        isGoalpostMagnet = false;
+        goalpostMagnetTimer = 0;
+      }
+    }
+    if (isGravityInversion) {
+      if (now >= gravityInversionEndTime) {
+        isGravityInversion = false;
+        gravityInversionTimer = 0;
+      }
+    }
+    if (heatCheckEndTime > 0 && now >= heatCheckEndTime) {
+      window.__testPerfectShot = false;
+      heatCheckEndTime = 0;
+      discs.forEach(d => { d.isFireball = false; });
+    }
+    if (bballFullcourtPressEndTime > 0 && now >= bballFullcourtPressEndTime) {
+      bballFullcourtPressEndTime = 0;
+    }
+    if (buzzerBeaterEndTime > 0 && now >= buzzerBeaterEndTime) {
+      buzzerBeaterEndTime = 0;
+      discs.forEach(d => { d.isBuzzerBeater = false; });
+    }
+    if (fullCourtPressEndTime > 0 && now >= fullCourtPressEndTime) {
+      fullCourtPressEndTime = 0;
     }
 
     const p = getPitch();
@@ -45668,6 +46110,7 @@
 
   function finishTennisMatch(winner) {
     tennisState.active = false;
+    if (typeof clearAllActivePowers === 'function') clearAllActivePowers();
     const isP1Win = (winner === 'p1');
 
     if (isP1Win) {
@@ -45760,12 +46203,42 @@
   function updateTennisEngine() {
     if (!tennisState.active || isPaused) return;
 
+    // Real-Time Power Timers Auto-Expire in Tennis
+    const now = Date.now();
+    if (isWindGust) {
+      if (now >= windGustEndTime) {
+        isWindGust = false;
+        windGustTimer = 0;
+      }
+    }
+    if (isGoldenShield) {
+      if (now >= goldenShieldEndTime) {
+        isGoldenShield = false;
+        goldenShieldTimer = 0;
+      }
+    }
+    if (isSlowMoWarp) {
+      if (now >= slowMoWarpEndTime) {
+        isSlowMoWarp = false;
+        slowMoWarpTimer = 0;
+      }
+    }
+    if (isTempestStorm) {
+      if (now >= tempestStormEndTime) {
+        isTempestStorm = false;
+        tempestStormTimer = 0;
+      }
+    }
+
     const p = getPitch();
     const c = getTennisCourtBounds(p);
     const netX = c.x + c.w / 2;
     const midY = c.y + c.h / 2;
 
-    // 1. UPDATE PLAYER 1 RACKET (LEFT SIDE - VERTICAL PADDLE)
+    const isOnline = (activeGameMode === 'online');
+    const myRacket = (isOnline && !isRoomHost) ? tennisState.p2Racket : tennisState.p1Racket;
+
+    // 1. UPDATE ACTIVE LOCAL PLAYER RACKET
     // Primary movement is along Y axis (W/S, Up/Down, Touch, Joystick Y)
     // Secondary horizontal positioning is along X axis (A/D, Left/Right, Joystick X)
     let moveDx = 0;
@@ -45786,20 +46259,38 @@
       moveDx /= moveLen;
       moveDy /= moveLen;
     }
-    const p1Speed = tennisState.p1Racket.speed || 11.2;
-    tennisState.p1Racket.vx = moveDx * p1Speed;
-    tennisState.p1Racket.vy = moveDy * p1Speed;
+    const rSpeed = myRacket.speed || 11.2;
+    myRacket.vx = moveDx * rSpeed;
+    myRacket.vy = moveDy * rSpeed;
 
-    tennisState.p1Racket.x += tennisState.p1Racket.vx;
-    tennisState.p1Racket.y += tennisState.p1Racket.vy;
+    myRacket.x += myRacket.vx;
+    myRacket.y += myRacket.vy;
 
-    // STRICT CLAMPING FOR PLAYER 1 (LEFT HALF OF COURT):
-    // P1 CAN NEVER CROSS THE NET (netX) TO THE RIGHT!
-    const p1HalfW = tennisState.p1Racket.w / 2;
-    const p1HalfH = tennisState.p1Racket.h / 2;
-    tennisState.p1Racket.x = Math.max(c.x + p1HalfW + 4, Math.min(netX - p1HalfW - 14, tennisState.p1Racket.x));
-    tennisState.p1Racket.y = Math.max(c.y + p1HalfH - 6, Math.min(c.y + c.h - p1HalfH + 6, tennisState.p1Racket.y));
-    tennisState.p1Racket.tilt = Math.max(-0.25, Math.min(0.25, tennisState.p1Racket.vy * 0.02));
+    const rHalfW = myRacket.w / 2;
+    const rHalfH = myRacket.h / 2;
+
+    if (myRacket === tennisState.p1Racket) {
+      // Clamping for Player 1 (Left Half)
+      myRacket.x = Math.max(c.x + rHalfW + 4, Math.min(netX - rHalfW - 14, myRacket.x));
+      myRacket.y = Math.max(c.y + rHalfH - 6, Math.min(c.y + c.h - rHalfH + 6, myRacket.y));
+      myRacket.tilt = Math.max(-0.25, Math.min(0.25, myRacket.vy * 0.02));
+    } else {
+      // Clamping for Player 2 (Right Half)
+      myRacket.x = Math.max(netX + rHalfW + 14, Math.min(c.x + c.w - rHalfW - 4, myRacket.x));
+      myRacket.y = Math.max(c.y + rHalfH - 6, Math.min(c.y + c.h - rHalfH + 6, myRacket.y));
+      myRacket.tilt = Math.max(-0.25, Math.min(0.25, myRacket.vy * 0.02));
+    }
+
+    // Broadcast local racket over network in online tennis match
+    if (isOnline && activeRoomCode && fbRtdb) {
+      const myTeamKey = isRoomHost ? 'p1' : 'p2';
+      fbRtdb.ref('match_rooms/' + activeRoomCode + '/tennis/' + myTeamKey).set({
+        x: Math.round(myRacket.x),
+        y: Math.round(myRacket.y),
+        tilt: Math.round(myRacket.tilt * 100) / 100,
+        t: Date.now()
+      }).catch(() => {});
+    }
 
     // Tutorial Movement Step 1 Detection
     if (isTutorialMode && activeSport === 'tennis' && tennisState.tutorialStep === 1) {
@@ -45811,35 +46302,35 @@
       }
     }
 
-    // 2. UPDATE OPPONENT P2 (AI RACKET ON RIGHT SIDE)
-    // Tracks incoming ball along Y axis to intercept
-    let aiSpeed = (tennisState.difficulty === 'easy') ? 6.8 : (tennisState.difficulty === 'pro') ? 11.2 : 8.8;
-    if (tennisState.ball.inFlight && tennisState.ball.vx > 0) {
-      // Ball coming towards AI (to the right): calculate intercept target along Y
-      const timeToAI = Math.max(1, (tennisState.p2Racket.x - tennisState.ball.x) / (tennisState.ball.vx || 1));
-      let predictedY = tennisState.ball.y + tennisState.ball.vy * timeToAI;
-      // Add slight AI imperfection on normal/easy
-      if (tennisState.difficulty !== 'pro') {
-        predictedY += Math.sin(Date.now() * 0.005) * 16;
+    // 2. UPDATE OPPONENT P2 (AI RACKET ON RIGHT SIDE in offline mode)
+    if (!isOnline) {
+      let aiSpeed = (tennisState.difficulty === 'easy') ? 6.8 : (tennisState.difficulty === 'pro') ? 11.2 : 8.8;
+      if (tennisState.ball.inFlight && tennisState.ball.vx > 0) {
+        // Ball coming towards AI (to the right): calculate intercept target along Y
+        const timeToAI = Math.max(1, (tennisState.p2Racket.x - tennisState.ball.x) / (tennisState.ball.vx || 1));
+        let predictedY = tennisState.ball.y + tennisState.ball.vy * timeToAI;
+        // Add slight AI imperfection on normal/easy
+        if (tennisState.difficulty !== 'pro') {
+          predictedY += Math.sin(Date.now() * 0.005) * 16;
+        }
+        tennisState.p2Racket.targetY = predictedY;
+      } else {
+        // Re-center along Y when idle
+        tennisState.p2Racket.targetY = midY;
       }
-      tennisState.p2Racket.targetY = predictedY;
-    } else {
-      // Re-center along Y when idle
-      tennisState.p2Racket.targetY = midY;
+
+      // Move AI racket smoothly towards target along Y
+      const aiDiff = (tennisState.p2Racket.targetY || midY) - tennisState.p2Racket.y;
+      tennisState.p2Racket.vy = Math.max(-aiSpeed, Math.min(aiSpeed, aiDiff * 0.20));
+      tennisState.p2Racket.y += tennisState.p2Racket.vy;
+
+      // STRICT CLAMPING FOR OPPONENT P2 (RIGHT HALF OF COURT):
+      const p2HalfW = tennisState.p2Racket.w / 2;
+      const p2HalfH = tennisState.p2Racket.h / 2;
+      tennisState.p2Racket.x = Math.max(netX + p2HalfW + 14, Math.min(c.x + c.w - p2HalfW - 4, tennisState.p2Racket.x));
+      tennisState.p2Racket.y = Math.max(c.y + p2HalfH - 6, Math.min(c.y + c.h - p2HalfH + 6, tennisState.p2Racket.y));
+      tennisState.p2Racket.tilt = Math.max(-0.25, Math.min(0.25, tennisState.p2Racket.vy * 0.02));
     }
-
-    // Move AI racket smoothly towards target along Y
-    const aiDiff = (tennisState.p2Racket.targetY || midY) - tennisState.p2Racket.y;
-    tennisState.p2Racket.vy = Math.max(-aiSpeed, Math.min(aiSpeed, aiDiff * 0.20));
-    tennisState.p2Racket.y += tennisState.p2Racket.vy;
-
-    // STRICT CLAMPING FOR OPPONENT P2 (RIGHT HALF OF COURT):
-    // P2 CAN NEVER CROSS THE NET (netX) TO THE LEFT!
-    const p2HalfW = tennisState.p2Racket.w / 2;
-    const p2HalfH = tennisState.p2Racket.h / 2;
-    tennisState.p2Racket.x = Math.max(netX + p2HalfW + 14, Math.min(c.x + c.w - p2HalfW - 4, tennisState.p2Racket.x));
-    tennisState.p2Racket.y = Math.max(c.y + p2HalfH - 6, Math.min(c.y + c.h - p2HalfH + 6, tennisState.p2Racket.y));
-    tennisState.p2Racket.tilt = Math.max(-0.25, Math.min(0.25, tennisState.p2Racket.vy * 0.02));
 
     // 2b. UPDATE DOUBLES PARTNER RACKETS (IF 2v2 DOUBLES ACTIVE)
     if (tennisState.isDoubles) {
@@ -45883,8 +46374,23 @@
     }
 
     // 4. BALL FLIGHT & VELOCITY
+    if (isWindGust) {
+      tennisState.ball.vx += 0.22; // Wind gust pushing ball rightward
+    }
     tennisState.ball.x += tennisState.ball.vx;
     tennisState.ball.y += tennisState.ball.vy;
+
+    // Online Host authoritative ball broadcast
+    if (isOnline && isRoomHost && activeRoomCode && fbRtdb && tennisState.ball.inFlight) {
+      fbRtdb.ref('match_rooms/' + activeRoomCode + '/tennis/ball').set({
+        x: Math.round(tennisState.ball.x),
+        y: Math.round(tennisState.ball.y),
+        vx: Math.round(tennisState.ball.vx * 100) / 100,
+        vy: Math.round(tennisState.ball.vy * 100) / 100,
+        isSmash: !!tennisState.ball.isSmash,
+        t: Date.now()
+      }).catch(() => {});
+    }
 
     // Ball trail
     tennisState.ball.trail.push({ x: tennisState.ball.x, y: tennisState.ball.y, isSmash: tennisState.ball.isSmash });
@@ -46244,6 +46750,24 @@
       ctx.fill();
       ctx.restore();
     });
+
+    // 9. Draw Wind Gust Streaks if active
+    if (isWindGust) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      const t = Date.now() * 0.003;
+      for (let i = 0; i < 7; i++) {
+        const streamY = c.y + (c.h / 8) * (i + 1) + Math.sin(t + i) * 12;
+        const streamX = c.x + (((t * 220 + i * 160) % (c.w + 100)) - 50);
+        ctx.beginPath();
+        ctx.moveTo(streamX, streamY);
+        ctx.lineTo(streamX + 55, streamY);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
 
     ctx.restore();
   }
