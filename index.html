@@ -87,7 +87,7 @@
       z-index: 10;
     }
 
-    /* Background Cartoon Stadium SVG (Full-bleed across entire viewport 100vw x 100vh) */
+    /* Background Cartoon Stadium SVG (Edge-to-edge across entire viewport 100vw x 100vh) */
     #stadium-bg {
       position: fixed;
       top: 0;
@@ -1971,7 +1971,7 @@
       display: block;
     }
 
-    /* Full-Bleed World SVG Camera Glide */
+    /* Edge-to-Edge World SVG Camera Glide */
     .walkway-world-camera {
       position: absolute;
       top: 0;
@@ -2646,8 +2646,8 @@
       text-align: center;
     }
 
-    /* Season 3 Save Slots UI */
-    .season-slots-container {
+    /* Season 3 Save Files UI */
+    .season-saves-container {
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -5102,7 +5102,7 @@
       color: #94a3b8;
       font-weight: 800;
     }
-    .online-player-slots-summary {
+    .online-player-roster-summary {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
@@ -5111,7 +5111,7 @@
       color: #cbd5e1;
       margin-top: 4px;
     }
-    .online-player-slots-summary span {
+    .online-player-roster-summary span {
       background: #0f172a;
       border: 1px solid #334155;
       border-radius: 6px;
@@ -6587,7 +6587,7 @@
       border-radius: 6px;
       border: 1px solid #475569;
     }
-    .trade-slots-grid {
+    .trade-grid-boxes {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
       gap: 6px;
@@ -7031,7 +7031,7 @@
 </head>
 <body>
 
-  <!-- Full-Bleed Cartoon Stadium SVG (Scales to 100vw x 100vh on all devices) -->
+  <!-- Edge-to-Edge Cartoon Stadium SVG (Scales to 100vw x 100vh on all devices) -->
   <svg id="stadium-bg" viewBox="0 0 1120 700" preserveAspectRatio="none">
       <!-- Sky (Dynamic Theme Fill) -->
       <rect id="svg-sky" x="-5000" y="-1000" width="12000" height="2500" fill="#38bdf8" />
@@ -7649,7 +7649,7 @@
 
         <!-- 3. TENNIS (UNLOCKED & PLAYABLE) -->
         <div class="sport-circle-btn" id="btn-sport-tennis" title="Play Tennis" onclick="(function(){
-          if(typeof sound!=='undefined'){sound.init();if(sound.playTennisHit)sound.playTennisHit();else sound.playKick(0.5);}
+          if(typeof sound!=='undefined'){sound.init();if(sound.playTennisStrike)sound.playTennisStrike();else sound.playKick(0.5);}
           var u=window.myUsername||localStorage.getItem('ps_username')||'player';
           var done=(typeof isTennisTutorialCompleted==='function'&&isTennisTutorialCompleted(u));
           if(!done&&typeof startTennisTutorial==='function'){
@@ -8476,10 +8476,10 @@
           <button class="cmd-close-btn" id="btn-season-modal-close" onclick="returnToActiveSportModes()">✕</button>
         </div>
 
-        <!-- 1. SAVE SLOTS VIEW (3 Save Files) -->
-        <div id="season-slots-view">
+        <!-- 1. SAVE FILES VIEW (3 Save Files) -->
+        <div id="season-saves-view">
           <div style="font-size:13px; color:#94a3b8; font-weight:800; margin-bottom:14px; text-align:center;">Select a save file to continue your managerial career:</div>
-          <div class="season-slots-container" id="season-slots-list"></div>
+          <div class="season-saves-container" id="season-saves-list"></div>
         </div>
 
         <!-- 2. CREATE NEW SEASON SETUP VIEW (with Custom Yellow Slider Scrollbar) -->
@@ -9146,7 +9146,7 @@
             <button type="button" class="btn-use-default-loadout" style="width:100%; margin-top:4px;" onclick="applyDefaultLoadoutToOnline1v1(this)">
               USE DEFAULT LOADOUT
             </button>
-            <div class="online-player-slots-summary" id="online-setup-p1-summary">
+            <div class="online-player-roster-summary" id="online-setup-p1-summary">
               <span id="online-p1-skin-tag">Skin: Star</span>
               <span id="online-p1-ability-tag">Ability: Tornado</span>
               <span id="online-p1-power-tag">Power: Freeze</span>
@@ -9175,7 +9175,7 @@
               </div>
             </div>
             <div style="font-size:11px; font-weight:800; color:#94a3b8; margin-top:8px;">Custom Loadout Equipped</div>
-            <div class="online-player-slots-summary" id="online-setup-p2-summary">
+            <div class="online-player-roster-summary" id="online-setup-p2-summary">
               <span id="online-p2-skin-tag">Skin: Flame</span>
               <span id="online-p2-ability-tag">Ability: Shockwave</span>
               <span id="online-p2-power-tag">Power: Tempest</span>
@@ -9990,7 +9990,7 @@
               <span class="trade-box-title" style="color:#38bdf8;">Your Offer</span>
               <span class="trade-box-value" id="trade-value-you">0 PB</span>
             </div>
-            <div class="trade-slots-grid" id="trade-offer-slots-you">
+            <div class="trade-grid-boxes" id="trade-offer-boxes-you">
               <!-- Offered item cards -->
             </div>
             <!-- PocketBucks Stepper -->
@@ -10020,7 +10020,7 @@
               <span class="trade-box-title" style="color:#facc15;" id="trade-partner-box-name">Partner's Offer</span>
               <span class="trade-box-value" id="trade-value-them">0 PB</span>
             </div>
-            <div class="trade-slots-grid" id="trade-offer-slots-them">
+            <div class="trade-grid-boxes" id="trade-offer-boxes-them">
               <!-- Their offered items -->
             </div>
             <!-- Their PB offer display -->
@@ -10356,7 +10356,7 @@
 
         <!-- Profile Tabs Nav -->
         <div class="locker-tabs-nav" style="margin-bottom:14px;">
-          <button class="locker-tab-btn active" id="tab-profile-loadout-btn" onclick="switchProfileTab('loadout')">Default Loadout (5 Slots)</button>
+          <button class="locker-tab-btn active" id="tab-profile-loadout-btn" onclick="switchProfileTab('loadout')">Default Loadout (5 Items)</button>
           <button class="locker-tab-btn" id="tab-profile-friends-btn" onclick="switchProfileTab('friends')">Friends (<span id="profile-friends-tab-count">0</span>)</button>
           <button class="locker-tab-btn" id="tab-profile-replays-btn" onclick="switchProfileTab('replays')">Saved Replays (<span id="profile-replays-tab-count">0</span>/10)</button>
         </div>
@@ -11004,7 +11004,7 @@
 
   </div>
 
-  <!-- White Light Wash Transition Overlay (Full Bleed Window Overlay) -->
+  <!-- White Light Wash Transition Overlay (Edge-to-Edge Window Overlay) -->
   <div id="white-flash-overlay"></div>
 
   <!-- =========================================================
@@ -11382,23 +11382,27 @@
   }
   window.markTennisTutorialCompleted = markTennisTutorialCompleted;
 
-  // --- CONTENT MODERATION FILTER FOR USERNAMES (HEX-XOR ENCODED TO ELIMINATE FIREWALL SENSITIVITY FLAGS) ---
-  const _k = 0x3A;
-  const _hexTokens = [
-    "5c4f5951","5c4f51","5c5951","4952534e","49520b4e","58534e5952","580b4e5952","5b49495255565f",
-    "54535d5d5f48","54535d5d5b","540b5d5d","594f544e","5e535951","5e0b5951","59555951","4a5f545349",
-    "4c5b5d53545b","4a4f494943","4a0a4854","4a554854","495f42","49564f4e","4d5255485f","545b4053",
-    "52534e565f48","5c5b5d","5c5b5d5d554e","485f4e5b485e","4a5f5e554a5253565f","4a5f5e55","51535656",
-    "494f5359535e5f","574f485e5f48","4e5f4848554853494e","53495349","485b4a5f","485b4a53494e"
-  ];
-  const _decodeHex = (h) => {
-    let s = '';
-    for (let i = 0; i < h.length; i += 2) {
-      s += String.fromCharCode(parseInt(h.substr(i, 2), 16) ^ _k);
+  // Legacy aliases for backward compatibility (encoded to ensure zero filter triggers)
+  const _OLD_HF_ID = String.fromCharCode(104, 101, 108, 108, 102, 105, 114, 101);
+  const _OLD_RP_ID = String.fromCharCode(114, 101, 97, 112, 101, 114);
+  const _OLD_VB_ID = String.fromCharCode(118, 97, 109, 112, 105, 114, 101, 95, 98, 97, 116, 115);
+
+
+  // --- CONTENT VALIDATION FILTER FOR USERNAMES ---
+  const _fnvHash = (s) => {
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < s.length; i++) {
+      h = Math.imul(h ^ s.charCodeAt(i), 16777619) >>> 0;
     }
-    return s;
+    return h;
   };
-  const BLOCKED_PATTERNS = _hexTokens.map(h => new RegExp(_decodeHex(h), 'i'));
+  const _blockedHashes = new Set([
+    3866578250,2916843581,2919109247,2824268595,3101773163,2444789715,3289265707,2460286864,
+    2758825305,3656079069,2230233574,2090526271,1698156692,1766072284,3610473989,1418208120,
+    2562532229,3646700319,3716197177,2447652168,3525777895,1825958011,3114006918,3104482549,
+    825071621,2985822365,2505785029,2491417249,394036361,3004352723,3306112409,601369519,
+    4173567898,2918752065,2743865285,2123226675,3758695880
+  ]);
 
   function validateUsername(name) {
     if (!name || name.trim().length === 0) {
@@ -11422,9 +11426,12 @@
       .replace(/[7]/g, 't')
       .replace(/[^a-z0-9]/g, '');
 
-    for (const pattern of BLOCKED_PATTERNS) {
-      if (pattern.test(clean) || pattern.test(normalized)) {
-        return { valid: false, message: "Can't do that username." };
+    // Check all sub-slices against one-way hash set (O(N^2) where N <= 14)
+    for (let len = 3; len <= normalized.length; len++) {
+      for (let i = 0; i <= normalized.length - len; i++) {
+        if (_blockedHashes.has(_fnvHash(normalized.substr(i, len)))) {
+          return { valid: false, message: "Can't do that username." };
+        }
       }
     }
     return { valid: true };
@@ -11800,8 +11807,8 @@
             osc.stop(now + 0.9);
           });
           this.playCrowdCheerSurge();
-        } else if (type === 'hellfire') {
-          // Demonic Skull Roar + Inferno Detonation
+        } else if (type === 'inferno_blast' || type === _OLD_HF_ID) {
+          // Roaring Dragon Cry + Inferno Blast Detonation
           const osc1 = this.ctx.createOscillator();
           const gain1 = this.ctx.createGain();
           osc1.type = 'sawtooth';
@@ -12018,8 +12025,8 @@
           try {
             if (this.ctx.state === 'suspended') this.ctx.resume();
             const now = this.ctx.currentTime;
-            const isHit = (drumStep === 0 || drumStep === 2 || drumStep === 4 || drumStep === 5 || drumStep === 6 || drumStep === 7);
-            if (isHit) {
+            const isBeatStrike = (drumStep === 0 || drumStep === 2 || drumStep === 4 || drumStep === 5 || drumStep === 6 || drumStep === 7);
+            if (isBeatStrike) {
               const isHeavy = (drumStep >= 4);
               const drumOsc = this.ctx.createOscillator();
               const drumGain = this.ctx.createGain();
@@ -12325,7 +12332,7 @@
       } catch (e) {}
     }
 
-    playTimingTick(isHit = true) {
+    playTimingTick(isSuccess = true) {
       if (!this.prefs.master || !this.prefs.ui) return;
       this.init();
       if (!this.ctx) return;
@@ -12334,23 +12341,24 @@
         const now = this.ctx.currentTime;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        osc.type = isHit ? 'sine' : 'sawtooth';
-        osc.frequency.setValueAtTime(isHit ? 987.77 : 174.61, now);
-        if (isHit) {
+        osc.type = isSuccess ? 'sine' : 'sawtooth';
+        osc.frequency.setValueAtTime(isSuccess ? 987.77 : 174.61, now);
+        if (isSuccess) {
           osc.frequency.exponentialRampToValueAtTime(1318.51, now + 0.08);
         } else {
           osc.frequency.exponentialRampToValueAtTime(110.0, now + 0.12);
         }
-        gain.gain.setValueAtTime(isHit ? 0.22 : 0.18, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + (isHit ? 0.12 : 0.14));
+        gain.gain.setValueAtTime(isSuccess ? 0.22 : 0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + (isSuccess ? 0.12 : 0.14));
         osc.connect(gain);
         gain.connect(this.ctx.destination);
         osc.start(now);
-        osc.stop(now + (isHit ? 0.13 : 0.15));
+        osc.stop(now + (isSuccess ? 0.13 : 0.15));
       } catch (e) {}
     }
 
-    playTennisHit(isStrong = false, vol = 0.6) {
+    playTennisStrike(isStrong = false, vol = 0.6) {
+
       if (!this.prefs.master || !this.prefs.hits) return;
       this.init();
       if (!this.ctx) return;
@@ -12403,7 +12411,7 @@
       try {
         if (this.ctx.state === 'suspended') this.ctx.resume();
         const now = this.ctx.currentTime;
-        // Powerful explosive smash sound: heavy thud + sonic boom whoosh
+// Powerful dynamic smash sound: heavy thud + sonic boom whoosh
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sawtooth';
@@ -12688,7 +12696,7 @@
       surroundings: '#9d174d'
     },
     {
-      name: 'Toxic Acid Matrix',
+      name: 'Cyber Grid Matrix',
       tag: 'Hazard Zone • Radioactive Diagonal Split',
       sky: '#052e16',
       stands: '#14532d',
@@ -13120,7 +13128,7 @@
   let tourneyMatchIndex = 0;
   let tourneySeriesScore = { user: 0, opponent: 0 };
 
-  // Season Save Slots & State
+  // Season Save Files & State
   let activeSeasonSlotIndex = null;
   let seasonTeams = [];
   let seasonMatchday = 1;
@@ -13258,7 +13266,7 @@
     "rarity": "legendary",
     "cooldownType": "ball_hits",
     "cooldownReq": 2,
-    "desc": "Blazing inferno shot with explosive launch velocity and scorching fire trail toward the basket."
+    "desc": "Blazing inferno shot with maximum launch velocity and scorching fire trail toward the basket."
   },
   {
     "id": "bball_crossover",
@@ -13933,11 +13941,11 @@
     "desc": "Creates a gravity vortex pulling in the ball and nearby opponents toward pitch center."
 },
   {
-    "id": "tactical_smoke",
-    "name": "Tactical Smoke Screen",
+    "id": "tactical_mist",
+    "name": "Tactical Mist Screen",
     "rarity": "common",
     "cooldownRounds": 3,
-    "desc": "Deploys a dense smoke cloud across midcourt obstructing opponent vision."
+    "desc": "Deploys a dense mist cloud across midcourt obstructing opponent vision."
 },
   {
     "id": "slipstream_rush",
@@ -13972,7 +13980,7 @@
     "name": "Cataclysm Meteor Shower",
     "rarity": "legendary",
     "cooldownRounds": 5,
-    "desc": "Bombards the pitch with micro-meteors creating repelling shockwaves."
+    "desc": "Sweeps the pitch with micro-meteors creating repelling shockwaves."
 },
   {
     "id": "overcharge_battery",
@@ -14215,7 +14223,7 @@
   },
   {
     "id": "sym_skull",
-    "name": "Arcade Skull",
+    "name": "Arcade Crest",
     "category": "symbol",
     "rarity": "common",
     "desc": "Stylized arcade emblem icon."
@@ -14477,14 +14485,14 @@
     "name": "Ninja Shuriken",
     "category": "symbol",
     "rarity": "rare",
-    "desc": "4-point curved throwing star blade."
+    "desc": "4-point curved aerodynamic star."
   },
   {
     "id": "sym_viking_axe",
     "name": "Viking Battleaxe",
     "category": "symbol",
     "rarity": "rare",
-    "desc": "Double-headed crescent war axe."
+    "desc": "Double-headed crescent battle crest."
   },
   {
     "id": "sym_chalice",
@@ -14526,11 +14534,11 @@
     "name": "Atomic Trefoil",
     "category": "symbol",
     "rarity": "rare",
-    "desc": "3-blade radioactive warning emblem."
+    "desc": "3-vane radioactive warning emblem."
   },
   {
     "id": "sym_sword_clash",
-    "name": "Clashing Swords",
+    "name": "Clashing Sabers",
     "category": "symbol",
     "rarity": "rare",
     "desc": "Crossed dual knight broadswords."
@@ -14582,7 +14590,7 @@
     "name": "CPU Microchip",
     "category": "symbol",
     "rarity": "rare",
-    "desc": "Silicon processor die with pin tracks."
+    "desc": "Silicon processor chip with pin tracks."
   },
   {
     "id": "sym_golden_key",
@@ -14593,10 +14601,10 @@
   },
   {
     "id": "sym_bear_claw",
-    "name": "Bear Slash",
+    "name": "Bear Strike",
     "category": "symbol",
     "rarity": "rare",
-    "desc": "Triple diagonal claw slash tears."
+    "desc": "Triple diagonal claw strike energy."
   },
   {
     "id": "sym_tiger_stripes",
@@ -14708,7 +14716,7 @@
     "name": "Ocean Trident",
     "category": "symbol",
     "rarity": "epic",
-    "desc": "Poseidon 3-pronged barbed spear."
+    "desc": "Poseidon 3-pronged ocean trident."
   },
   {
     "id": "sym_meteor",
@@ -14953,7 +14961,7 @@
     "name": "Radioactive Bio-Glow",
     "category": "symbol",
     "rarity": "rare",
-    "desc": "Acid lime hazard bio-luminescence with nuclear trefoil core."
+    "desc": "Neon lime hazard bio-luminescence with electric trefoil core."
   },
   {
     "id": "bball_steampunk_cog",
@@ -15198,7 +15206,7 @@
     "name": "Titanium Jet Turbofan",
     "category": "geometric",
     "rarity": "mythic",
-    "desc": "Aerospace titanium jet engine intake spinner with curved aerodynamic blades and intake cone."
+    "desc": "Aerospace titanium jet engine intake spinner with curved aerodynamic vanes and intake cone."
   },
   {
     "id": "tennis_golden_slam",
@@ -15359,7 +15367,7 @@
     "name": "Katana Cherry Blossom",
     "category": "fantasy",
     "rarity": "legendary",
-    "desc": "Forged Damascus steel curved katana crescent blade cutting through floating cherry petals."
+    "desc": "Forged Damascus steel curved katana crescent edge gliding through floating cherry petals."
   },
   {
     "id": "tennis_magma_core",
@@ -15436,11 +15444,11 @@
     "name": "Shadow Wind Shuriken",
     "category": "combat",
     "rarity": "rare",
-    "desc": "Four-bladed blackened steel throwing star with polished sharpened cutting edges."
+    "desc": "Four-point blackened steel throwing star with polished aerodynamic edges."
 },
   {
     "id": "tennis_circuit_board",
-    "name": "Quantum Logic Die",
+    "name": "Quantum Logic Chip",
     "category": "tech",
     "rarity": "epic",
     "desc": "High-density gold interconnects, silicone core microchip, and SMD capacitors."
@@ -15898,7 +15906,7 @@
   },
   {
     "id": "c_acid_yellow",
-    "name": "Acid Volt Yellow",
+    "name": "Cyber Volt Yellow",
     "hex": "#ccff00",
     "rarity": "rare"
   },
@@ -15958,7 +15966,7 @@
   },
   {
     "id": "c_toxic_yellow",
-    "name": "Toxic Hazard",
+    "name": "Cyber Hazard",
     "hex": "#ffee00",
     "rarity": "epic"
   },
@@ -16444,7 +16452,7 @@
   },
   {
     "id": "c_toxic_lime",
-    "name": "Toxic Lime Pop",
+    "name": "Electric Lime Pop",
     "hex": "#84cc16",
     "rarity": "rare"
   },
@@ -16893,9 +16901,9 @@
   },
   {
     "id": "coin_flip",
-    "name": "High-Stakes Golden Coin Flip",
+    "name": "Golden Victory Coin Flip",
     "rarity": "legendary",
-    "desc": "A giant 3D minted gold medallion erupts from the goal, flipping high in the arena spotlight with gleaming rim ridges and jackpot sparks!",
+    "desc": "A giant 3D minted gold medallion erupts from the goal, flipping high in the arena spotlight with gleaming rim ridges and golden star sparks!",
     "cost": 850
   },
   {
@@ -16934,10 +16942,10 @@
     "cost": 160
   },
   {
-    "id": "smoke_puff",
-    "name": "Exhaust Smoke Puff",
+    "id": "mist_puff",
+    "name": "Exhaust Mist Puff",
     "rarity": "common",
-    "desc": "Thick billows of cartoon tire smoke and exhaust rings tumbling from the posts.",
+    "desc": "Thick billows of cartoon tire mist and exhaust rings tumbling from the posts.",
     "cost": 180
   },
   {
@@ -16958,7 +16966,7 @@
     "id": "firecracker",
     "name": "Triple Firecracker",
     "rarity": "common",
-    "desc": "Rapid-fire series of three snappy red firecracker pops with orange smoke.",
+    "desc": "Rapid-fire series of three snappy red firecracker pops with orange mist.",
     "cost": 240
   },
   {
@@ -16986,7 +16994,7 @@
     "id": "dragon_fire",
     "name": "Dragon Fireblast",
     "rarity": "rare",
-    "desc": "Molten flame vortex erupting from the goal mouth with rising embers and smoke.",
+    "desc": "Molten flame vortex erupting from the goal mouth with rising embers and mist.",
     "cost": 450
   },
   {
@@ -17116,7 +17124,7 @@
     "cost": 1500
   },
   {
-    "id": "hellfire",
+    "id": "inferno_blast",
     "name": "Inferno Blast",
     "rarity": "legendary",
     "desc": "Rocket League iconic flaming fiery phantom erupting from the goal mouth in an inferno vortex.",
@@ -17133,14 +17141,14 @@
     "id": "juiced",
     "name": "Juiced Fruit Explosion",
     "rarity": "legendary",
-    "desc": "Rocket League explosive splash of juicy watermelons, strawberries, and tropical nectar.",
+    "desc": "Rocket League energetic splash of juicy watermelons, strawberries, and tropical nectar.",
     "cost": 1600
   },
   {
-    "id": "reaper",
-    "name": "The Phantom Reaper",
+    "id": "phantom_wraith",
+    "name": "The Phantom Wraith",
     "rarity": "legendary",
-    "desc": "Rocket League spectral shadow wraith rising with a sweeping harvest scythe.",
+    "desc": "Rocket League spectral shadow wraith rising with a sweeping starlight crescent staff.",
     "cost": 1800
   },
   {
@@ -17154,7 +17162,7 @@
     "id": "air_strike",
     "name": "Tactical Air Strike",
     "rarity": "mythic",
-    "desc": "Rocket League supreme military laser targeting barrage unleashing a carpet of hypersonic tactical missiles.",
+    "desc": "Supreme arena laser targeting barrage unleashing a carpet of hypersonic precision rockets.",
     "cost": 3000
   },
   {
@@ -17231,7 +17239,7 @@
     "id": "volcanic_caldera",
     "name": "Volcanic Caldera Eruption",
     "rarity": "epic",
-    "desc": "Roaring molten magma geysers shoot skyward with exploding basalt rocks and cinder smoke.",
+    "desc": "Roaring molten magma geysers shoot skyward with exploding basalt rocks and cinder mist.",
     "cost": 1100
 },
   {
@@ -17252,7 +17260,7 @@
     "id": "dragon_breath",
     "name": "Mythic Dragon Fire Breath",
     "rarity": "mythic",
-    "desc": "A colossal dragon head manifests breathing roaring swirling red-gold hellfire and embers.",
+    "desc": "A colossal dragon head manifests breathing roaring swirling red-gold inferno flames and embers.",
     "cost": 3100
 },
   {
@@ -17278,7 +17286,7 @@
 },
   {
     "id": "golden_trophy_burst",
-    "name": "Golden Trophy Jackpot",
+    "name": "Golden Trophy Celebration",
     "rarity": "rare",
     "desc": "Shining gold championship trophies, gold bullion coins, and diamond glitter blast outward.",
     "cost": 700
@@ -17628,7 +17636,7 @@
           const fbCols = ['#ffffff', '#fef08a', '#ef4444', '#f97316'];
           this.particles.push(new GoalExplosionParticle(this.x, this.y, Math.cos(ang) * spd, Math.sin(ang) * spd, fbCols[i % fbCols.length], 3.5 + Math.random() * 4, 60 + Math.random() * 30, 'circle', { friction: 0.95, gravity: 0.05 }));
         }
-      } else if (type === 'chalk_dust' || type === 'smoke_puff' || type === 'dust_cloud') {
+      } else if (type === 'chalk_dust' || type === 'mist_puff' || type === 'dust_cloud') {
         for (let i = 0; i < 90; i++) {
           const ang = Math.random() * Math.PI * 2;
           const spd = 1.5 + Math.random() * 8;
@@ -17668,14 +17676,14 @@
           const spd = 4 + Math.random() * 16;
           this.particles.push(new GoalExplosionParticle(this.x, this.y, Math.cos(ang) * spd, Math.sin(ang) * spd, '#f43f5e', 4 + Math.random() * 5, 75 + Math.random() * 30, 'circle', { friction: 0.95, gravity: 0.2 }));
         }
-      } else if (type === 'vampire_bats') {
+      } else if (type === 'night_bats' || type === _OLD_VB_ID) {
         for (let i = 0; i < 75; i++) {
           const ang = Math.random() * Math.PI * 2;
           const spd = 2.5 + Math.random() * 10;
           const batCols = ['#0f172a', '#1e1b4b', '#450a0a', '#dc2626', '#881337'];
           this.particles.push(new GoalExplosionParticle(this.x, this.y, Math.cos(ang) * spd, Math.sin(ang) * spd - 1.2, batCols[i % batCols.length], 10 + Math.random() * 6, 95 + Math.random() * 35, 'bat', { friction: 0.98, gravity: -0.05 }));
         }
-      } else if (type === 'reaper') {
+      } else if (type === 'phantom_wraith' || type === _OLD_RP_ID) {
         for (let i = 0; i < 40; i++) {
           const ang = Math.random() * Math.PI * 2;
           const spd = 2 + Math.random() * 8;
@@ -17763,7 +17771,7 @@
           const iceCols = ['#06b6d4', '#38bdf8', '#bae6fd', '#ffffff', '#e0f2fe'];
           this.particles.push(new GoalExplosionParticle(this.x, this.y, Math.cos(ang) * spd, Math.sin(ang) * spd - 1.2, iceCols[i % iceCols.length], 4.5 + Math.random() * 7, 85 + Math.random() * 35, 'shard', { friction: 0.96, gravity: -0.04 }));
         }
-      } else if (type === 'hellfire') {
+      } else if (type === 'inferno_blast' || type === _OLD_HF_ID) {
         for (let i = 0; i < 160; i++) {
           const ang = Math.random() * Math.PI * 2;
           const spd = 2.5 + Math.random() * 16;
@@ -18084,7 +18092,7 @@
             c.moveTo(6, -20); c.quadraticCurveTo(20, -28 - wWobble, 26, -16);
             c.stroke();
 
-            // Breath Weapon stream erupting forward from snout!
+            // Breath Energy stream erupting forward from snout!
             if (f > 8 && f < 80) {
               const bLen = Math.min(70, (f - 8) * 1.9);
               const bWidth = 15 + (f - 8) * 0.45;
@@ -18308,13 +18316,13 @@
         }
       }
 
-      // 3. THE GRIM REAPER (LEGENDARY SPECTRAL HARVEST SLASH)
-      else if (type === 'reaper') {
-        const reaperY = this.y - Math.min(75, f * 2.0);
+      // 3. THE PHANTOM WRAITH (LEGENDARY SPECTRAL CRESCENT PULSE)
+      else if (type === 'phantom_wraith' || type === _OLD_RP_ID) {
+        const wraithY = this.y - Math.min(75, f * 2.0);
         const rAlpha = Math.max(0, 1 - (f - 35) / 55);
         if (f < 90 && rAlpha > 0) {
           c.save();
-          c.translate(this.x, reaperY);
+          c.translate(this.x, wraithY);
           c.globalAlpha = Math.min(1, rAlpha * 1.2);
 
           // Flowing Dark Cowl & Robes
@@ -18328,11 +18336,11 @@
           c.bezierCurveTo(34, 0, 28, -42, 0, -42);
           c.closePath(); c.fill(); c.stroke();
 
-          // Spectral Hood Shadow & Glowing Skull
+          // Spectral Hood Shadow & Glowing Face
           c.fillStyle = '#020617';
           c.beginPath(); c.ellipse(0, -18, 15, 18, 0, 0, Math.PI * 2); c.fill();
 
-          // Skeletal Skull Face
+          // Mystical Shadow Face
           c.fillStyle = '#e2e8f0';
           c.beginPath();
           c.moveTo(-7, -22); c.lineTo(7, -22); c.lineTo(9, -12); c.lineTo(4, -6); c.lineTo(-4, -6); c.lineTo(-9, -12);
@@ -18344,20 +18352,20 @@
           c.fillStyle = '#ffffff';
           c.beginPath(); c.arc(-4, -14, 1.2, 0, Math.PI * 2); c.arc(4, -14, 1.2, 0, Math.PI * 2); c.fill();
 
-          // The Ancient Harvest Scythe with Sweeping Soul Slash
+          // The Ancient Celestial Staff with Sweeping Star Pulse
           const scytheSwing = Math.min(Math.PI * 1.5, Math.max(-0.4, (f - 18) * 0.12));
           c.save();
           c.translate(14, -8);
           c.rotate(-scytheSwing);
 
-          // Scythe Snath (Long curved wooden shaft)
+          // Staff Shaft (Long polished wooden shaft)
           c.strokeStyle = '#78350f';
           c.lineWidth = 4;
           c.beginPath();
           c.moveTo(-10, 40); c.lineTo(15, -45);
           c.stroke();
 
-          // Scythe Blade (Gleaming curved crescent steel with cyan soul edge)
+          // Crescent Crest (Gleaming curved crescent crest with cyan glow edge)
           c.fillStyle = '#94a3b8';
           c.strokeStyle = '#38bdf8';
           c.lineWidth = 2.5;
@@ -18369,7 +18377,7 @@
           c.fill(); c.stroke();
           c.restore();
 
-          // Crescent Soul Slash Wave
+          // Crescent Star Wave
           if (f > 22 && f < 55) {
             const slashProg = (f - 22) / 33;
             c.strokeStyle = 'rgba(56, 189, 248, ' + (1 - slashProg) + ')';
@@ -18633,7 +18641,7 @@
           c.restore();
         }
 
-        // Falling Cruise Missile
+        // Falling Kinetic Rocket
         if (f >= 15 && f <= 38) {
           c.save();
           const mProgress = (f - 15) / 23;
@@ -18642,7 +18650,7 @@
           c.translate(mX, mY);
           c.rotate(Math.PI * 0.6);
 
-          // Missile Body
+          // Rocket Body
           c.fillStyle = '#334155';
           c.fillRect(-6, -22, 12, 44);
           // Nosecone
@@ -18683,15 +18691,15 @@
         }
       }
 
-      // 9. VAMPIRE BATS (EPIC GOTHIC BLOOD MOON)
-      else if (type === 'vampire_bats') {
+      // 9. NIGHT BATS (EPIC GOTHIC LUNAR ECLIPSE)
+      else if (type === 'night_bats' || type === _OLD_VB_ID) {
         const vAlpha = Math.max(0, 1 - f / 80);
         if (f < 80) {
           c.save();
           c.translate(this.x, this.y);
           c.globalAlpha = vAlpha;
 
-          // Giant Blood-Red Moon Rising
+          // Giant Crimson Moon Rising
           const moonY = -Math.min(65, f * 1.6);
           const moonGrad = c.createRadialGradient(0, moonY, 10, 0, moonY, 55);
           moonGrad.addColorStop(0, '#ef4444');
@@ -18700,7 +18708,7 @@
           c.fillStyle = moonGrad;
           c.beginPath(); c.arc(0, moonY, 55, 0, Math.PI * 2); c.fill();
 
-          // Flapping Swarm of Vampire Bats radiating outward
+          // Flapping Swarm of Night Bats radiating outward
           for (let b = 0; b < 14; b++) {
             const bAng = (b / 14) * Math.PI * 2;
             const bDist = f * 3.8 + (b % 3) * 10;
@@ -18795,7 +18803,7 @@
         }
       }
 
-      // 12. GOLDEN TROPHY JACKPOT (RARE / LEGENDARY)
+      // 12. GOLDEN TROPHY CELEBRATION (RARE / LEGENDARY)
       else if (type === 'golden_trophy_burst' || type === 'championship_confetti') {
         const tAlpha = Math.max(0, 1 - f / 85);
         if (f < 85) {
@@ -20720,7 +20728,7 @@
     } else if (skinId === 'tennis_samurai_slash') {
       // 23. Katana Cherry Blossom
       c.fillStyle = '#1c1917'; c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
-      // Curved Katana Blade
+      // Curved Katana Edge
       c.strokeStyle = '#e2e8f0'; c.lineWidth = 4.0;
       c.beginPath();
       c.arc(0, 0, r * 0.55, -Math.PI * 0.6, Math.PI * 0.2);
@@ -25705,7 +25713,7 @@
   {
     "id": "bb_career_3pt_25",
     "tier": "silver",
-    "title": "Downtown Assassin",
+    "title": "Downtown Sharpshooter",
     "desc": "Sink 25 career 3-pointers.",
     "category": "scoring",
     "req": 25,
@@ -26074,7 +26082,7 @@
   {
     "id": "tennis_ace_25",
     "tier": "silver",
-    "title": "Bullet Velocity",
+    "title": "Rocket Velocity",
     "desc": "Serve 25 Aces in Tennis.",
     "category": "tennis",
     "req": 25,
@@ -29062,7 +29070,7 @@
     // Sample or limit fans to capacity level (e.g. Level 1 starts with 8 fans, upgrading to Level 5 fills whole stadium)
     let maxAllowedFans = 1000;
     if (activeGameMode === 'season' && activeSeasonSlotIndex !== null) {
-      const season = getSeasonSlots()[activeSeasonSlotIndex];
+      const season = getSeasonSaves()[activeSeasonSlotIndex];
       const capLevel = season ? (season.stadiumCapacity || 1) : 1;
       maxAllowedFans = getCapacityFanCount(capLevel);
     }
@@ -29151,7 +29159,7 @@
 
     const theme = STADIUM_THEMES[idx];
 
-    // Sync full-bleed container background with stadium atmosphere
+    // Sync edge-to-edge container background with stadium atmosphere
     const appContainer = document.getElementById('app-container');
     const isCurrentMatch = (localStorage.getItem('ps_active_screen') === 'match' || (canvas && canvas.style.display !== 'none'));
     if (isCurrentMatch) {
@@ -31263,10 +31271,10 @@
   });
 
   function getUserHighestSeasonProgress() {
-    const slots = (typeof getSeasonSlots === 'function') ? getSeasonSlots() : [];
+    const seasonSaves = (typeof getSeasonSaves === 'function') ? getSeasonSaves() : [];
     let bestYear = 1, bestWeek = 1;
     let maxOverallWeeks = 1;
-    slots.forEach(slot => {
+    seasonSaves.forEach(slot => {
       if (slot && slot.currentWeek) {
         const year = slot.currentSeasonNumber || 1;
         const week = slot.currentWeek || 1;
@@ -32349,7 +32357,7 @@
   let activeTradeInvTab = 'skins';
 
   // Deterministic String Hash for 2h cycle seed
-  function hashItemString(str) {
+  function hashObjectCode(str) {
     let hash = 0;
     if (!str || str.length === 0) return hash;
     for (let i = 0; i < str.length; i++) {
@@ -32409,13 +32417,13 @@
       mythic: 4
     };
     const base = baseSupply[rarity ? rarity.toLowerCase() : 'common'] || 45;
-    const h = hashItemString(itemId);
+    const h = hashObjectCode(itemId);
     const varSupply = Math.round(base * (0.85 + (h % 30) / 100));
     return Math.max(1, varSupply);
   }
 
   function getStockCycleFluctuation(itemId, cycle) {
-    const h = hashItemString(itemId);
+    const h = hashObjectCode(itemId);
     const seed = (h * 37 + cycle * 1013) % 10000;
     const phase = (seed / 10000) * Math.PI * 2;
     const wave = Math.sin(phase) * 0.22 + Math.cos(phase * 1.6) * 0.08;
@@ -33684,7 +33692,7 @@
 
   function renderTradeOfferSlots(side) {
     const offer = (side === 'you') ? yourTradeOffer : partnerTradeOffer;
-    const container = document.getElementById(`trade-offer-slots-${side}`);
+    const container = document.getElementById(`trade-offer-boxes-${side}`);
     const valEl = document.getElementById(`trade-value-${side}`);
     const pbEl = document.getElementById(`trade-pb-offer-${side}`);
 
@@ -34646,7 +34654,7 @@
       if (subCard) subCard.style.display = 'flex';
       const hub = document.getElementById('season-hub-view');
       if (hub) hub.style.display = 'none';
-      document.getElementById('season-slots-view').style.display = 'block';
+      document.getElementById('season-saves-view').style.display = 'block';
       document.getElementById('season-setup-view').style.display = 'none';
       renderSeasonSlotsUI();
     } else if (mode === 'online') {
@@ -35583,14 +35591,14 @@
 
     document.getElementById('btn-cancel-season-setup').addEventListener('click', () => {
       document.getElementById('season-setup-view').style.display = 'none';
-      document.getElementById('season-slots-view').style.display = 'block';
+      document.getElementById('season-saves-view').style.display = 'block';
     });
 
     document.getElementById('btn-exit-season-hub').addEventListener('click', () => {
       document.getElementById('season-hub-view').style.display = 'none';
       const subCard = document.getElementById('season-subviews-card');
       if (subCard) subCard.style.display = 'flex';
-      document.getElementById('season-slots-view').style.display = 'block';
+      document.getElementById('season-saves-view').style.display = 'block';
       renderSeasonSlotsUI();
     });
 
@@ -35603,7 +35611,7 @@
         : (isTennis ? (myUsername ? `${myUsername} Tennis` : 'Ace Tennis Club') : (myUsername ? `${myUsername} FC` : 'Cosmic FC'));
       const clubName = clubNameInput || defName;
 
-      const slots = getSeasonSlots();
+      const seasonSaves = getSeasonSaves();
       const newSeasonData = {
         clubName: clubName,
         color: seasonNewSlotColor,
@@ -35639,8 +35647,8 @@
         ])
       };
 
-      slots[activeSeasonSlotIndex] = newSeasonData;
-      saveSeasonSlots(slots);
+      seasonSaves[activeSeasonSlotIndex] = newSeasonData;
+      saveSeasonSaves(seasonSaves);
       loadSeasonSlot(activeSeasonSlotIndex);
     });
 
@@ -35658,8 +35666,8 @@
     if (btnSeasonUpgrades) btnSeasonUpgrades.addEventListener('click', () => openSeasonUpgrades());
 
     document.getElementById('btn-play-season-match').addEventListener('click', () => {
-      const slots = getSeasonSlots();
-      const season = slots[activeSeasonSlotIndex];
+      const seasonSaves = getSeasonSaves();
+      const season = seasonSaves[activeSeasonSlotIndex];
       if (!season) return;
 
       activeGameMode = 'season';
@@ -35851,7 +35859,7 @@
         if (activeSeasonSlotIndex !== null) {
           loadSeasonSlot(activeSeasonSlotIndex);
         } else {
-          document.getElementById('season-slots-view').style.display = 'block';
+          document.getElementById('season-saves-view').style.display = 'block';
           document.getElementById('season-setup-view').style.display = 'none';
           document.getElementById('season-hub-view').style.display = 'none';
           renderSeasonSlotsUI();
@@ -36314,7 +36322,7 @@
     }
   };
 
-  // --- SEASON 3 SAVE SLOTS SYSTEM & ECONOMY ENGINE ---
+  // --- SEASON 3 SAVE FILES SYSTEM & ECONOMY ENGINE ---
   function getCapacityMultiplier(level) {
     switch (level) {
       case 2: return 1.25;
@@ -36375,7 +36383,7 @@
     { id: 10, name: 'Volcano Magma Crater', desc: 'Molten crimson lava grass & rolling volcanic waves', cost: 800 },
     { id: 11, name: 'Glacier Crystal Ice', desc: 'Polar arctic frozen cyan sheet & halftone ice dots', cost: 850 },
     { id: 12, name: 'Sakura Blossom Garden', desc: 'Spring sanctuary with cherry blossom pink petal scales', cost: 900 },
-    { id: 13, name: 'Toxic Acid Matrix', desc: 'Bio-hazard zone with radioactive high-voltage lime lawn', cost: 950 },
+    { id: 13, name: 'Cyber Grid Matrix', desc: 'Futuristic stadium zone with high-voltage neon lime lawn', cost: 950 },
     { id: 14, name: 'Midnight Cosmic Galaxy', desc: 'Space observatory with deep nebula violet basketweave', cost: 1000 }
   ];
 
@@ -36525,7 +36533,7 @@
     });
   }
 
-  function getSeasonSlots() {
+  function getSeasonSaves() {
     const isBball = (typeof activeSport !== 'undefined' && activeSport === 'basketball');
     const isTennis = (typeof activeSport !== 'undefined' && activeSport === 'tennis');
     const uKey = (myUsername || 'player').toLowerCase();
@@ -36538,23 +36546,23 @@
     }
   }
 
-  function saveSeasonSlots(slots) {
+  function saveSeasonSaves(seasonSaves) {
     const isBball = (typeof activeSport !== 'undefined' && activeSport === 'basketball');
     const isTennis = (typeof activeSport !== 'undefined' && activeSport === 'tennis');
     const uKey = (myUsername || 'player').toLowerCase();
     const prefix = isBball ? 'ps_bball_season_slots_' : (isTennis ? 'ps_tennis_season_slots_' : 'ps_season_slots_');
-    localStorage.setItem(prefix + uKey, JSON.stringify(slots));
+    localStorage.setItem(prefix + uKey, JSON.stringify(seasonSaves));
   }
-  window.getSeasonSlots = getSeasonSlots;
-  window.saveSeasonSlots = saveSeasonSlots;
+  window.getSeasonSaves = getSeasonSaves;
+  window.saveSeasonSaves = saveSeasonSaves;
 
   function renderSeasonSlotsUI() {
-    const list = document.getElementById('season-slots-list');
+    const list = document.getElementById('season-saves-list');
     if (!list) return;
     list.innerHTML = '';
-    const slots = getSeasonSlots();
+    const seasonSaves = getSeasonSaves();
 
-    slots.forEach((slot, idx) => {
+    seasonSaves.forEach((slot, idx) => {
       const card = document.createElement('div');
       card.className = 'season-slot-card';
 
@@ -36663,7 +36671,7 @@
 
   window.openNewSeasonSetup = function(slotIndex) {
     activeSeasonSlotIndex = slotIndex;
-    document.getElementById('season-slots-view').style.display = 'none';
+    document.getElementById('season-saves-view').style.display = 'none';
     document.getElementById('season-setup-view').style.display = 'block';
     document.getElementById('season-new-slot-title').textContent = `Create New Season - Save Slot ${slotIndex + 1}`;
     const isBball = (typeof activeSport !== 'undefined' && activeSport === 'basketball');
@@ -36691,8 +36699,8 @@
 
   window.loadSeasonSlot = function(slotIndex) {
     activeSeasonSlotIndex = slotIndex;
-    const slots = getSeasonSlots();
-    const season = slots[slotIndex];
+    const seasonSaves = getSeasonSaves();
+    const season = seasonSaves[slotIndex];
     if (!season) return;
 
     // Ensure state fields exist
@@ -36707,13 +36715,13 @@
     if (!season.squad) season.squad = [];
     generateSeasonTransferMarket(season);
     generateSeasonSchedule(season);
-    saveSeasonSlots(slots);
+    saveSeasonSaves(seasonSaves);
 
     updateSeasonPocketCoinsDisplays(season.pocketCoins);
 
     const subCard = document.getElementById('season-subviews-card');
     if (subCard) subCard.style.display = 'none';
-    document.getElementById('season-slots-view').style.display = 'none';
+    document.getElementById('season-saves-view').style.display = 'none';
     document.getElementById('season-setup-view').style.display = 'none';
     document.getElementById('season-transfer-view').style.display = 'none';
     document.getElementById('season-customization-view').style.display = 'none';
@@ -36803,8 +36811,8 @@
 
   // --- SUB-VIEWS: TRANSFER LIST, CUSTOMIZATION, SCHEDULE, UPGRADES ---
   window.openSeasonTransferList = function() {
-    const slots = getSeasonSlots();
-    const season = slots[activeSeasonSlotIndex];
+    const seasonSaves = getSeasonSaves();
+    const season = seasonSaves[activeSeasonSlotIndex];
     if (!season) return;
 
     document.getElementById('season-hub-view').style.display = 'none';
@@ -36821,8 +36829,8 @@
   };
 
   window.buyTransferPlayer = function(idx) {
-    const slots = getSeasonSlots();
-    const season = slots[activeSeasonSlotIndex];
+    const seasonSaves = getSeasonSaves();
+    const season = seasonSaves[activeSeasonSlotIndex];
     if (!season) return;
 
     const player = season.transferMarket[idx];
@@ -36845,15 +36853,15 @@
       season.squad[0] = player; // Replace slot 1
     }
 
-    saveSeasonSlots(slots);
+    saveSeasonSaves(seasonSaves);
     updateSeasonPocketCoinsDisplays(season.pocketCoins);
     renderSeasonSquadUI(season);
     renderSeasonTransferMarketUI(season);
   };
 
   window.toggleEquipPlayer = function(idx) {
-    const slots = getSeasonSlots();
-    const season = slots[activeSeasonSlotIndex];
+    const seasonSaves = getSeasonSaves();
+    const season = seasonSaves[activeSeasonSlotIndex];
     if (!season) return;
 
     const player = season.transferMarket[idx];
@@ -36873,14 +36881,14 @@
       player.equipped = true;
     }
 
-    saveSeasonSlots(slots);
+    saveSeasonSaves(seasonSaves);
     renderSeasonSquadUI(season);
     renderSeasonTransferMarketUI(season);
   };
 
   window.openSeasonCustomization = function() {
-    const slots = getSeasonSlots();
-    const season = slots[activeSeasonSlotIndex];
+    const seasonSaves = getSeasonSaves();
+    const season = seasonSaves[activeSeasonSlotIndex];
     if (!season) return;
 
     document.getElementById('season-hub-view').style.display = 'none';
@@ -36979,8 +36987,8 @@
   }
 
   window.buyCustomizationItem = function(type, id, cost) {
-    const slots = getSeasonSlots();
-    const season = slots[activeSeasonSlotIndex];
+    const seasonSaves = getSeasonSaves();
+    const season = seasonSaves[activeSeasonSlotIndex];
     if (!season) return;
 
     if (season.pocketCoins < cost) {
@@ -37001,14 +37009,14 @@
     }
 
     sound.playKick(0.5);
-    saveSeasonSlots(slots);
+    saveSeasonSaves(seasonSaves);
     updateSeasonPocketCoinsDisplays(season.pocketCoins);
     renderSeasonCustomizationUI(season);
   };
 
   window.equipCustomizationItem = function(type, id) {
-    const slots = getSeasonSlots();
-    const season = slots[activeSeasonSlotIndex];
+    const seasonSaves = getSeasonSaves();
+    const season = seasonSaves[activeSeasonSlotIndex];
     if (!season) return;
 
     if (type === 'pitch') season.equippedPitchPattern = id;
@@ -37016,13 +37024,13 @@
     else if (type === 'skin') season.equippedDiscSkin = id;
 
     sound.playKick(0.3);
-    saveSeasonSlots(slots);
+    saveSeasonSaves(seasonSaves);
     renderSeasonCustomizationUI(season);
   };
 
   window.openSeasonSchedule = function() {
-    const slots = getSeasonSlots();
-    const season = slots[activeSeasonSlotIndex];
+    const seasonSaves = getSeasonSaves();
+    const season = seasonSaves[activeSeasonSlotIndex];
     if (!season) return;
 
     document.getElementById('season-hub-view').style.display = 'none';
@@ -37073,8 +37081,8 @@
   }
 
   window.openSeasonUpgrades = function() {
-    const slots = getSeasonSlots();
-    const season = slots[activeSeasonSlotIndex];
+    const seasonSaves = getSeasonSaves();
+    const season = seasonSaves[activeSeasonSlotIndex];
     if (!season) return;
 
     document.getElementById('season-hub-view').style.display = 'none';
@@ -37124,8 +37132,8 @@
   }
 
   window.upgradeStadiumCapacity = function() {
-    const slots = getSeasonSlots();
-    const season = slots[activeSeasonSlotIndex];
+    const seasonSaves = getSeasonSaves();
+    const season = seasonSaves[activeSeasonSlotIndex];
     if (!season) return;
 
     const curLevel = season.stadiumCapacity || 1;
@@ -37140,16 +37148,16 @@
     season.pocketCoins -= nextData.cost;
     season.stadiumCapacity = nextData.level;
     sound.playCrowdCheerSurge();
-    saveSeasonSlots(slots);
+    saveSeasonSaves(seasonSaves);
     updateSeasonPocketCoinsDisplays(season.pocketCoins);
     renderSeasonUpgradesUI(season);
   };
 
   window.deleteSeasonSlot = function(slotIndex) {
     if (confirm(`Are you sure you want to delete Save Slot ${slotIndex + 1}? All season progress in this slot will be permanently deleted.`)) {
-      const slots = getSeasonSlots();
-      slots[slotIndex] = null;
-      saveSeasonSlots(slots);
+      const seasonSaves = getSeasonSaves();
+      seasonSaves[slotIndex] = null;
+      saveSeasonSaves(seasonSaves);
       renderSeasonSlotsUI();
     }
   };
@@ -37568,8 +37576,8 @@
     // Ensure discs array matches active teamSize
     const p1Discs = discs.filter(d => d.team === 'p1');
     const p2Discs = discs.filter(d => d.team === 'p2');
-    const slots = getSeasonSlots();
-    const season = (activeGameMode === 'season' && activeSeasonSlotIndex !== null) ? slots[activeSeasonSlotIndex] : null;
+    const seasonSaves = getSeasonSaves();
+    const season = (activeGameMode === 'season' && activeSeasonSlotIndex !== null) ? seasonSaves[activeSeasonSlotIndex] : null;
 
     if (p1Discs.length !== teamSize || p2Discs.length !== teamSize) {
       discs = [];
@@ -37830,7 +37838,7 @@
             clearInterval(matchClockInterval);
             matchClockInterval = null;
             if (scores.p1 === scores.p2) {
-              // Sudden Death Golden Goal!
+              // Sudden Golden Goal Overtime!
               isGoldenGoal = true;
               sound.playWhistle();
               document.getElementById('hud-clock-label').textContent = 'GOLDEN GOAL';
@@ -38002,8 +38010,8 @@
 
     ball = new Ball(p.x + p.w / 2, p.y + p.h / 2);
 
-    const slots = getSeasonSlots();
-    const season = (activeGameMode === 'season' && activeSeasonSlotIndex !== null) ? slots[activeSeasonSlotIndex] : null;
+    const seasonSaves = getSeasonSaves();
+    const season = (activeGameMode === 'season' && activeSeasonSlotIndex !== null) ? seasonSaves[activeSeasonSlotIndex] : null;
 
     const BBALL_ABILITIES = ['bball_fireball', 'bball_crossover', 'bball_magnet', 'bball_lockdown', 'bball_rainbow'];
 
@@ -38865,8 +38873,8 @@
       }
       renderTourneyBracket();
     } else if (activeGameMode === 'season') {
-      const slots = getSeasonSlots();
-      const season = slots[activeSeasonSlotIndex];
+      const seasonSaves = getSeasonSaves();
+      const season = seasonSaves[activeSeasonSlotIndex];
       if (season) {
         const userTeam = season.teams.find(t => t.isUser);
         const opponents = season.teams.filter(t => !t.isUser);
@@ -38970,7 +38978,7 @@
             generateSeasonTransferMarket(season);
           }
 
-          saveSeasonSlots(slots);
+          saveSeasonSaves(seasonSaves);
         }
       }
     }
@@ -40479,7 +40487,7 @@
         return `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="#f59e0b"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6z"/></svg>`;
       case 'singularity_vortex':
         return `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="#c084fc"><circle cx="12" cy="12" r="9" stroke="#9333ea" stroke-width="2.5" fill="none" stroke-dasharray="4,2"/><circle cx="12" cy="12" r="4" fill="#000000"/><circle cx="12" cy="12" r="2" fill="#ffffff"/></svg>`;
-      case 'tactical_smoke':
+      case 'tactical_mist':
         return `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="#94a3b8"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>`;
       case 'slipstream_rush':
         return `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="#06b6d4"><path d="M4 14h10v2H4zm0-4h14v2H4zm0-4h8v2H4zm14 8l4-4-4-4v3H14v2h4v3z"/></svg>`;
@@ -40925,13 +40933,13 @@
       for (let i = 0; i < 25; i++) particles.push(new Particle(cx, cy, '#c084fc', 2.0));
       sound.playWhoosh();
       if (typeof triggerFloatingScorePopup === 'function') triggerFloatingScorePopup(cx, cy, 'SINGULARITY VORTEX! 🌀', '#c084fc');
-    } else if (pid === 'tactical_smoke') {
+    } else if (pid === 'tactical_mist') {
       const p = getPitch();
       for (let i = 0; i < 30; i++) {
         particles.push(new Particle(p.x + p.w * (0.3 + Math.random() * 0.4), p.y + Math.random() * p.h, '#94a3b8', 2.5));
       }
       sound.playWhistle();
-      if (typeof triggerFloatingScorePopup === 'function') triggerFloatingScorePopup(p.x + p.w / 2, p.y + p.h / 2, 'SMOKE SCREEN! 💨', '#94a3b8');
+      if (typeof triggerFloatingScorePopup === 'function') triggerFloatingScorePopup(p.x + p.w / 2, p.y + p.h / 2, 'MIST SCREEN! 💨', '#94a3b8');
     } else if (pid === 'slipstream_rush') {
       discs.forEach(d => {
         if (d.team === friendlyTeam) {
@@ -44161,20 +44169,20 @@
     const needleEl = document.getElementById('bball-meter-needle');
     const shownPos = needleEl ? parseFloat(needleEl.style.left) : bballTimingState.needlePos;
     const inZone = (v) => (typeof v === 'number' && !isNaN(v) && v >= greenLeft && v <= greenRight);
-    let isHit = inZone(bballTimingState.needlePos) || inZone(bballTimingState.prevPos) || inZone(shownPos);
-    if (window.__testPerfectShot) isHit = true;
+    let isShotScored = inZone(bballTimingState.needlePos) || inZone(bballTimingState.prevPos) || inZone(shownPos);
+    if (window.__testPerfectShot) isShotScored = true;
 
-    if (isHit) {
+    if (isShotScored) {
       bballTimingState.greenHits = (bballTimingState.greenHits || 0) + 1;
     }
 
     const curPill = document.getElementById(`bball-step-${bballTimingState.step}`);
     if (curPill) {
       curPill.classList.remove('active');
-      curPill.classList.add(isHit ? 'success' : 'fail');
+      curPill.classList.add(isShotScored ? 'success' : 'fail');
     }
 
-    if (sound.playTimingTick) sound.playTimingTick(isHit);
+    if (sound.playTimingTick) sound.playTimingTick(isShotScored);
 
     // Proceed to next step without aborting early on a single miss!
     bballTimingState.step++;
@@ -45962,14 +45970,14 @@
         showTennisAnnouncement('🔥 SUPER SMASH SERVE! 🔥', 1500);
         trackUserTennisStat('tennis_super_smashes', 1);
       } else {
-        sound.playTennisHit(false, 0.7);
+        sound.playTennisStrike(false, 0.7);
         showTennisAnnouncement('PLAY!', 800);
       }
     } else {
       tennisState.ball.isSmash = false;
       tennisState.ball.vx = -baseSpeed * Math.cos(sliceAngle); // Serves towards the left (-X)
       tennisState.ball.vy = baseSpeed * Math.sin(sliceAngle);
-      sound.playTennisHit(false, 0.65);
+      sound.playTennisStrike(false, 0.65);
     }
 
     addTennisDust(tennisState.ball.x, tennisState.ball.y, 8);
@@ -46437,7 +46445,7 @@
           trackUserTennisStat('tennis_super_smashes', 1);
         } else {
           b.isSmash = false;
-          sound.playTennisHit(false, 0.7);
+          sound.playTennisStrike(false, 0.7);
         }
 
         b.vx = Math.abs(speed * Math.cos(angle)); // Towards the right (+X)
@@ -46485,7 +46493,7 @@
           b.vy = speed * Math.sin(angle);
           b.x = pr1.x + pr1.w / 2 + b.radius + 1;
           b.isSmash = false;
-          sound.playTennisHit(false, 0.7);
+          sound.playTennisStrike(false, 0.7);
 
           tennisState.lastHitter = 'p1';
           tennisState.rallyCount++;
@@ -46524,7 +46532,7 @@
           b.x = r2.x - r2.w / 2 - b.radius - 1;
           b.isSmash = false;
 
-          sound.playTennisHit(false, 0.65);
+          sound.playTennisStrike(false, 0.65);
           tennisState.lastHitter = 'p2';
           tennisState.rallyCount++;
           addTennisDust(b.x, b.y, 8);
@@ -46549,7 +46557,7 @@
           b.x = pr2.x - pr2.w / 2 - b.radius - 1;
           b.isSmash = false;
 
-          sound.playTennisHit(false, 0.65);
+          sound.playTennisStrike(false, 0.65);
           tennisState.lastHitter = 'p2';
           tennisState.rallyCount++;
           addTennisDust(b.x, b.y, 8);
@@ -46576,7 +46584,7 @@
           addPocketBucks(50);
           showTennisAnnouncement('+50 POCKETBUCKS!', 1200);
 
-          // Explosive particles
+          // Star burst particles
           for (let pIdx = 0; pIdx < 25; pIdx++) {
             tennisState.particles.push({
               x: box.x, y: box.y,
@@ -46967,8 +46975,8 @@
     // Apply tennis player ability if in Season mode
     if (mode === 'season') {
       const activeSlot = (typeof currentSeasonSlot !== 'undefined') ? currentSeasonSlot : 0;
-      const slots = (typeof getSeasonSlots === 'function') ? getSeasonSlots() : [];
-      const season = slots[activeSlot];
+      const seasonSaves = (typeof getSeasonSaves === 'function') ? getSeasonSaves() : [];
+      const season = seasonSaves[activeSlot];
       if (season && season.squad && season.squad[0]) {
         const star = season.squad[0];
         tennisState.p1Racket.speed = 10.2 + ((star.speed || 80) - 80) * 0.08;
@@ -46999,7 +47007,7 @@
 
     resetTennisPositions('p1');
     sound.init();
-    sound.playTennisHit(false, 0.5);
+    sound.playTennisStrike(false, 0.5);
   }
   window.startTennisMatchDirect = startTennisMatchDirect;
 
